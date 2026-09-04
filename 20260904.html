@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixel Quest｜2D 平台冒險</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111827;color:#fff;font-family:system-ui,"Noto Sans TC",sans-serif;display:flex;justify-content:center;min-height:100vh;padding:18px}.wrap{width:min(1100px,100%)}h1{text-align:center;margin:4px 0 10px;font-size:clamp(24px,4vw,40px)}.hud{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}.pill{background:#1f2937;border:1px solid #374151;border-radius:999px;padding:7px 14px;font-weight:700}.game{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border:3px solid #374151;border-radius:18px;background:linear-gradient(#38bdf8 0%,#bae6fd 65%,#86efac 65%,#22c55e 100%);box-shadow:0 18px 50px #0008}.game canvas{width:100%;height:100%;display:block;image-rendering:pixelated}.overlay{position:absolute;inset:0;display:none;place-items:center;background:#020617b8;text-align:center;padding:20px}.card{background:#111827ee;border:2px solid #64748b;border-radius:18px;padding:24px;min-width:min(90%,420px)}button{border:0;border-radius:10px;padding:11px 16px;font-size:16px;font-weight:800;cursor:pointer;margin:4px;background:#fbbf24;color:#111827}button:hover{filter:brightness(1.1)}.help{text-align:center;color:#cbd5e1;margin:10px 0;font-size:14px}.mobile{display:none;text-align:center}.mobile button{width:62px;height:48px;padding:0} @media(max-width:700px){.mobile{display:block}}
+</style>
+</head>
+<body><div class="wrap">
+<h1>🧭 Pixel Quest｜2D 平台冒險</h1>
+<div class="hud"><span class="pill">❤️ 生命：<b id="lives">3</b></span><span class="pill">🪙 金幣：<b id="coins">0</b></span><span class="pill">🚩 檢查點：<b id="checkpoint">起點</b></span><span class="pill">🏁 關卡：<b id="level">1</b></span></div>
+<div class="game"><canvas id="c" width="960" height="540"></canvas><div id="overlay" class="overlay"><div class="card"><h2 id="overTitle">你掉下去了！</h2><p id="overText">別擔心，從最近的檢查點再出發。</p><button id="restart">重新開始</button><button id="next" style="display:none">下一關</button></div></div></div>
+<div class="help">操作：← → / A D 移動　↑ / W / 空白鍵 跳躍（二段跳）　R 重新開始</div>
+<div class="mobile"><button data-k="left">◀</button><button data-k="jump">▲</button><button data-k="right">▶</button></div>
+</div>
+<script>
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');let keys={},mobile={};
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if([' ','arrowup','arrowleft','arrowright'].includes(e.key.toLowerCase()))e.preventDefault();if(e.key.toLowerCase()==='r')resetLevel()});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.querySelectorAll('.mobile button').forEach(b=>{let k=b.dataset.k;b.onpointerdown=()=>mobile[k]=true;b.onpointerup=b.onpointerleave=()=>mobile[k]=false});
+const levels=[
+{spawn:[70,430],goal:[890,90],plats:[[0,500,960,40],[70,420,150,18],[285,360,140,18],[500,430,130,18],[690,330,140,18],[820,210,100,18]],coins:[[130,385],[340,325],[550,395],[750,295],[860,175]],haz:[[240,480,45,20],[430,480,55,20],[635,480,55,20]],moving:{x:400,y:250,w:120,h:18,dx:0.9,min:330,max:650}},
+{spawn:[55,430],goal:[890,70],plats:[[0,500,960,40],[50,420,120,18],[220,470,110,18],[360,370,130,18],[540,290,120,18],[700,400,110,18],[820,180,100,18]],coins:[[100,385],[265,435],[410,335],[590,255],[750,365],[865,145]],haz:[[175,480,45,20],[330,480,30,20],[675,480,50,20]],moving:{x:480,y:190,w:120,h:18,dx:1.1,min:300,max:700}}
+];
+let L=0,p,spawn,checkpoint,coins,life,cam=0,won=false,dead=false,moving;
+function init(){life=3;coins=0;checkpoint=[...levels[L].spawn];spawn=[...checkpoint];load();document.getElementById('overlay').style.display='none'}
+function load(){let d=levels[L];p={x:spawn[0],y:spawn[1],w:28,h:38,vx:0,vy:0,on:false,jumps:0};checkpoint=[...spawn];moving={...d.moving};dead=false;won=false;updateHud()}
+function resetLevel(){spawn=[...levels[L].spawn];init()}
+function die(){if(dead||won)return;life--;if(life<=0){dead=true;show('挑戰失敗','生命用完了，再試一次吧！',false)}else{p.x=checkpoint[0];p.y=checkpoint[1]-50;p.vx=p.vy=0;updateHud()}}
+function show(t,s,n){document.getElementById('overTitle').textContent=t;document.getElementById('overText').textContent=s;document.getElementById('next').style.display=n?'inline-block':'none';document.getElementById('overlay').style.display='grid'}
+function updateHud(){document.getElementById('lives').textContent=life;document.getElementById('coins').textContent=coins;document.getElementById('checkpoint').textContent=checkpoint[0]===levels[L].spawn[0]?'起點':'已啟用';document.getElementById('level').textContent=L+1}
+function rectHit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function update(){if(dead||won)return;let d=levels[L],left=keys['arrowleft']||keys['a']||mobile.left,right=keys['arrowright']||keys['d']||mobile.right,jump=keys['arrowup']||keys['w']||keys[' ']||mobile.jump;
+let wasJump=p._jump||false;p._jump=jump;if(jump&&!wasJump&&p.jumps<2){p.vy=-12;p.jumps++}
+p.vx+=(right?0.8:0)-(left?0.8:0);p.vx*=0.82;p.vx=Math.max(-6,Math.min(6,p.vx));p.vy+=0.55;p.vy=Math.min(15,p.vy);p.x+=p.vx;p.y+=p.vy;p.on=false;
+// moving platform
+moving.x+=moving.dx;if(moving.x<moving.min||moving.x>moving.max)moving.dx*=-1;let plats=d.plats.map(a=>({x:a[0],y:a[1],w:a[2],h:a[3]}));plats.push({x:moving.x,y:moving.y,w:moving.w,h:moving.h});
+for(const q of plats){if(p.vy>=0&&p.x+p.w>q.x&&p.x<q.x+q.w&&p.y+p.h>=q.y&&p.y+p.h<=q.y+q.h+p.vy+2){p.y=q.y-p.h;p.vy=0;p.on=true;p.jumps=0}}
+if(p.x<0)p.x=0;if(p.x+p.w>960)p.x=960-p.w;if(p.y>590)die();
+for(const h of d.haz){let q={x:h[0],y:h[1],w:h[2],h:h[3]};if(rectHit(p,q))die()}
+for(let i=d.coins.length-1;i>=0;i--){let q={x:d.coins[i][0]-9,y:d.coins[i][1]-9,w:18,h:18};if(rectHit(p,q)){d.coins.splice(i,1);coins++;updateHud()}}
+if(p.x>620&&p.x<800&&p.y<390&&checkpoint[0]===d.spawn[0]){checkpoint=[p.x,p.y+50];updateHud()}
+let g={x:d.goal[0],y:d.goal[1],w:24,h:120};if(rectHit(p,g)){won=true;show('🎉 關卡完成！','你成功抵達目標旗幟！',L<levels.length-1)}
+cam=Math.max(0,Math.min(240,p.x-300));draw()}
+function draw(){let d=levels[L];ctx.clearRect(0,0,960,540);ctx.save();ctx.translate(-cam,0);ctx.fillStyle='#ffffff55';for(let i=0;i<12;i++){ctx.beginPath();ctx.arc(i*100+30,70+(i%3)*35,22,0,7);ctx.fill()}
+for(const a of d.plats){ctx.fillStyle='#334155';ctx.fillRect(a[0],a[1],a[2],a[3]);ctx.fillStyle='#22c55e';ctx.fillRect(a[0],a[1],a[2],5)}
+ctx.fillStyle='#7c3aed';ctx.fillRect(moving.x,moving.y,moving.w,moving.h);ctx.fillStyle='#c4b5fd';ctx.fillRect(moving.x,moving.y,moving.w,4);
+for(const h of d.haz){ctx.fillStyle='#ef4444';for(let x=h[0];x<h[0]+h[2];x+=12){ctx.beginPath();ctx.moveTo(x,h[1]+h[3]);ctx.lineTo(x+6,h[1]);ctx.lineTo(x+12,h[1]+h[3]);ctx.fill()}}
+for(const c of d.coins){ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(c[0],c[1],9,0,7);ctx.fill();ctx.fillStyle='#854d0e';ctx.font='bold 12px sans-serif';ctx.fillText('$',c[0]-4,c[1]+4)}
+// flag
+ctx.fillStyle='#f8fafc';ctx.fillRect(d.goal[0],d.goal[1],5,120);ctx.fillStyle='#ef4444';ctx.beginPath();ctx.moveTo(d.goal[0]+5,d.goal[1]);ctx.lineTo(d.goal[0]+55,d.goal[1]+20);ctx.lineTo(d.goal[0]+5,d.goal[1]+40);ctx.fill();
+// player
+ctx.fillStyle='#2563eb';ctx.fillRect(p.x,p.y,p.w,p.h);ctx.fillStyle='#f8fafc';ctx.fillRect(p.x+6,p.y+8,5,6);ctx.fillRect(p.x+18,p.y+8,5,6);ctx.fillStyle='#111827';ctx.fillRect(p.x+9,p.y+25,12,4);ctx.restore()}
+document.getElementById('restart').onclick=()=>{document.getElementById('overlay').style.display='none';init()};document.getElementById('next').onclick=()=>{L=(L+1)%levels.length;init()};
+init();function loop(){update();requestAnimationFrame(loop)}loop();
+</script></body></html>
