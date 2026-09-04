@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interactive Particle Field</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050816;color:#fff;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif}canvas{position:fixed;inset:0;width:100%;height:100%;cursor:crosshair}.panel{position:fixed;top:18px;left:18px;width:300px;padding:18px;border:1px solid #ffffff1c;border-radius:18px;background:#081024cc;backdrop-filter:blur(14px);box-shadow:0 18px 50px #0008}.title{font-size:20px;font-weight:800;margin-bottom:4px}.sub{font-size:12px;color:#9ca9c6;margin-bottom:16px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0;font-size:13px}.row input[type=range]{width:145px;accent-color:#65d9ff}.val{width:40px;text-align:right;color:#73e5ff;font-variant-numeric:tabular-nums}.colors{display:flex;gap:8px}.swatch{width:30px;height:30px;border-radius:9px;border:1px solid #fff4;cursor:pointer}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.buttons button{border:0;border-radius:10px;padding:10px 8px;background:#16233f;color:#eaf5ff;font-weight:700;cursor:pointer}.buttons button:hover{background:#21345a}.buttons button.primary{background:#167da1}.hint{font-size:11px;color:#7f8ca8;margin-top:12px;line-height:1.5}@media(max-width:600px){.panel{width:calc(100% - 28px);left:14px;top:14px;padding:14px}.row input[type=range]{width:42vw}}
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+<div class="panel">
+<div class="title">✦ 互動粒子場</div><div class="sub">移動游標，讓粒子形成即時旋渦與光跡</div>
+<div class="row"><span>粒子數量</span><input id="count" type="range" min="200" max="2500" step="50" value="900"><span id="countV" class="val">900</span></div>
+<div class="row"><span>旋渦力道</span><input id="force" type="range" min="0.1" max="3" step="0.1" value="1.1"><span id="forceV" class="val">1.1</span></div>
+<div class="row"><span>軌跡長度</span><input id="trail" type="range" min="0.70" max="0.99" step="0.01" value="0.90"><span id="trailV" class="val">0.90</span></div>
+<div class="row"><span>背景</span><div class="colors"><button class="swatch" data-bg="#050816" style="background:#050816" title="深藍"></button><button class="swatch" data-bg="#000000" style="background:#000" title="黑色"></button><button class="swatch" data-bg="#101010" style="background:#101010" title="深灰"></button><button class="swatch" data-bg="#071b1b" style="background:#071b1b" title="墨綠"></button></div></div>
+<div class="buttons"><button id="clear">清除粒子</button><button id="reset">重置</button><button id="shot" class="primary" style="grid-column:1/-1">⬇ 下載截圖</button></div>
+<div class="hint">滑鼠靠近粒子會產生旋轉吸引力；按住滑鼠可增強擾動。觸控裝置可直接拖曳。</div>
+</div>
+<script>
+const c=document.getElementById('field'),x=c.getContext('2d');let W,H,dpr,particles=[],mx=-9999,my=-9999,down=false,bg='#050816';
+const cfg={count:900,force:1.1,trail:.90};
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0)}
+function particle(){let a=Math.random()*Math.PI*2,r=Math.sqrt(Math.random())*Math.max(W,H)*.55;return{x:W/2+Math.cos(a)*r,y:H/2+Math.sin(a)*r,vx:(Math.random()-.5)*.7,vy:(Math.random()-.5)*.7,size:Math.random()*1.8+.5,h:Math.random()*360,life:Math.random()}}
+function rebuild(){particles=Array.from({length:cfg.count},particle)}
+function pointer(e){const r=c.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top}c.addEventListener('pointermove',pointer);c.addEventListener('pointerdown',e=>{down=true;pointer(e)});addEventListener('pointerup',()=>down=false);c.addEventListener('pointerleave',()=>{mx=-9999;my=-9999});
+function draw(){x.fillStyle=bg+'e6';x.fillRect(0,0,W,H);for(const p of particles){let dx=mx-p.x,dy=my-p.y,dist=Math.hypot(dx,dy),rad=260;if(dist<rad){let q=(1-dist/rad)*cfg.force*(down?2.1:1),nx=dx/(dist||1),ny=dy/(dist||1);p.vx+=(-ny*q*.22+nx*q*.045);p.vy+=(nx*q*.22+ny*q*.045)}p.vx*=.985;p.vy*=.985;p.x+=p.vx;p.y+=p.vy;if(p.x<-30||p.x>W+30||p.y<-30||p.y>H+30){Object.assign(p,particle());p.x=Math.random()<.5?Math.random()*W:(Math.random()<.5?-10:W+10);p.y=Math.random()*H}p.h=(p.h+.35)%360;x.beginPath();x.fillStyle=`hsla(${p.h},95%,68%,${.65+p.size*.12})`;x.arc(p.x,p.y,p.size,0,Math.PI*2);x.fill()}}
+function loop(){draw();requestAnimationFrame(loop)}
+function sync(id,key,out,parse){const el=document.getElementById(id),o=document.getElementById(out);el.oninput=()=>{cfg[key]=parse(el.value);o.textContent=el.value;if(key==='count')rebuild()}}sync('count','count','countV',Number);sync('force','force','forceV',Number);sync('trail','trail','trailV',Number);
+document.getElementById('clear').onclick=()=>particles=[];document.getElementById('reset').onclick=()=>{cfg.count=900;cfg.force=1.1;cfg.trail=.90;for(const [id,v] of [['count',900],['force',1.1],['trail',.90]]){document.getElementById(id).value=v;document.getElementById(id+'V').textContent=v}bg='#050816';rebuild()};document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>bg=b.dataset.bg);
+document.getElementById('shot').onclick=()=>{const out=document.createElement('canvas');out.width=W*dpr;out.height=H*dpr;const ox=out.getContext('2d');ox.drawImage(c,0,0);const a=document.createElement('a');a.download='particle-field.png';a.href=out.toDataURL('image/png');a.click()};
+addEventListener('resize',resize);resize();rebuild();loop();
+</script>
+</body></html>
