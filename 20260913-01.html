@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓AI解決我的生活大小事｜學員資料</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;background:linear-gradient(135deg,#eef4ff,#f8f9fc);color:#333}.header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;text-align:center;padding:35px 20px;box-shadow:0 5px 15px rgba(0,0,0,.15)}.header h1{margin:0 0 10px;font-size:32px}.header p{margin:0;font-size:17px;opacity:.95}.container{max-width:1400px;margin:25px auto;padding:0 20px}.controls{background:white;padding:20px;border-radius:18px;box-shadow:0 5px 18px rgba(0,0,0,.08);margin-bottom:25px}.search-box{width:100%;padding:14px 18px;font-size:17px;border:2px solid #ddd;border-radius:12px;outline:none;transition:.3s}.search-box:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}.buttons button{border:none;padding:10px 18px;border-radius:10px;cursor:pointer;font-size:15px;background:#eef2ff;color:#4338ca;transition:.2s}.buttons button:hover{transform:translateY(-2px);background:#e0e7ff}.buttons button.active{background:#4f46e5;color:white}.stats{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:25px}.stat{flex:1;min-width:150px;background:white;border-radius:15px;padding:18px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,.07)}.stat-number{display:block;font-size:28px;font-weight:bold;color:#4f46e5}.stat-title{color:#666;margin-top:5px}.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}.card{background:white;border-radius:20px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:all .25s ease;border:1px solid #eee;position:relative;overflow:hidden}.card:hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(0,0,0,.14)}.card::before{content:"";position:absolute;top:0;left:0;width:100%;height:5px;background:linear-gradient(90deg,#4f46e5,#a855f7)}.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.number{width:42px;height:42px;border-radius:50%;background:#eef2ff;color:#4338ca;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:17px}.badge{padding:6px 12px;border-radius:20px;font-size:13px;font-weight:bold}.old{background:#fff7ed;color:#c2410c}.new{background:#ecfdf5;color:#047857}.name{font-size:24px;font-weight:bold;margin-bottom:5px}.age{display:inline-block;font-size:15px;color:#666;margin-bottom:18px}.info{margin-top:12px}.label{font-size:14px;color:#6366f1;font-weight:bold;margin-bottom:5px}.content{line-height:1.7;font-size:15px;color:#444}.highlight{margin-top:15px;padding:14px;border-radius:12px;background:#f8f7ff;border-left:4px solid #7c3aed;line-height:1.7;font-size:15px}.no-result{text-align:center;padding:50px;color:#777;display:none}footer{text-align:center;padding:35px 20px;color:#777;font-size:14px}@media(max-width:600px){.header h1{font-size:25px}.header p{font-size:15px}.container{padding:0 12px}.card-grid{grid-template-columns:1fr}.card{padding:18px}.buttons button{flex:1;min-width:90px}}
+</style>
+</head>
+<body>
+<header class="header"><h1>🤖 讓AI解決我的生活大小事</h1><p>彰化社區大學｜學員資料卡片</p></header>
+<div class="container">
+<div class="stats"><div class="stat"><span class="stat-number" id="totalCount">0</span><div class="stat-title">學員人數</div></div><div class="stat"><span class="stat-number" id="oldCount">0</span><div class="stat-title">舊學員</div></div><div class="stat"><span class="stat-number" id="newCount">0</span><div class="stat-title">新學員</div></div></div>
+<div class="controls"><input type="text" id="search" class="search-box" placeholder="🔍 搜尋姓名、背景、印象深刻的內容..."><div class="buttons"><button class="active" onclick="filterStudents('all',this)">👥 全部</button><button onclick="filterStudents('old',this)">👴 舊學員</button><button onclick="filterStudents('new',this)">🆕 新學員</button><button onclick="sortAge('desc')">🔽 年齡由大到小</button><button onclick="sortAge('asc')">🔼 年齡由小到大</button><button onclick="sortNumber()">🔢 編號排序</button></div></div>
+<div id="cardGrid" class="card-grid"></div><div id="noResult" class="no-result">😅 找不到符合條件的學員</div>
+</div>
+<footer>© 2026 彰化社區大學｜讓AI解決我的生活大小事</footer>
+<script>
+const students=[
+{no:1,name:"王@珠",age:68,type:"old",background:"已上課很多期，想學習AI",highlight:"因為想學習AI，所以來社大上課"},
+{no:2,name:"林@慧",age:53,type:"old",background:"第2次上課，上學期缺課較多",highlight:"再來學一次"},
+{no:3,name:"許@榛",age:47,type:"old",background:"第3次上課，上學期缺課較多",highlight:"希望把AI運用在工作上"},
+{no:4,name:"曾@美",age:64,type:"old",background:"第2次上課",highlight:"因有事已向老師請假一個月"},
+{no:5,name:"黃@庭",age:56,type:"old",background:"曾多次上課",highlight:"週六下午來這邊上課湊人氣，提升電腦學習力"},
+{no:6,name:"王@貞",age:52,type:"old",background:"第2次上課",highlight:"想要過充實的週六"},
+{no:7,name:"黃@香",age:70,type:"old",background:"第3次來社大上課",highlight:"因為想學習AI"},
+{no:8,name:"林@華",age:70,type:"old",background:"已有多次學習經驗",highlight:"星期六放假日很無趣，來認識新東西、交年輕朋友"},
+{no:9,name:"鄭@彰",age:65,type:"old",background:"第2次上課",highlight:"想長知識追上世界的潮流"},
+{no:10,name:"楊@姝",age:67,type:"old",background:"喜歡課程氛圍",highlight:"溫故知新"},
+{no:11,name:"—",age:null,type:"",background:"未提供",highlight:"—"},
+{no:12,name:"林@雲",age:26,type:"old",background:"第2次上課",highlight:"課程很先進、跟得上時事，老師又很細心"},
+{no:13,name:"林@儒",age:61,type:"new",background:"第1次上課",highlight:"想增加AI的能力"},
+{no:14,name:"—",age:null,type:"",background:"未提供",highlight:"—"},
+{no:15,name:"許@",age:69,type:"new",background:"第1次上課，已有AI使用經驗",highlight:"會用，但是想再深入一點學習"},
+{no:16,name:"粘@莉",age:63,type:"new",background:"初次來社大上課",highlight:"現在是AI時代，希望將AI帶入生活"},
+{no:17,name:"莊@章",age:62,type:"new",background:"第1次來上課",highlight:"想利用時間空檔學AI"},
+{no:18,name:"施@蓁",age:58,type:"new",background:"第1次來社大上課",highlight:"因為想學習AI"},
+{no:19,name:"曾@銘",age:65,type:"new",background:"第1次上課，想深入了解AI",highlight:"想了解AI有多難學、有多廣度"},
+{no:20,name:"廖@昭",age:75,type:"new",background:"曾參加過2次AI課程",highlight:"重修的主要目的是喚起學習記憶"},
+{no:21,name:"李@平",age:67,type:"new",background:"第1次上課，退休後時間較多",highlight:"退休沒事做，所以想來學習新知"},
+{no:22,name:"陸@蘭",age:37,type:"new",background:"第1次來上課",highlight:"想了解認識AI，能應用到生活"},
+{no:23,name:"林@鋐",age:19,type:"new",background:"第1次來上課",highlight:"怕媽媽自己一個人來上課太無聊，所以來上課"},
+{no:24,name:"高@弘",age:50,type:"new",background:"第1次上課",highlight:"週六下午在家無聊，所以來上課"},
+{no:25,name:"施@玲",age:62,type:"new",background:"第1次上課",highlight:"週六下午在家無聊，想來學個興趣"},
+{no:26,name:"孫@雲",age:67,type:"new",background:"第1次上AI課",highlight:"羨慕同學生成的圖片、影片，也想擁有這個能力"},
+{no:27,name:"葉@美",age:70,type:"new",background:"第1次學AI",highlight:"想知道AI怎樣應用到生活上"}
+];
+let currentFilter="all";
+function render(data){const grid=document.getElementById("cardGrid"),noResult=document.getElementById("noResult");grid.innerHTML="";if(data.length===0){noResult.style.display="block";return}noResult.style.display="none";data.forEach(s=>{let badge=s.type==="old"?'<span class="badge old">👴 舊學員</span>':s.type==="new"?'<span class="badge new">🆕 新學員</span>':'';let ageText=s.age===null?"年齡未提供":`${s.age} 歲`;const card=document.createElement("div");card.className="card";card.innerHTML=`<div class="card-top"><div class="number">${s.no}</div>${badge}</div><div class="name">${s.name}</div><div class="age">🎂 ${ageText}</div><div class="info"><div class="label">📚 學習背景</div><div class="content">${s.background}</div></div><div class="highlight"><div class="label">⭐ 印象深刻</div>${s.highlight}</div>`;grid.appendChild(card)});updateStats()}
+function updateStats(){const v=students.filter(s=>s.name!=="—");document.getElementById("totalCount").textContent=v.length;document.getElementById("oldCount").textContent=v.filter(s=>s.type==="old").length;document.getElementById("newCount").textContent=v.filter(s=>s.type==="new").length}
+function filterStudents(type,button){currentFilter=type;document.querySelectorAll(".buttons button").forEach(b=>b.classList.remove("active"));button.classList.add("active");applySearch()}
+function applySearch(){const k=document.getElementById("search").value.toLowerCase().trim();let r=students.filter(s=>{const mt=currentFilter==="all"||s.type===currentFilter;const text=`${s.no}${s.name}${s.age}${s.background}${s.highlight}`.toLowerCase();return mt&&text.includes(k)});render(r)}
+function sortAge(direction){let r=[...students];r.sort((a,b)=>{if(a.age===null)return 1;if(b.age===null)return-1;return direction==="desc"?b.age-a.age:a.age-b.age});render(r)}
+function sortNumber(){let r=[...students];r.sort((a,b)=>a.no-b.no);render(r)}
+document.getElementById("search").addEventListener("input",applySearch);render(students);
+</script>
+</body>
+</html>
