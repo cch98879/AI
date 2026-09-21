@@ -1,5 +1,8 @@
+
 <!DOCTYPE html>
-<html lang="zh-Hant"><head>
+<html lang="zh-Hant">
+
+<head>
 
 <meta charset="UTF-8">
 
@@ -141,6 +144,23 @@ h1 {
 
 
 /* ================================
+   鎖定後的輸入框
+   ================================ */
+
+.setting-row input:disabled {
+
+    background: #e9ecef;
+
+    color: #555;
+
+    cursor: not-allowed;
+
+    border-color: #bbb;
+
+}
+
+
+/* ================================
    儲存庫資訊
    ================================ */
 
@@ -198,7 +218,9 @@ button:hover {
 }
 
 
-/* 載入按鈕 */
+/* ================================
+   載入按鈕
+   ================================ */
 
 .btn-load {
 
@@ -207,11 +229,30 @@ button:hover {
 }
 
 
-/* 下載按鈕 */
+/* ================================
+   下載按鈕
+   ================================ */
 
 .btn-download {
 
     background: #238636;
+
+}
+
+
+/* ================================
+   下載後的按鈕
+   ================================ */
+
+.btn-download:disabled {
+
+    background: #6c757d;
+
+    color: #eee;
+
+    cursor: not-allowed;
+
+    opacity: 0.65;
 
 }
 
@@ -436,7 +477,21 @@ a {
 
     <h1>
 
-讓AI解決我的生活大小事<br>📦<a href="https://github.com/"><font color="blue"><u>GitHUB</u></font></a>儲存庫空間的檔案
+        讓AI解決我的生活大小事<br>
+
+        📦
+
+        <a href="https://github.com/">
+
+            <font color="blue">
+
+                <u>GitHUB</u>
+
+            </font>
+
+        </a>
+
+        儲存庫空間的檔案
 
     </h1>
 
@@ -448,6 +503,32 @@ a {
     <div class="github-setting">
 
 
+        <!-- ================================
+             ★ 網頁管理員
+             ================================ -->
+
+        <div class="setting-row">
+
+            <label for="webAdmin">
+
+                網頁管理員
+
+            </label>
+
+
+            <input
+                type="text"
+                id="webAdmin"
+                value="李信賢"
+            >
+
+        </div>
+
+
+        <!-- ================================
+             GitHub 帳號
+             ================================ -->
+
         <div class="setting-row">
 
             <label for="githubUser">
@@ -457,10 +538,18 @@ a {
             </label>
 
 
-            <input type="text" id="githubUser" value="cch98879">
+            <input
+                type="text"
+                id="githubUser"
+                value="cch98879"
+            >
 
         </div>
 
+
+        <!-- ================================
+             儲存庫名稱
+             ================================ -->
 
         <div class="setting-row">
 
@@ -471,7 +560,11 @@ a {
             </label>
 
 
-            <input type="text" id="githubRepo" value="AI">
+            <input
+                type="text"
+                id="githubRepo"
+                value="AI"
+            >
 
         </div>
 
@@ -515,7 +608,10 @@ a {
     <div class="toolbar">
 
 
-        <button class="btn-load" onclick="startLoad()">
+        <button
+            class="btn-load"
+            onclick="startLoad()"
+        >
 
             🔍 載入儲存庫
 
@@ -536,7 +632,10 @@ a {
         </button>
 
 
-        <button class="btn-download" onclick="downloadHTML()">
+        <button
+            class="btn-download"
+            onclick="downloadHTML()"
+        >
 
             📥 下載此網頁index.html
 
@@ -550,7 +649,10 @@ a {
          目前路徑
          ================================ -->
 
-    <div class="path" id="currentPath">
+    <div
+        class="path"
+        id="currentPath"
+    >
 
         📁 /
 
@@ -599,6 +701,45 @@ let currentPath = "";
    ========================================= */
 
 let historyPath = [];
+
+
+/* =========================================
+   ★★★ 判斷目前是否已下載 ★★★
+   ========================================= */
+
+let isDownloaded = false;
+
+
+/* =========================================
+   頁面載入時檢查下載狀態
+   ========================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        if (isDownloaded) {
+
+            lockDownloadState();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   取得網頁管理員
+   ========================================= */
+
+function getWebAdmin() {
+
+    return document
+        .getElementById("webAdmin")
+        .value
+        .trim();
+
+}
 
 
 /* =========================================
@@ -1304,61 +1445,260 @@ function goBack() {
 
 
 /* =========================================
+   ★★★ 鎖定下載狀態 ★★★
+
+   鎖定：
+   ① 網頁管理員
+   ② GitHub帳號
+   ③ 儲存庫名稱
+   ④ 下載按鈕
+   ========================================= */
+
+function lockDownloadState() {
+
+
+    const webAdmin =
+        document.getElementById(
+            "webAdmin"
+        );
+
+
+    const userInput =
+        document.getElementById(
+            "githubUser"
+        );
+
+
+    const repoInput =
+        document.getElementById(
+            "githubRepo"
+        );
+
+
+    const downloadButton =
+        document.querySelector(
+            ".btn-download"
+        );
+
+
+    /* =====================================
+       鎖定網頁管理員
+       ===================================== */
+
+    if (webAdmin) {
+
+        webAdmin.disabled = true;
+
+    }
+
+
+    /* =====================================
+       鎖定 GitHub 帳號
+       ===================================== */
+
+    if (userInput) {
+
+        userInput.disabled = true;
+
+    }
+
+
+    /* =====================================
+       鎖定儲存庫名稱
+       ===================================== */
+
+    if (repoInput) {
+
+        repoInput.disabled = true;
+
+    }
+
+
+    /* =====================================
+       鎖定下載按鈕
+       ===================================== */
+
+    if (downloadButton) {
+
+        downloadButton.disabled = true;
+
+        downloadButton.innerHTML =
+            "📥 已下載 index.html";
+
+    }
+
+}
+
+
+/* =========================================
    ★★★ 下載目前完整 HTML ★★★
+
    檔名：index.html
    ========================================= */
 
 function downloadHTML() {
 
 
-    /*
-     * 先取得目前輸入的帳號與儲存庫
-     */
+    /* =====================================
+       防止重複下載
+       ===================================== */
+
+    if (isDownloaded) {
+
+        return;
+
+    }
+
+
+    /* =====================================
+       取得目前輸入內容
+       ===================================== */
+
+    const webAdminInput =
+        document.getElementById(
+            "webAdmin"
+        );
+
 
     const userInput =
-        document
-            .getElementById("githubUser");
+        document.getElementById(
+            "githubUser"
+        );
 
 
     const repoInput =
-        document
-            .getElementById("githubRepo");
+        document.getElementById(
+            "githubRepo"
+        );
 
 
-    /*
-     * 將目前輸入的內容
-     * 寫入 HTML 的 value 屬性
-     *
-     * 這樣下載後再次開啟 index.html
-     * 還會保留目前輸入的設定。
-     */
+    const webAdmin =
+        webAdminInput.value.trim();
+
+
+    const user =
+        userInput.value.trim();
+
+
+    const repo =
+        repoInput.value.trim();
+
+
+    /* =====================================
+       檢查網頁管理員
+       ===================================== */
+
+    if (!webAdmin) {
+
+        alert(
+            "請輸入網頁管理員姓名！"
+        );
+
+        webAdminInput.focus();
+
+        return;
+
+    }
+
+
+    /* =====================================
+       檢查 GitHub 帳號
+       ===================================== */
+
+    if (!user) {
+
+        alert(
+            "請輸入 GitHub 帳號！"
+        );
+
+        userInput.focus();
+
+        return;
+
+    }
+
+
+    /* =====================================
+       檢查儲存庫
+       ===================================== */
+
+    if (!repo) {
+
+        alert(
+            "請輸入 GitHub 儲存庫名稱！"
+        );
+
+        repoInput.focus();
+
+        return;
+
+    }
+
+
+    /* =====================================
+       ★ 將目前輸入內容寫入 HTML
+
+       確保下載後仍保留使用者輸入內容。
+       ===================================== */
+
+    webAdminInput.setAttribute(
+        "value",
+        webAdmin
+    );
+
 
     userInput.setAttribute(
         "value",
-        userInput.value
+        user
     );
 
 
     repoInput.setAttribute(
         "value",
-        repoInput.value
+        repo
     );
 
 
-    /*
-     * 複製整個 HTML 文件
-     */
+    /* =====================================
+       ★ 設定已下載狀態
+       ===================================== */
+
+    isDownloaded = true;
+
+
+    /* =====================================
+       ★ 鎖定目前頁面
+       ===================================== */
+
+    lockDownloadState();
+
+
+    /* =====================================
+       ★ 複製完整 HTML
+
+       因為前面已經：
+
+       ① 寫入 value
+       ② isDownloaded = true
+       ③ disabled = true
+
+       所以這些狀態都會被寫入
+       下載下來的 index.html。
+       ===================================== */
 
     const html =
+
         "<!DOCTYPE html>\n" +
+
         document.documentElement.outerHTML;
 
 
-    /*
-     * 建立 Blob
-     */
+    /* =====================================
+       建立 Blob
+       ===================================== */
 
     const blob =
+
         new Blob(
             [html],
             {
@@ -1368,17 +1708,20 @@ function downloadHTML() {
         );
 
 
-    /*
-     * 建立下載網址
-     */
+    /* =====================================
+       建立下載網址
+       ===================================== */
 
     const url =
-        URL.createObjectURL(blob);
+
+        URL.createObjectURL(
+            blob
+        );
 
 
-    /*
-     * 建立下載連結
-     */
+    /* =====================================
+       建立下載連結
+       ===================================== */
 
     const link =
         document.createElement("a");
@@ -1387,39 +1730,75 @@ function downloadHTML() {
     link.href = url;
 
 
-    /*
-     * ★ 固定下載檔名
-     */
+    /* =====================================
+       ★ 固定檔名
+       ===================================== */
 
     link.download =
         "index.html";
 
 
-    /*
-     * 執行下載
-     */
+    /* =====================================
+       執行下載
+       ===================================== */
 
-    document.body.appendChild(link);
+    document.body.appendChild(
+        link
+    );
+
 
     link.click();
 
 
-    /*
-     * 清理
-
-     */
-
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
+    document.body.removeChild(
+        link
+    );
 
 
-    /*
-     * 提示使用者
-     */
+    /* =====================================
+       清理 Blob URL
+       ===================================== */
+
+    setTimeout(
+        function() {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        1000
+    );
+
+
+    /* =====================================
+       提示使用者
+       ===================================== */
 
     alert(
-        "✅ 已下載 index.html"
+
+        "✅ 已下載 index.html\n\n" +
+
+        "網頁管理員：" +
+        webAdmin +
+        "\n" +
+
+        "GitHub帳號：" +
+        user +
+        "\n" +
+
+        "儲存庫名稱：" +
+        repo +
+        "\n\n" +
+
+        "🔒 網頁管理員已鎖定\n" +
+
+        "🔒 GitHub帳號已鎖定\n" +
+
+        "🔒 儲存庫名稱已鎖定\n" +
+
+        "🔒 下載按鈕已鎖定"
+
     );
 
 }
@@ -1427,6 +1806,6 @@ function downloadHTML() {
 </script>
 
 
+</body>
 
-
-</body></html>
+</html>
