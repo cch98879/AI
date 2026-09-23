@@ -297,13 +297,13 @@
 
 <div class="container">
 
-    <h1>📦 讓AI解決我的生活大小事-GitHUB儲存庫空間的檔案</h1>
+    <h1>📦 讓AI解決我的生活大小事-<font color="blue"><span id="showAdmin">李信賢</span></font>的網站</h1>
 
     <!-- ==================== 設定區 ==================== -->
     <div class="settings">
 
         <div class="form-row">
-            <label for="webAdmin">網頁管理員</label>
+            <label for="webAdmin">網站管理員</label>
             <input
                 type="text"
                 id="webAdmin"
@@ -338,14 +338,14 @@
                 type="button"
                 class="btn-load"
                 onclick="startLoad()">
-                🔍 載入儲存庫
+                🔍 載入GitHUB儲存庫
             </button>
 
             <button
                 type="button"
                 class="btn-back"
                 onclick="goBack()">
-                ⬅ 返回
+                ⬅ 返回前一頁
             </button>
 
             <button
@@ -369,7 +369,7 @@
         <span id="showAdmin">李信賢</span>
         <br>
 
-        <strong>📦 儲存庫：</strong>
+        <strong>📦 GitHUB儲存庫：</strong>
         <span id="repoInfo">尚未載入</span>
         <br>
 
@@ -385,6 +385,8 @@
 
     <!-- ==================== 路徑 ==================== -->
     <div class="path-bar">
+	🌐 <a href="https://github.com/"><font color="blue"><u>從GitHUB儲存庫_上傳檔案或刪除檔案</u></font></a>
+	<BR>
         📂 目前位置：
         <span id="currentPath">/</span>
     </div>
@@ -530,7 +532,7 @@ function startLoad() {
 
     if (!admin) {
 
-        alert("請輸入「網頁管理員」");
+        alert("請輸入「網站管理員」");
 
         document.getElementById("webAdmin").focus();
 
@@ -1239,7 +1241,7 @@ function goBack() {
 
         if (currentPath === "") {
 
-            alert("目前已經是根目錄");
+            alert("目前已經是首頁");
 
         } else {
 
