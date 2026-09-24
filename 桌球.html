@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>乒乓球</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#111;color:white;font-family:Arial,"Microsoft JhengHei",sans-serif;text-align:center;overflow:hidden}
+h1{margin:15px 0 5px;font-size:32px}
+#score{font-size:28px;margin:5px 0 10px;font-weight:bold}
+#gameContainer{width:90vw;max-width:1000px;margin:auto}
+canvas{display:block;width:100%;height:auto;background:#000;border:3px solid white;cursor:none}
+#message{margin-top:10px;font-size:18px}
+button{margin-top:10px;padding:10px 25px;font-size:18px;border:none;border-radius:8px;cursor:pointer}
+button:hover{background:#ddd}
+</style>
+</head>
+<body>
+<h1>🏓 彰化社區大學 115秋季班乒乓球大賽</h1>
+<div id="score"><span id="playerScore">0</span> : <span id="computerScore">0</span></div>
+<div id="gameContainer"><canvas id="gameCanvas" width="1000" height="600"></canvas></div>
+<div id="message">🖱️ 滑鼠移動控制左側球拍　⬆️⬇️ 方向鍵也可以控制左側球拍</div>
+<button onclick="restartGame()">重新開始</button>
+<script>
+const canvas=document.getElementById("gameCanvas"),ctx=canvas.getContext("2d");
+const playerScoreText=document.getElementById("playerScore"),computerScoreText=document.getElementById("computerScore");
+const paddleWidth=15,paddleHeight=100,ballSize=14;
+const player={x:30,y:250,width:paddleWidth,height:paddleHeight,speed:8};
+const computer={x:955,y:250,width:paddleWidth,height:paddleHeight,speed:5};
+const ball={x:493,y:293,size:ballSize,speedX:6,speedY:4};
+let playerScore=0,computerScore=0,upPressed=false,downPressed=false;
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowUp"){upPressed=true;e.preventDefault()}
+ if(e.key==="ArrowDown"){downPressed=true;e.preventDefault()}
+});
+document.addEventListener("keyup",e=>{
+ if(e.key==="ArrowUp")upPressed=false;
+ if(e.key==="ArrowDown")downPressed=false;
+});
+canvas.addEventListener("mousemove",e=>{
+ const rect=canvas.getBoundingClientRect();
+ const mouseY=(e.clientY-rect.top)*(canvas.height/rect.height);
+ player.y=mouseY-player.height/2;keepPaddleInside(player);
+});
+function keepPaddleInside(p){
+ if(p.y<0)p.y=0;
+ if(p.y+p.height>canvas.height)p.y=canvas.height-p.height;
+}
+function updatePlayer(){
+ if(upPressed)player.y-=player.speed;
+ if(downPressed)player.y+=player.speed;
+ keepPaddleInside(player);
+}
+function updateComputer(){
+ const pc=computer.y+computer.height/2,bc=ball.y+ball.size/2;
+ if(pc<bc-10)computer.y+=computer.speed;
+ if(pc>bc+10)computer.y-=computer.speed;
+ keepPaddleInside(computer);
+}
+function checkWallCollision(){
+ if(ball.y<=0){ball.y=0;ball.speedY*=-1}
+ if(ball.y+ball.size>=canvas.height){ball.y=canvas.height-ball.size;ball.speedY*=-1}
+}
+function checkPaddleCollision(p,isPlayer){
+ if(ball.x<p.x+p.width&&ball.x+ball.size>p.x&&ball.y<p.y+p.height&&ball.y+ball.size>p.y){
+  if(isPlayer)ball.x=p.x+p.width;else ball.x=p.x-ball.size;
+  ball.speedX*=-1;
+  const pc=p.y+p.height/2,bc=ball.y+ball.size/2;
+  const hit=(bc-pc)/(p.height/2);
+  ball.speedY=hit*6;
+  ball.speedX*=1.03;
+ }
+}
+function checkScore(){
+ if(ball.x+ball.size<0){computerScore++;computerScoreText.textContent=computerScore;resetBall(-1)}
+ if(ball.x>canvas.width){playerScore++;playerScoreText.textContent=playerScore;resetBall(1)}
+}
+function resetBall(direction){
+ ball.x=canvas.width/2-ball.size/2;
+ ball.y=canvas.height/2-ball.size/2;
+ ball.speedX=6*direction;
+ ball.speedY=(Math.random()>0.5?1:-1)*4;
+}
+function updateBall(){
+ ball.x+=ball.speedX;ball.y+=ball.speedY;
+ checkWallCollision();checkPaddleCollision(player,true);checkPaddleCollision(computer,false);checkScore();
+}
+function drawPaddle(p){ctx.fillStyle="white";ctx.fillRect(p.x,p.y,p.width,p.height)}
+function drawBall(){
+ ctx.fillStyle="white";ctx.beginPath();
+ ctx.arc(ball.x+ball.size/2,ball.y+ball.size/2,ball.size/2,0,Math.PI*2);ctx.fill();
+}
+function drawCenterLine(){
+ ctx.strokeStyle="#555";ctx.lineWidth=3;ctx.setLineDash([10,15]);
+ ctx.beginPath();ctx.moveTo(canvas.width/2,0);ctx.lineTo(canvas.width/2,canvas.height);ctx.stroke();ctx.setLineDash([]);
+}
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ drawCenterLine();drawPaddle(player);drawPaddle(computer);drawBall();
+}
+function gameLoop(){updatePlayer();updateComputer();updateBall();draw();requestAnimationFrame(gameLoop)}
+function restartGame(){
+ playerScore=0;computerScore=0;playerScoreText.textContent="0";computerScoreText.textContent="0";
+ player.y=canvas.height/2-paddleHeight/2;computer.y=canvas.height/2-paddleHeight/2;
+ resetBall(Math.random()>0.5?1:-1);
+}
+restartGame();gameLoop();
+</script>
+</body>
+</html>
