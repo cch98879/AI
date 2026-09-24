@@ -1,0 +1,1455 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_鼓</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#050714;
+    --panel:rgba(15,20,45,.72);
+    --line:rgba(120,150,255,.18);
+    --text:#eef3ff;
+    --muted:#8d9bc7;
+    --cyan:#00f5ff;
+    --pink:#ff39d6;
+    --purple:#9b5cff;
+    --green:#54ffb5;
+    --yellow:#ffe66d;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    color:var(--text);
+    font-family:
+        "Noto Sans CJK TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at 20% 20%,rgba(0,245,255,.13),transparent 28%),
+        radial-gradient(circle at 80% 15%,rgba(255,57,214,.12),transparent 30%),
+        radial-gradient(circle at 50% 90%,rgba(155,92,255,.13),transparent 32%),
+        #050714;
+
+    overflow-x:hidden;
+}
+
+/* 背景星點 */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+
+    background-image:
+        radial-gradient(circle,rgba(255,255,255,.8) 1px,transparent 1px),
+        radial-gradient(circle,rgba(0,245,255,.5) 1px,transparent 1px);
+
+    background-size:90px 90px,150px 150px;
+    background-position:10px 20px,40px 70px;
+    opacity:.12;
+}
+
+.container{
+    width:min(1400px,94%);
+    margin:auto;
+    padding:35px 0 50px;
+}
+
+/* 標題 */
+header{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.logo{
+    font-size:clamp(28px,5vw,52px);
+    font-weight:900;
+    letter-spacing:5px;
+
+    background:linear-gradient(
+        90deg,
+        var(--cyan),
+        #ffffff,
+        var(--pink),
+        var(--purple)
+    );
+
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+
+    text-shadow:
+        0 0 20px rgba(0,245,255,.35),
+        0 0 40px rgba(255,57,214,.25);
+}
+
+.subtitle{
+    color:var(--muted);
+    letter-spacing:4px;
+    font-size:13px;
+    margin-top:8px;
+}
+
+/* 主控制面板 */
+.panel{
+    background:linear-gradient(
+        145deg,
+        rgba(18,25,55,.85),
+        rgba(8,12,30,.76)
+    );
+
+    border:1px solid var(--line);
+    border-radius:24px;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.45),
+        inset 0 0 40px rgba(100,130,255,.035);
+
+    backdrop-filter:blur(18px);
+    padding:25px;
+}
+
+/* 控制區 */
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:25px;
+}
+
+.control-group{
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    padding:10px 14px;
+
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+}
+
+.control-group label{
+    color:var(--muted);
+    font-size:13px;
+}
+
+input[type=number]{
+    width:65px;
+    background:#090d20;
+    color:white;
+    border:1px solid rgba(0,245,255,.25);
+    border-radius:8px;
+    padding:7px;
+    text-align:center;
+    outline:none;
+}
+
+input[type=range]{
+    width:130px;
+    accent-color:var(--cyan);
+}
+
+/* 按鈕 */
+button{
+    border:0;
+    cursor:pointer;
+    color:white;
+
+    font-weight:700;
+    letter-spacing:1px;
+
+    border-radius:12px;
+    padding:11px 18px;
+
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    background:rgba(255,255,255,.11);
+}
+
+button:active{
+    transform:scale(.94);
+}
+
+.play{
+    min-width:120px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(0,245,255,.22),
+        rgba(155,92,255,.22)
+    );
+
+    border-color:rgba(0,245,255,.5);
+
+    box-shadow:
+        0 0 18px rgba(0,245,255,.2);
+}
+
+.play.playing{
+    color:#07101c;
+    background:linear-gradient(
+        135deg,
+        var(--cyan),
+        var(--green)
+    );
+
+    box-shadow:
+        0 0 25px rgba(0,245,255,.55);
+}
+
+.random{
+    border-color:rgba(255,57,214,.35);
+}
+
+.clear{
+    border-color:rgba(255,80,100,.3);
+}
+
+/* 步驟數 */
+.steps-selector{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
+
+.steps-selector button{
+    min-width:58px;
+    padding:8px 12px;
+}
+
+.steps-selector button.active{
+    background:linear-gradient(
+        135deg,
+        rgba(0,245,255,.22),
+        rgba(155,92,255,.25)
+    );
+
+    border-color:var(--cyan);
+
+    box-shadow:
+        0 0 15px rgba(0,245,255,.25);
+}
+
+/* 鼓機 */
+.sequencer{
+    width:100%;
+    overflow-x:auto;
+    padding-bottom:8px;
+}
+
+.grid{
+    display:grid;
+
+    grid-template-columns:
+        150px repeat(var(--steps), minmax(32px,1fr));
+
+    gap:7px;
+
+    min-width:850px;
+}
+
+/* 步驟數字 */
+.step-number{
+    height:28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#65729f;
+    font-size:11px;
+    border-radius:8px;
+}
+
+.step-number.current{
+    color:#fff;
+
+    background:rgba(0,245,255,.15);
+
+    box-shadow:
+        0 0 15px rgba(0,245,255,.35);
+}
+
+/* 鼓組名稱 */
+.instrument{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    padding:0 15px;
+
+    font-weight:800;
+    letter-spacing:1px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.025);
+    border:1px solid rgba(255,255,255,.05);
+}
+
+.instrument-icon{
+    font-size:20px;
+}
+
+/* 節拍 */
+.pad{
+    position:relative;
+
+    height:48px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.015)
+        );
+
+    border:1px solid rgba(255,255,255,.07);
+
+    transition:
+        transform .1s ease,
+        background .15s ease,
+        box-shadow .15s ease;
+}
+
+.pad:hover{
+    transform:scale(1.05);
+    border-color:rgba(255,255,255,.25);
+}
+
+/* 每4拍分隔 */
+.pad:nth-child(4n+2){
+    border-left-color:rgba(0,245,255,.22);
+}
+
+/* 啟用狀態 */
+.pad.active{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,245,255,.85),
+            rgba(92,100,255,.85)
+        );
+
+    border-color:var(--cyan);
+
+    box-shadow:
+        0 0 12px rgba(0,245,255,.55),
+        inset 0 0 12px rgba(255,255,255,.25);
+
+    animation:padGlow 1.8s infinite alternate;
+}
+
+@keyframes padGlow{
+    from{
+        box-shadow:
+            0 0 8px rgba(0,245,255,.35);
+    }
+    to{
+        box-shadow:
+            0 0 18px rgba(0,245,255,.7);
+    }
+}
+
+/* 播放中的格子 */
+.pad.current{
+    outline:2px solid rgba(255,255,255,.9);
+
+    box-shadow:
+        0 0 25px rgba(255,255,255,.55),
+        0 0 45px rgba(0,245,255,.35);
+
+    transform:scale(1.08);
+}
+
+.pad.active.current{
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            var(--cyan)
+        );
+
+    box-shadow:
+        0 0 30px white,
+        0 0 60px var(--cyan);
+}
+
+/* 播放器底部資訊 */
+.status{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-top:25px;
+    padding-top:18px;
+
+    border-top:1px solid rgba(255,255,255,.07);
+
+    color:var(--muted);
+    font-size:13px;
+}
+
+.status strong{
+    color:var(--cyan);
+}
+
+/* 發光波形 */
+.visualizer{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+
+    height:55px;
+    gap:4px;
+
+    margin-top:20px;
+}
+
+.bar{
+    width:5px;
+    height:15px;
+
+    border-radius:5px;
+
+    background:linear-gradient(
+        to top,
+        var(--purple),
+        var(--cyan)
+    );
+
+    opacity:.35;
+}
+
+.visualizer.playing .bar{
+    animation:wave .7s ease-in-out infinite alternate;
+}
+
+.bar:nth-child(2){animation-delay:.05s}
+.bar:nth-child(3){animation-delay:.1s}
+.bar:nth-child(4){animation-delay:.15s}
+.bar:nth-child(5){animation-delay:.2s}
+.bar:nth-child(6){animation-delay:.25s}
+.bar:nth-child(7){animation-delay:.3s}
+.bar:nth-child(8){animation-delay:.35s}
+.bar:nth-child(9){animation-delay:.4s}
+.bar:nth-child(10){animation-delay:.45s}
+.bar:nth-child(11){animation-delay:.5s}
+.bar:nth-child(12){animation-delay:.55s}
+
+@keyframes wave{
+    from{
+        height:10px;
+        opacity:.3;
+    }
+    to{
+        height:45px;
+        opacity:1;
+    }
+}
+
+/* 手機 */
+@media(max-width:700px){
+
+    .container{
+        width:96%;
+        padding-top:20px;
+    }
+
+    .panel{
+        padding:15px;
+        border-radius:18px;
+    }
+
+    .controls{
+        gap:8px;
+    }
+
+    .control-group{
+        width:100%;
+        justify-content:center;
+    }
+
+    .grid{
+        grid-template-columns:
+            110px repeat(var(--steps),32px);
+    }
+
+    .pad{
+        height:43px;
+    }
+
+    .instrument{
+        padding:0 8px;
+        font-size:12px;
+    }
+
+    .status{
+        flex-direction:column;
+        gap:8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <div class="logo">讓AI解決我的生活大小事_鼓</div>
+</header>
+
+<div class="panel">
+
+    <!-- 控制 -->
+    <div class="controls">
+
+        <div class="control-group">
+            <label>BPM</label>
+            <input id="bpm" type="number" min="40" max="220" value="120">
+        </div>
+
+        <div class="control-group">
+            <label>SWING</label>
+            <input id="swing" type="range" min="0" max="50" value="0">
+            <span id="swingValue">0%</span>
+        </div>
+
+        <div class="control-group">
+            <label>音量</label>
+            <input id="volume" type="range" min="0" max="100" value="70">
+        </div>
+
+        <button id="playBtn" class="play">▶ 播放</button>
+
+        <button id="randomBtn" class="random">
+            ✦ 隨機
+        </button>
+
+        <button id="clearBtn" class="clear">
+            ⌫ 清除
+        </button>
+
+    </div>
+
+    <!-- 步驟 -->
+    <div class="steps-selector">
+
+        <button data-steps="8">8 STEP</button>
+        <button data-steps="16" class="active">16 STEP</button>
+        <button data-steps="24">24 STEP</button>
+        <button data-steps="32">32 STEP</button>
+
+    </div>
+
+    <!-- Sequencer -->
+    <div class="sequencer">
+        <div id="grid" class="grid"></div>
+    </div>
+
+    <div class="visualizer" id="visualizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+
+    <div class="status">
+        <div>
+            BPM：
+            <strong id="bpmDisplay">120</strong>
+        </div>
+
+        <div>
+            STEP：
+            <strong id="stepDisplay">--</strong>
+        </div>
+
+        <div>
+            STATUS：
+            <strong id="statusText">READY</strong>
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   基本設定
+========================================= */
+
+const instruments = [
+    {
+        name:"KICK",
+        icon:"●",
+        type:"kick"
+    },
+    {
+        name:"SNARE",
+        icon:"◆",
+        type:"snare"
+    },
+    {
+        name:"HI-HAT",
+        icon:"◇",
+        type:"hihat"
+    },
+    {
+        name:"PERC",
+        icon:"✦",
+        type:"perc"
+    }
+];
+
+let steps = 16;
+
+let pattern = instruments.map(() =>
+    Array(steps).fill(false)
+);
+
+let currentStep = -1;
+let timer = null;
+let playing = false;
+
+let audioContext;
+let masterGain;
+
+
+/* =========================================
+   建立音訊
+========================================= */
+
+function initAudio(){
+
+    if(audioContext) return;
+
+    audioContext =
+        new (window.AudioContext ||
+        window.webkitAudioContext)();
+
+    masterGain =
+        audioContext.createGain();
+
+    masterGain.gain.value =
+        Number(volume.value) / 100;
+
+    masterGain.connect(
+        audioContext.destination
+    );
+}
+
+
+/* =========================================
+   建立網格
+========================================= */
+
+function buildGrid(){
+
+    const grid =
+        document.getElementById("grid");
+
+    grid.innerHTML = "";
+
+    grid.style.setProperty(
+        "--steps",
+        steps
+    );
+
+    /* 左上角 */
+
+    const title =
+        document.createElement("div");
+
+    title.className = "instrument";
+    title.innerHTML =
+        `<span class="instrument-icon">✦</span>
+         <span>DRUM MACHINE</span>`;
+
+    grid.appendChild(title);
+
+
+    /* STEP 編號 */
+
+    for(let s=0;s<steps;s++){
+
+        const number =
+            document.createElement("div");
+
+        number.className =
+            "step-number";
+
+        number.textContent =
+            String(s+1).padStart(2,"0");
+
+        number.dataset.step=s;
+
+        grid.appendChild(number);
+    }
+
+
+    /* 每一組樂器 */
+
+    instruments.forEach(
+        (instrument,row)=>{
+
+        const label =
+            document.createElement("div");
+
+        label.className =
+            "instrument";
+
+        label.innerHTML =
+            `<span class="instrument-icon">
+                ${instrument.icon}
+             </span>
+             <span>${instrument.name}</span>`;
+
+        grid.appendChild(label);
+
+
+        for(let s=0;s<steps;s++){
+
+            const pad =
+                document.createElement("div");
+
+            pad.className="pad";
+
+            pad.dataset.row=row;
+            pad.dataset.step=s;
+
+            if(pattern[row][s]){
+                pad.classList.add("active");
+            }
+
+            pad.addEventListener(
+                "click",
+                ()=>{
+
+                    pattern[row][s] =
+                        !pattern[row][s];
+
+                    pad.classList.toggle(
+                        "active",
+                        pattern[row][s]
+                    );
+
+                    /* 點擊音效 */
+
+                    initAudio();
+
+                    playSound(
+                        instrument.type
+                    );
+                }
+            );
+
+            grid.appendChild(pad);
+        }
+
+    });
+}
+
+
+/* =========================================
+   音效
+========================================= */
+
+function playSound(type){
+
+    if(!audioContext) return;
+
+    const now =
+        audioContext.currentTime;
+
+    const gain =
+        audioContext.createGain();
+
+    gain.connect(masterGain);
+
+
+    /* Kick */
+
+    if(type==="kick"){
+
+        const osc =
+            audioContext.createOscillator();
+
+        osc.type="sine";
+
+        osc.frequency.setValueAtTime(
+            150,
+            now
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            45,
+            now+0.12
+        );
+
+        gain.gain.setValueAtTime(
+            1,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            now+.18
+        );
+
+        osc.connect(gain);
+
+        osc.start(now);
+        osc.stop(now+.2);
+    }
+
+
+    /* Snare */
+
+    if(type==="snare"){
+
+        const buffer =
+            audioContext.createBuffer(
+                1,
+                audioContext.sampleRate*.2,
+                audioContext.sampleRate
+            );
+
+        const data =
+            buffer.getChannelData(0);
+
+        for(let i=0;i<data.length;i++){
+
+            data[i] =
+                Math.random()*2-1;
+        }
+
+        const noise =
+            audioContext.createBufferSource();
+
+        noise.buffer=buffer;
+
+        const filter =
+            audioContext.createBiquadFilter();
+
+        filter.type="highpass";
+        filter.frequency.value=1200;
+
+        gain.gain.setValueAtTime(
+            .65,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            now+.18
+        );
+
+        noise.connect(filter);
+        filter.connect(gain);
+
+        noise.start(now);
+    }
+
+
+    /* Hi Hat */
+
+    if(type==="hihat"){
+
+        const buffer =
+            audioContext.createBuffer(
+                1,
+                audioContext.sampleRate*.08,
+                audioContext.sampleRate
+            );
+
+        const data =
+            buffer.getChannelData(0);
+
+        for(let i=0;i<data.length;i++){
+
+            data[i] =
+                Math.random()*2-1;
+        }
+
+        const noise =
+            audioContext.createBufferSource();
+
+        noise.buffer=buffer;
+
+        const filter =
+            audioContext.createBiquadFilter();
+
+        filter.type="highpass";
+        filter.frequency.value=6000;
+
+        gain.gain.setValueAtTime(
+            .3,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            now+.07
+        );
+
+        noise.connect(filter);
+        filter.connect(gain);
+
+        noise.start(now);
+    }
+
+
+    /* Perc */
+
+    if(type==="perc"){
+
+        const osc =
+            audioContext.createOscillator();
+
+        osc.type="triangle";
+
+        osc.frequency.value =
+            450;
+
+        gain.gain.setValueAtTime(
+            .4,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .001,
+            now+.12
+        );
+
+        osc.connect(gain);
+
+        osc.start(now);
+        osc.stop(now+.15);
+    }
+}
+
+
+/* =========================================
+   播放單一步驟
+========================================= */
+
+function playStep(){
+
+    currentStep++;
+
+    if(currentStep>=steps){
+        currentStep=0;
+    }
+
+    /* 移除舊高亮 */
+
+    document
+        .querySelectorAll(".pad.current")
+        .forEach(el =>
+            el.classList.remove("current")
+        );
+
+    document
+        .querySelectorAll(".step-number.current")
+        .forEach(el =>
+            el.classList.remove("current")
+        );
+
+
+    /* STEP 編號 */
+
+    const stepNumber =
+        document.querySelector(
+            `.step-number[data-step="${currentStep}"]`
+        );
+
+    if(stepNumber){
+        stepNumber.classList.add("current");
+    }
+
+
+    /* 播放節拍 */
+
+    instruments.forEach(
+        (instrument,row)=>{
+
+        const pad =
+            document.querySelector(
+                `.pad[data-row="${row}"][data-step="${currentStep}"]`
+            );
+
+        if(pad){
+
+            pad.classList.add("current");
+
+            if(pattern[row][currentStep]){
+
+                playSound(
+                    instrument.type
+                );
+            }
+        }
+
+    });
+
+
+    document.getElementById(
+        "stepDisplay"
+    ).textContent =
+        `${currentStep+1} / ${steps}`;
+
+
+    /* 下一步 */
+
+    const bpm =
+        Number(
+            document.getElementById("bpm").value
+        );
+
+    const base =
+        60000 / bpm / 4;
+
+    const swing =
+        Number(
+            document.getElementById("swing").value
+        );
+
+    const swingAmount =
+        base * swing / 100;
+
+    let delay = base;
+
+    if(currentStep % 2 === 0){
+        delay = base + swingAmount;
+    }else{
+        delay = base - swingAmount;
+    }
+
+    timer =
+        setTimeout(
+            playStep,
+            Math.max(20,delay)
+        );
+}
+
+
+/* =========================================
+   播放 / 停止
+========================================= */
+
+function togglePlay(){
+
+    initAudio();
+
+    if(
+        audioContext.state === "suspended"
+    ){
+        audioContext.resume();
+    }
+
+    playing=!playing;
+
+    const btn =
+        document.getElementById(
+            "playBtn"
+        );
+
+    const visualizer =
+        document.getElementById(
+            "visualizer"
+        );
+
+    const status =
+        document.getElementById(
+            "statusText"
+        );
+
+
+    if(playing){
+
+        btn.textContent =
+            "■ 停止";
+
+        btn.classList.add("playing");
+
+        visualizer.classList.add(
+            "playing"
+        );
+
+        status.textContent =
+            "PLAYING";
+
+        currentStep=-1;
+
+        playStep();
+
+    }else{
+
+        clearTimeout(timer);
+
+        btn.textContent =
+            "▶ 播放";
+
+        btn.classList.remove(
+            "playing"
+        );
+
+        visualizer.classList.remove(
+            "playing"
+        );
+
+        status.textContent =
+            "READY";
+
+        document
+            .querySelectorAll(
+                ".current"
+            )
+            .forEach(el =>
+                el.classList.remove(
+                    "current"
+                )
+            );
+
+        document.getElementById(
+            "stepDisplay"
+        ).textContent="--";
+    }
+}
+
+
+/* =========================================
+   隨機節奏
+========================================= */
+
+function randomPattern(){
+
+    instruments.forEach(
+        (instrument,row)=>{
+
+        for(let s=0;s<steps;s++){
+
+            let probability;
+
+            if(row===0){
+                probability=.45;
+            }else if(row===1){
+                probability=.25;
+            }else if(row===2){
+                probability=.60;
+            }else{
+                probability=.28;
+            }
+
+            pattern[row][s] =
+                Math.random() < probability;
+        }
+    });
+
+    buildGrid();
+}
+
+
+/* =========================================
+   清除
+========================================= */
+
+function clearPattern(){
+
+    pattern =
+        instruments.map(() =>
+            Array(steps).fill(false)
+        );
+
+    buildGrid();
+}
+
+
+/* =========================================
+   STEP 切換
+========================================= */
+
+document
+    .querySelectorAll(
+        ".steps-selector button"
+    )
+    .forEach(button=>{
+
+    button.addEventListener(
+        "click",
+        ()=>{
+
+        steps =
+            Number(
+                button.dataset.steps
+            );
+
+        document
+            .querySelectorAll(
+                ".steps-selector button"
+            )
+            .forEach(btn =>
+                btn.classList.remove(
+                    "active"
+                )
+            );
+
+        button.classList.add(
+            "active"
+        );
+
+
+        pattern =
+            instruments.map(
+                ()=>Array(steps).fill(false)
+            );
+
+        currentStep=-1;
+
+        if(playing){
+
+            clearTimeout(timer);
+
+            playStep();
+        }
+
+        buildGrid();
+
+    });
+
+});
+
+
+/* =========================================
+   BPM
+========================================= */
+
+const bpm =
+    document.getElementById("bpm");
+
+const bpmDisplay =
+    document.getElementById(
+        "bpmDisplay"
+    );
+
+bpm.addEventListener(
+    "input",
+    ()=>{
+
+    let value =
+        Math.max(
+            40,
+            Math.min(
+                220,
+                Number(bpm.value)
+            )
+        );
+
+    bpm.value=value;
+    bpmDisplay.textContent=value;
+
+});
+
+
+/* =========================================
+   Swing
+========================================= */
+
+const swing =
+    document.getElementById(
+        "swing"
+    );
+
+const swingValue =
+    document.getElementById(
+        "swingValue"
+    );
+
+swing.addEventListener(
+    "input",
+    ()=>{
+
+    swingValue.textContent =
+        swing.value+"%";
+
+});
+
+
+/* =========================================
+   音量
+========================================= */
+
+const volume =
+    document.getElementById(
+        "volume"
+    );
+
+volume.addEventListener(
+    "input",
+    ()=>{
+
+    if(masterGain){
+
+        masterGain.gain.value =
+            Number(volume.value)/100;
+    }
+
+});
+
+
+/* =========================================
+   按鈕
+========================================= */
+
+document
+    .getElementById("playBtn")
+    .addEventListener(
+        "click",
+        togglePlay
+    );
+
+document
+    .getElementById("randomBtn")
+    .addEventListener(
+        "click",
+        randomPattern
+    );
+
+document
+    .getElementById("clearBtn")
+    .addEventListener(
+        "click",
+        clearPattern
+    );
+
+
+/* =========================================
+   初始節奏
+========================================= */
+
+function createDefaultPattern(){
+
+    /* Kick */
+
+    [0,4,8,12].forEach(
+        s=>{
+            if(s<steps)
+                pattern[0][s]=true;
+        }
+    );
+
+    /* Snare */
+
+    [4,12].forEach(
+        s=>{
+            if(s<steps)
+                pattern[1][s]=true;
+        }
+    );
+
+    /* HiHat */
+
+    for(let s=0;s<steps;s+=2){
+
+        pattern[2][s]=true;
+    }
+
+    /* Perc */
+
+    [3,7,11,15].forEach(
+        s=>{
+            if(s<steps)
+                pattern[3][s]=true;
+        }
+    );
+}
+
+
+/* =========================================
+   鍵盤快捷鍵
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+    if(
+        e.code==="Space" &&
+        document.activeElement.tagName!=="INPUT"
+    ){
+
+        e.preventDefault();
+
+        togglePlay();
+    }
+
+    if(
+        e.key.toLowerCase()==="r"
+    ){
+
+        randomPattern();
+    }
+
+    if(
+        e.key.toLowerCase()==="c"
+    ){
+
+        clearPattern();
+    }
+
+});
+
+
+/* =========================================
+   啟動
+========================================= */
+
+createDefaultPattern();
+buildGrid();
+
+</script>
+
+</body>
+</html>

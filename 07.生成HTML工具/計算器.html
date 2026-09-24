@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_計算器</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family:
+        Arial,
+        "Microsoft JhengHei",
+        sans-serif;
+
+    overflow: hidden;
+
+    /* 夢幻星空背景 */
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 20%),
+        radial-gradient(circle at 80% 30%, rgba(255,180,255,0.18), transparent 25%),
+        radial-gradient(circle at 30% 80%, rgba(120,200,255,0.20), transparent 25%),
+        linear-gradient(
+            135deg,
+            #16002f,
+            #240052,
+            #092b59,
+            #001b3d
+        );
+
+    position: relative;
+}
+
+/* =========================
+   夢幻星星
+========================= */
+
+body::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 3px;
+    height: 3px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    top: 10%;
+    left: 15%;
+
+    box-shadow:
+        80px 40px white,
+        180px 120px rgba(255,255,255,.8),
+        280px 60px white,
+        380px 180px rgba(255,255,255,.7),
+        500px 100px white,
+        620px 220px rgba(255,255,255,.8),
+        720px 80px white,
+        820px 200px rgba(255,255,255,.7),
+        920px 120px white,
+        1000px 300px rgba(255,255,255,.8),
+        110px 400px rgba(255,255,255,.7),
+        250px 500px white,
+        420px 420px rgba(255,255,255,.8),
+        600px 520px white,
+        760px 430px rgba(255,255,255,.7),
+        900px 550px white;
+
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+
+    from {
+        opacity: .3;
+        transform: scale(.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+}
+
+/* =========================
+   漂浮夢幻光球
+========================= */
+
+body::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.25),
+            rgba(160,100,255,.12),
+            transparent 70%
+        );
+
+    top: 10%;
+    right: 5%;
+
+    filter: blur(20px);
+
+    animation: floatLight 7s ease-in-out infinite alternate;
+}
+
+@keyframes floatLight {
+
+    from {
+        transform: translate(0,0) scale(1);
+    }
+
+    to {
+        transform: translate(-80px,100px) scale(1.4);
+    }
+}
+
+/* =========================
+   計算機
+========================= */
+
+.calculator {
+
+    position: relative;
+    z-index: 5;
+
+    width: 350px;
+
+    padding: 22px;
+
+    border-radius: 30px;
+
+    /* 毛玻璃 */
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.22),
+            rgba(255,255,255,.07)
+        );
+
+    border: 1px solid rgba(255,255,255,.3);
+
+    backdrop-filter: blur(20px);
+
+    -webkit-backdrop-filter: blur(20px);
+
+    box-shadow:
+
+        0 25px 60px rgba(0,0,0,.45),
+
+        inset 0 1px 1px rgba(255,255,255,.4),
+
+        0 0 40px rgba(160,100,255,.25);
+
+    animation: calculatorFloat 5s ease-in-out infinite;
+}
+
+@keyframes calculatorFloat {
+
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* =========================
+   標題
+========================= */
+
+.designer {
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 16px;
+
+    text-shadow:
+
+        0 0 5px white,
+        0 0 10px #c9a7ff,
+        0 0 20px #9d6cff;
+
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+
+    from {
+        text-shadow:
+            0 0 5px white,
+            0 0 10px #c9a7ff;
+    }
+
+    to {
+        text-shadow:
+            0 0 10px white,
+            0 0 20px #d9b8ff,
+            0 0 35px #9d6cff;
+    }
+}
+
+/* =========================
+   顯示器
+========================= */
+
+.display {
+
+    width: 100%;
+
+    height: 75px;
+
+    margin-bottom: 18px;
+
+    padding: 12px 16px;
+
+    border: none;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.85),
+            rgba(240,225,255,.7)
+        );
+
+    color: #24104a;
+
+    text-align: right;
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+    outline: none;
+
+    box-shadow:
+
+        inset 0 3px 10px rgba(0,0,0,.15),
+
+        0 0 20px rgba(255,255,255,.25);
+
+}
+
+/* =========================
+   按鈕區
+========================= */
+
+.buttons {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 11px;
+}
+
+/* =========================
+   一般按鈕
+========================= */
+
+button {
+
+    height: 60px;
+
+    border: none;
+
+    border-radius: 18px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.20),
+            rgba(255,255,255,.08)
+        );
+
+    border: 1px solid rgba(255,255,255,.18);
+
+    box-shadow:
+
+        0 6px 15px rgba(0,0,0,.25),
+
+        inset 0 1px 1px rgba(255,255,255,.25);
+
+    transition:
+        transform .15s,
+        box-shadow .15s,
+        background .15s;
+}
+
+/* 滑鼠移入 */
+
+button:hover {
+
+    transform: translateY(-3px);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.35),
+            rgba(255,255,255,.15)
+        );
+
+    box-shadow:
+
+        0 8px 20px rgba(0,0,0,.3),
+
+        0 0 15px rgba(255,255,255,.2);
+}
+
+/* 按下 */
+
+button:active {
+
+    transform: scale(.92);
+
+    box-shadow:
+        inset 0 3px 8px rgba(0,0,0,.3);
+}
+
+/* =========================
+   運算符號
+========================= */
+
+.operator {
+
+    background:
+        linear-gradient(
+            135deg,
+            #9b5cff,
+            #6c35d9
+        );
+
+    box-shadow:
+        0 0 15px rgba(155,92,255,.35);
+}
+
+.operator:hover {
+
+    background:
+        linear-gradient(
+            135deg,
+            #b27aff,
+            #814de5
+        );
+
+    box-shadow:
+        0 0 25px rgba(155,92,255,.65);
+}
+
+/* =========================
+   清除
+========================= */
+
+.clear {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff5f8f,
+            #d83268
+        );
+
+    box-shadow:
+        0 0 15px rgba(255,80,140,.35);
+}
+
+.clear:hover {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff78a1,
+            #ec3f78
+        );
+
+    box-shadow:
+        0 0 25px rgba(255,80,140,.65);
+}
+
+/* =========================
+   等號
+========================= */
+
+.equal {
+
+    background:
+        linear-gradient(
+            135deg,
+            #35d6b0,
+            #169b83
+        );
+
+    box-shadow:
+        0 0 15px rgba(53,214,176,.35);
+}
+
+.equal:hover {
+
+    background:
+        linear-gradient(
+            135deg,
+            #58e8c8,
+            #20b99b
+        );
+
+    box-shadow:
+        0 0 25px rgba(53,214,176,.65);
+}
+
+/* =========================
+   0 按鈕
+========================= */
+
+.zero {
+
+    grid-column: span 2;
+}
+
+/* =========================
+   手機版
+========================= */
+
+@media (max-width: 480px) {
+
+    .calculator {
+
+        width: 92%;
+
+        padding: 18px;
+
+        border-radius: 25px;
+    }
+
+    .designer {
+
+        font-size: 15px;
+
+        letter-spacing: 1px;
+    }
+
+    .display {
+
+        height: 68px;
+
+        font-size: 28px;
+    }
+
+    button {
+
+        height: 56px;
+
+        font-size: 20px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="calculator">
+
+<!-- 標題 -->
+<div class="designer">
+讓AI解決我的生活大小事_計算器
+</div>
+
+<!-- 顯示器 -->
+<input
+    type="text"
+    id="display"
+    class="display"
+    value="0"
+    readonly
+>
+
+<!-- 按鈕 -->
+<div class="buttons">
+
+    <button class="clear" onclick="clearDisplay()">C</button>
+
+    <button onclick="deleteLast()">⌫</button>
+
+    <button onclick="addOperator('%')">%</button>
+
+    <button class="operator" onclick="addOperator('/')">÷</button>
+
+
+    <button onclick="addNumber('7')">7</button>
+
+    <button onclick="addNumber('8')">8</button>
+
+    <button onclick="addNumber('9')">9</button>
+
+    <button class="operator" onclick="addOperator('*')">×</button>
+
+
+    <button onclick="addNumber('4')">4</button>
+
+    <button onclick="addNumber('5')">5</button>
+
+    <button onclick="addNumber('6')">6</button>
+
+    <button class="operator" onclick="addOperator('-')">−</button>
+
+
+    <button onclick="addNumber('1')">1</button>
+
+    <button onclick="addNumber('2')">2</button>
+
+    <button onclick="addNumber('3')">3</button>
+
+    <button class="operator" onclick="addOperator('+')">+</button>
+
+
+    <button class="zero" onclick="addNumber('0')">0</button>
+
+    <button onclick="addNumber('.')">.</button>
+
+    <button class="equal" onclick="calculate()">=</button>
+
+</div>
+```
+
+</div>
+
+<script>
+
+let display = document.getElementById("display");
+
+let expression = "";
+
+
+/* =========================
+   輸入數字
+========================= */
+
+function addNumber(number) {
+
+    if (expression === "0") {
+
+        expression = "";
+    }
+
+    expression += number;
+
+    display.value = expression;
+}
+
+
+/* =========================
+   輸入運算符號
+========================= */
+
+function addOperator(operator) {
+
+    if (expression === "") {
+
+        return;
+    }
+
+    let lastChar =
+        expression.slice(-1);
+
+    if ("+-*/%".includes(lastChar)) {
+
+        expression =
+            expression.slice(0, -1);
+    }
+
+    expression += operator;
+
+    display.value = expression;
+}
+
+
+/* =========================
+   清除
+========================= */
+
+function clearDisplay() {
+
+    expression = "";
+
+    display.value = "0";
+}
+
+
+/* =========================
+   刪除
+========================= */
+
+function deleteLast() {
+
+    expression =
+        expression.slice(0, -1);
+
+    if (expression === "") {
+
+        display.value = "0";
+
+    } else {
+
+        display.value = expression;
+    }
+}
+
+
+/* =========================
+   計算
+========================= */
+
+function calculate() {
+
+    if (expression === "") {
+
+        return;
+    }
+
+    try {
+
+        let lastChar =
+            expression.slice(-1);
+
+        if ("+-*/%".includes(lastChar)) {
+
+            expression =
+                expression.slice(0, -1);
+        }
+
+        let result =
+            Function(
+                '"use strict"; return (' +
+                expression +
+                ')'
+            )();
+
+        result =
+            Math.round(
+                result * 100000000
+            ) / 100000000;
+
+        display.value = result;
+
+        expression =
+            String(result);
+
+    }
+
+    catch (error) {
+
+        display.value = "錯誤";
+
+        expression = "";
+    }
+}
+
+
+/* =========================
+   鍵盤操作
+========================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        let key = event.key;
+
+        if (
+            (key >= "0" && key <= "9") ||
+            key === "."
+        ) {
+
+            addNumber(key);
+        }
+
+        else if (
+            key === "+" ||
+            key === "-" ||
+            key === "*" ||
+            key === "/" ||
+            key === "%"
+        ) {
+
+            addOperator(key);
+        }
+
+        else if (
+            key === "Enter" ||
+            key === "="
+        ) {
+
+            calculate();
+        }
+
+        else if (
+            key === "Backspace"
+        ) {
+
+            deleteLast();
+        }
+
+        else if (
+            key === "Escape"
+        ) {
+
+            clearDisplay();
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_桌球大賽</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+}
+
+body{
+    background:
+        radial-gradient(circle at 50% 20%,#17204a 0%,#080b18 40%,#02030a 100%);
+    color:white;
+    font-family:
+        Arial,
+        "Microsoft JhengHei",
+        sans-serif;
+    text-align:center;
+    overflow:hidden;
+}
+
+/* 科技背景線條 */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        linear-gradient(rgba(0,220,255,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,220,255,.04) 1px,transparent 1px);
+
+    background-size:40px 40px;
+}
+
+/* 標題 */
+
+h1{
+    margin:12px 0 2px;
+
+    font-size:clamp(20px,3vw,34px);
+
+    font-weight:900;
+
+    letter-spacing:2px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 5px #00eaff,
+        0 0 15px #00eaff,
+        0 0 30px #0077ff;
+}
+
+/* 副標題 */
+
+.subtitle{
+    font-size:13px;
+
+    color:#00eaff;
+
+    letter-spacing:4px;
+
+    margin-bottom:4px;
+
+    text-shadow:
+        0 0 8px #00eaff;
+}
+
+/* 分數區 */
+
+#scoreBoard{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:25px;
+
+    margin:4px 0 8px;
+
+}
+
+/* 玩家 */
+
+.scoreBox{
+
+    min-width:150px;
+
+    padding:6px 18px;
+
+    border:1px solid #00eaff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,234,255,.12),
+            rgba(0,0,0,.5)
+        );
+
+    box-shadow:
+        0 0 10px rgba(0,234,255,.5),
+        inset 0 0 15px rgba(0,234,255,.08);
+
+    clip-path:
+        polygon(
+            8px 0,
+            100% 0,
+            100% calc(100% - 8px),
+            calc(100% - 8px) 100%,
+            0 100%,
+            0 8px
+        );
+}
+
+.scoreTitle{
+
+    font-size:12px;
+
+    letter-spacing:3px;
+
+    color:#00eaff;
+
+}
+
+#score{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    letter-spacing:8px;
+
+    text-shadow:
+        0 0 8px #00eaff,
+        0 0 20px #0077ff;
+
+}
+
+/* 遊戲區 */
+
+#gameContainer{
+
+    width:92vw;
+
+    max-width:1000px;
+
+    margin:auto;
+
+    position:relative;
+
+}
+
+/* Canvas */
+
+canvas{
+
+    display:block;
+
+    width:100%;
+
+    height:auto;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #101b35,
+            #02040c 75%
+        );
+
+    border:2px solid #00eaff;
+
+    cursor:none;
+
+    box-shadow:
+
+        0 0 8px #00eaff,
+
+        0 0 25px rgba(0,170,255,.6),
+
+        inset 0 0 40px rgba(0,170,255,.15);
+
+}
+
+/* 操作說明 */
+
+#message{
+
+    margin-top:7px;
+
+    font-size:14px;
+
+    color:#9defff;
+
+    text-shadow:
+        0 0 8px #00eaff;
+
+    letter-spacing:1px;
+
+}
+
+/* 按鈕 */
+
+button{
+
+    margin-top:8px;
+
+    padding:10px 28px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    color:#00eaff;
+
+    background:#050a16;
+
+    border:1px solid #00eaff;
+
+    cursor:pointer;
+
+    letter-spacing:2px;
+
+    transition:.2s;
+
+    box-shadow:
+        0 0 8px rgba(0,234,255,.5);
+
+    clip-path:
+        polygon(
+            8px 0,
+            100% 0,
+            100% calc(100% - 8px),
+            calc(100% - 8px) 100%,
+            0 100%,
+            0 8px
+        );
+}
+
+button:hover{
+
+    color:white;
+
+    background:#00aeea;
+
+    box-shadow:
+        0 0 10px #00eaff,
+        0 0 30px #00eaff;
+
+    transform:scale(1.05);
+
+}
+
+/* 設計者 */
+
+.designer{
+
+    margin-top:5px;
+
+    font-size:11px;
+
+    letter-spacing:3px;
+
+    color:#667799;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🏓讓AI解決我的生活大小事_桌球大賽
+
+</h1>
+
+<div class="subtitle">
+    ⚡ CYBER PONG // ESPORTS ARENA ⚡
+</div>
+
+<div id="scoreBoard">
+
+```
+<div class="scoreBox">
+
+    <div class="scoreTitle">
+        PLAYER
+    </div>
+
+    <div id="score">
+        <span id="playerScore">0</span>
+    </div>
+
+</div>
+
+<div style="
+    font-size:24px;
+    color:#ff00e6;
+    text-shadow:0 0 15px #ff00e6;
+">
+    VS
+</div>
+
+<div class="scoreBox">
+
+    <div class="scoreTitle">
+        CPU
+    </div>
+
+    <div id="score">
+        <span id="computerScore">0</span>
+    </div>
+
+</div>
+```
+
+</div>
+
+<div id="gameContainer">
+
+```
+<canvas
+    id="gameCanvas"
+    width="1000"
+    height="600">
+</canvas>
+```
+
+</div>
+
+<div id="message">
+
+```
+🖱️ 滑鼠移動控制左側球拍　
+⬆️⬇️ 方向鍵也可以控制左側球拍
+```
+
+</div>
+
+<button onclick="restartGame()">
+    ⚡ 重新開始
+</button>
+
+<div class="designer">
+    SYSTEM DESIGN // 李信賢
+</div>
+
+<script>
+
+const canvas =
+    document.getElementById("gameCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const playerScoreText =
+    document.getElementById("playerScore");
+
+const computerScoreText =
+    document.getElementById("computerScore");
+
+
+/* =========================
+   遊戲參數
+========================= */
+
+const paddleWidth = 15;
+const paddleHeight = 100;
+const ballSize = 14;
+
+const player = {
+
+    x:30,
+    y:250,
+
+    width:paddleWidth,
+    height:paddleHeight,
+
+    speed:8
+
+};
+
+const computer = {
+
+    x:955,
+    y:250,
+
+    width:paddleWidth,
+    height:paddleHeight,
+
+    speed:5
+
+};
+
+const ball = {
+
+    x:493,
+    y:293,
+
+    size:ballSize,
+
+    speedX:6,
+    speedY:4
+
+};
+
+
+/* =========================
+   遊戲狀態
+========================= */
+
+let playerScore = 0;
+let computerScore = 0;
+
+let upPressed = false;
+let downPressed = false;
+
+
+/* =========================
+   粒子系統
+========================= */
+
+let particles = [];
+
+function createParticles(x,y){
+
+    for(let i=0;i<15;i++){
+
+        particles.push({
+
+            x:x,
+            y:y,
+
+            vx:(Math.random()-.5)*8,
+            vy:(Math.random()-.5)*8,
+
+            life:1,
+
+            size:Math.random()*4+1
+
+        });
+
+    }
+
+}
+
+
+function updateParticles(){
+
+    for(let i=particles.length-1;i>=0;i--){
+
+        let p=particles[i];
+
+        p.x+=p.vx;
+        p.y+=p.vy;
+
+        p.life-=0.04;
+
+        if(p.life<=0){
+
+            particles.splice(i,1);
+
+        }
+
+    }
+
+}
+
+
+function drawParticles(){
+
+    for(let p of particles){
+
+        ctx.save();
+
+        ctx.globalAlpha=p.life;
+
+        ctx.fillStyle="#00eaff";
+
+        ctx.shadowColor="#00eaff";
+
+        ctx.shadowBlur=15;
+
+        ctx.fillRect(
+            p.x,
+            p.y,
+            p.size,
+            p.size
+        );
+
+        ctx.restore();
+
+    }
+
+}
+
+
+/* =========================
+   鍵盤控制
+========================= */
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        if(e.key==="ArrowUp"){
+
+            upPressed=true;
+
+            e.preventDefault();
+
+        }
+
+        if(e.key==="ArrowDown"){
+
+            downPressed=true;
+
+            e.preventDefault();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keyup",
+    e=>{
+
+        if(e.key==="ArrowUp")
+            upPressed=false;
+
+        if(e.key==="ArrowDown")
+            downPressed=false;
+
+    }
+);
+
+
+/* =========================
+   滑鼠控制
+========================= */
+
+canvas.addEventListener(
+    "mousemove",
+    e=>{
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+        const mouseY =
+            (e.clientY-rect.top)
+            *
+            (canvas.height/rect.height);
+
+        player.y =
+            mouseY-player.height/2;
+
+        keepPaddleInside(player);
+
+    }
+);
+
+
+/* =========================
+   球拍限制
+========================= */
+
+function keepPaddleInside(p){
+
+    if(p.y<0)
+        p.y=0;
+
+    if(
+        p.y+p.height>
+        canvas.height
+    )
+        p.y=
+            canvas.height-p.height;
+
+}
+
+
+/* =========================
+   玩家
+========================= */
+
+function updatePlayer(){
+
+    if(upPressed)
+        player.y-=player.speed;
+
+    if(downPressed)
+        player.y+=player.speed;
+
+    keepPaddleInside(player);
+
+}
+
+
+/* =========================
+   電腦
+========================= */
+
+function updateComputer(){
+
+    const pc =
+        computer.y+
+        computer.height/2;
+
+    const bc =
+        ball.y+
+        ball.size/2;
+
+    if(pc<bc-10)
+        computer.y+=computer.speed;
+
+    if(pc>bc+10)
+        computer.y-=computer.speed;
+
+    keepPaddleInside(computer);
+
+}
+
+
+/* =========================
+   牆壁碰撞
+========================= */
+
+function checkWallCollision(){
+
+    if(ball.y<=0){
+
+        ball.y=0;
+
+        ball.speedY*=-1;
+
+        createParticles(
+            ball.x,
+            ball.y
+        );
+
+    }
+
+
+    if(
+        ball.y+
+        ball.size>=
+        canvas.height
+    ){
+
+        ball.y=
+            canvas.height-ball.size;
+
+        ball.speedY*=-1;
+
+        createParticles(
+            ball.x,
+            ball.y
+        );
+
+    }
+
+}
+
+
+/* =========================
+   球拍碰撞
+========================= */
+
+function checkPaddleCollision(
+    p,
+    isPlayer
+){
+
+    if(
+
+        ball.x<p.x+p.width &&
+
+        ball.x+ball.size>p.x &&
+
+        ball.y<p.y+p.height &&
+
+        ball.y+ball.size>p.y
+
+    ){
+
+        if(isPlayer){
+
+            ball.x=
+                p.x+p.width;
+
+        }else{
+
+            ball.x=
+                p.x-ball.size;
+
+        }
+
+        ball.speedX*=-1;
+
+
+        const pc =
+            p.y+
+            p.height/2;
+
+        const bc =
+            ball.y+
+            ball.size/2;
+
+        const hit =
+            (bc-pc)/
+            (p.height/2);
+
+        ball.speedY =
+            hit*6;
+
+
+        /* 增加速度 */
+
+        ball.speedX*=1.03;
+
+
+        /* 碰撞特效 */
+
+        createParticles(
+
+            ball.x+
+            ball.size/2,
+
+            ball.y+
+            ball.size/2
+
+        );
+
+    }
+
+}
+
+
+/* =========================
+   得分
+========================= */
+
+function checkScore(){
+
+    if(
+        ball.x+
+        ball.size<0
+    ){
+
+        computerScore++;
+
+        computerScoreText.textContent =
+            computerScore;
+
+        resetBall(-1);
+
+    }
+
+
+    if(
+        ball.x>
+        canvas.width
+    ){
+
+        playerScore++;
+
+        playerScoreText.textContent =
+            playerScore;
+
+        resetBall(1);
+
+    }
+
+}
+
+
+/* =========================
+   重置球
+========================= */
+
+function resetBall(direction){
+
+    ball.x =
+        canvas.width/2-
+        ball.size/2;
+
+    ball.y =
+        canvas.height/2-
+        ball.size/2;
+
+    ball.speedX =
+        6*direction;
+
+    ball.speedY =
+        (
+            Math.random()>0.5
+            ?1
+            :-1
+        )*4;
+
+    particles=[];
+
+}
+
+
+/* =========================
+   球移動
+========================= */
+
+function updateBall(){
+
+    ball.x+=ball.speedX;
+
+    ball.y+=ball.speedY;
+
+    checkWallCollision();
+
+    checkPaddleCollision(
+        player,
+        true
+    );
+
+    checkPaddleCollision(
+        computer,
+        false
+    );
+
+    checkScore();
+
+}
+
+
+/* =========================
+   科技網格
+========================= */
+
+function drawGrid(){
+
+    ctx.save();
+
+    ctx.strokeStyle =
+        "rgba(0,180,255,.08)";
+
+    ctx.lineWidth=1;
+
+    const grid=40;
+
+
+    for(
+        let x=0;
+        x<canvas.width;
+        x+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(x,0);
+
+        ctx.lineTo(
+            x,
+            canvas.height
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    for(
+        let y=0;
+        y<canvas.height;
+        y+=grid
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+
+        ctx.lineTo(
+            canvas.width,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   球拍
+========================= */
+
+function drawPaddle(p,isPlayer){
+
+    ctx.save();
+
+
+    /* 外部光暈 */
+
+    ctx.shadowBlur=25;
+
+    ctx.shadowColor =
+        isPlayer
+        ?" #00eaff"
+        :"#ff00e6";
+
+
+    ctx.fillStyle =
+        isPlayer
+        ?" #00eaff"
+        :"#ff00e6";
+
+
+    ctx.fillRect(
+
+        p.x,
+        p.y,
+        p.width,
+        p.height
+
+    );
+
+
+    /* 內部亮線 */
+
+    ctx.shadowBlur=0;
+
+    ctx.fillStyle="#ffffff";
+
+    ctx.fillRect(
+
+        p.x+4,
+        p.y+8,
+        3,
+        p.height-16
+
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   球
+========================= */
+
+function drawBall(){
+
+    ctx.save();
+
+
+    const cx =
+        ball.x+
+        ball.size/2;
+
+    const cy =
+        ball.y+
+        ball.size/2;
+
+
+    /* 球的光暈 */
+
+    ctx.shadowColor =
+        "#00eaff";
+
+    ctx.shadowBlur=30;
+
+
+    ctx.fillStyle="#ffffff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+
+        cx,
+        cy,
+
+        ball.size/2,
+
+        0,
+        Math.PI*2
+
+    );
+
+    ctx.fill();
+
+
+    /* 核心 */
+
+    ctx.shadowBlur=10;
+
+    ctx.fillStyle="#00eaff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+
+        cx,
+        cy,
+
+        4,
+
+        0,
+        Math.PI*2
+
+    );
+
+    ctx.fill();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   球的速度拖尾
+========================= */
+
+function drawBallTrail(){
+
+    ctx.save();
+
+    for(
+        let i=1;
+        i<=8;
+        i++
+    ){
+
+        const alpha =
+            (9-i)/50;
+
+        ctx.globalAlpha=alpha;
+
+        ctx.fillStyle="#00eaff";
+
+        ctx.shadowColor="#00eaff";
+
+        ctx.shadowBlur=20;
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            ball.x+
+            ball.size/2-
+            ball.speedX*i*1.5,
+
+            ball.y+
+            ball.size/2-
+            ball.speedY*i*1.5,
+
+            ball.size/2-
+
+            i*.7,
+
+            0,
+            Math.PI*2
+
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   中央科技線
+========================= */
+
+function drawCenterLine(){
+
+    ctx.save();
+
+
+    ctx.setLineDash(
+        [8,16]
+    );
+
+
+    ctx.lineWidth=2;
+
+    ctx.strokeStyle=
+        "rgba(0,234,255,.5)";
+
+    ctx.shadowColor="#00eaff";
+
+    ctx.shadowBlur=12;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        canvas.width/2,
+        0
+    );
+
+    ctx.lineTo(
+        canvas.width/2,
+        canvas.height
+    );
+
+    ctx.stroke();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   HUD裝飾
+========================= */
+
+function drawHUD(){
+
+    ctx.save();
+
+    ctx.strokeStyle=
+        "rgba(0,234,255,.5)";
+
+    ctx.lineWidth=2;
+
+
+    /* 左上 */
+
+    ctx.beginPath();
+
+    ctx.moveTo(15,15);
+
+    ctx.lineTo(100,15);
+
+    ctx.stroke();
+
+
+    /* 右上 */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        canvas.width-100,
+        15
+    );
+
+    ctx.lineTo(
+        canvas.width-15,
+        15
+    );
+
+    ctx.stroke();
+
+
+    /* 左下 */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        15,
+        canvas.height-15
+    );
+
+    ctx.lineTo(
+        100,
+        canvas.height-15
+    );
+
+    ctx.stroke();
+
+
+    /* 右下 */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        canvas.width-100,
+        canvas.height-15
+    );
+
+    ctx.lineTo(
+        canvas.width-15,
+        canvas.height-15
+    );
+
+    ctx.stroke();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================
+   主畫面
+========================= */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    drawGrid();
+
+    drawHUD();
+
+    drawCenterLine();
+
+    drawBallTrail();
+
+    drawPaddle(
+        player,
+        true
+    );
+
+    drawPaddle(
+        computer,
+        false
+    );
+
+    drawBall();
+
+    drawParticles();
+
+}
+
+
+/* =========================
+   遊戲主迴圈
+========================= */
+
+function gameLoop(){
+
+    updatePlayer();
+
+    updateComputer();
+
+    updateBall();
+
+    updateParticles();
+
+    draw();
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* =========================
+   重新開始
+========================= */
+
+function restartGame(){
+
+    playerScore=0;
+
+    computerScore=0;
+
+
+    playerScoreText.textContent="0";
+
+    computerScoreText.textContent="0";
+
+
+    player.y=
+        canvas.height/2-
+        paddleHeight/2;
+
+
+    computer.y=
+        canvas.height/2-
+        paddleHeight/2;
+
+
+    resetBall(
+
+        Math.random()>0.5
+        ?1
+        :-1
+
+    );
+
+}
+
+
+/* 啟動 */
+
+restartGame();
+
+gameLoop();
+
+</script>
+
+</body>
+</html>

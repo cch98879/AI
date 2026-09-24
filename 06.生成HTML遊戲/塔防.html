@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>讓AI解決我的生活大小事_塔防</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    user-select:none;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:"Segoe UI","Microsoft JhengHei",sans-serif;
+    background:#050719;
+    color:#fff;
+}
+
+body{
+    background:
+        radial-gradient(circle at 20% 20%,rgba(82,60,255,.20),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(0,220,255,.16),transparent 30%),
+        linear-gradient(135deg,#030511,#080b24 55%,#020617);
+}
+
+/* 星空 */
+#stars{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+        radial-gradient(circle,#fff 1px,transparent 1px),
+        radial-gradient(circle,#6ee7ff 1px,transparent 1px);
+    background-size:80px 80px,130px 130px;
+    background-position:0 0,30px 50px;
+    opacity:.35;
+    animation:starMove 30s linear infinite;
+}
+
+@keyframes starMove{
+    from{background-position:0 0,30px 50px}
+    to{background-position:80px 80px,160px 180px}
+}
+
+#game{
+    position:relative;
+    width:100%;
+    height:100%;
+}
+
+/* 頂部 HUD */
+#hud{
+    position:absolute;
+    z-index:20;
+    top:15px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(1100px,94%);
+    padding:12px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+
+    background:rgba(8,13,42,.72);
+    border:1px solid rgba(105,227,255,.45);
+    border-radius:18px;
+    backdrop-filter:blur(15px);
+
+    box-shadow:
+        0 0 25px rgba(0,220,255,.15),
+        inset 0 0 25px rgba(80,80,255,.08);
+}
+
+.logo{
+    font-size:20px;
+    font-weight:bold;
+    letter-spacing:3px;
+    color:#8df4ff;
+    text-shadow:0 0 12px #00d9ff;
+}
+
+.stats{
+    display:flex;
+    gap:22px;
+    font-weight:bold;
+}
+
+.stat span{
+    color:#78eaff;
+    margin-right:5px;
+}
+
+#wave{
+    color:#ff8cff;
+}
+
+/* Canvas */
+#canvas{
+    position:absolute;
+    left:50%;
+    top:55%;
+    transform:translate(-50%,-50%);
+    width:min(1100px,94vw);
+    height:min(680px,70vh);
+
+    border:1px solid rgba(80,230,255,.45);
+    border-radius:24px;
+
+    background:
+        radial-gradient(circle at 50% 50%,rgba(25,50,110,.25),transparent 60%),
+        rgba(3,7,28,.8);
+
+    box-shadow:
+        0 0 35px rgba(0,220,255,.15),
+        inset 0 0 50px rgba(70,80,255,.12);
+}
+
+/* 左側塔選擇 */
+#towerPanel{
+    position:absolute;
+    z-index:30;
+    left:25px;
+    bottom:25px;
+
+    width:250px;
+    padding:14px;
+
+    background:rgba(7,12,38,.82);
+    border:1px solid rgba(104,233,255,.4);
+    border-radius:18px;
+    backdrop-filter:blur(15px);
+
+    box-shadow:0 0 30px rgba(0,220,255,.12);
+}
+
+.panelTitle{
+    color:#8ceeff;
+    font-size:14px;
+    letter-spacing:2px;
+    margin-bottom:10px;
+}
+
+.towerBtn{
+    width:100%;
+    margin:6px 0;
+    padding:10px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    color:#fff;
+    background:rgba(30,42,85,.55);
+    border:1px solid rgba(110,220,255,.25);
+    border-radius:12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.towerBtn:hover{
+    transform:translateX(4px);
+    background:rgba(50,70,130,.65);
+    box-shadow:0 0 18px rgba(0,220,255,.25);
+}
+
+.towerBtn.selected{
+    border-color:#7df5ff;
+    box-shadow:0 0 18px rgba(0,220,255,.4);
+}
+
+.towerIcon{
+    font-size:22px;
+}
+
+.towerCost{
+    color:#ffd86b;
+}
+
+/* 選塔提示 */
+#hint{
+    position:absolute;
+    z-index:15;
+    left:50%;
+    bottom:15px;
+    transform:translateX(-50%);
+    color:#7defff;
+    font-size:13px;
+    opacity:.75;
+}
+
+/* 升級面板 */
+#upgradePanel{
+    display:none;
+    position:absolute;
+    z-index:40;
+    right:25px;
+    bottom:25px;
+
+    width:250px;
+    padding:16px;
+
+    background:rgba(8,12,40,.9);
+    border:1px solid rgba(255,120,255,.4);
+    border-radius:18px;
+
+    box-shadow:0 0 30px rgba(255,80,255,.15);
+}
+
+#upgradePanel h3{
+    margin:0 0 8px;
+    color:#ff9dff;
+}
+
+.upgradeBtn{
+    width:100%;
+    padding:9px;
+    margin-top:7px;
+    border:1px solid rgba(255,140,255,.4);
+    border-radius:10px;
+    background:rgba(90,40,110,.35);
+    color:white;
+    cursor:pointer;
+}
+
+.upgradeBtn:hover{
+    background:rgba(130,60,150,.55);
+    box-shadow:0 0 15px rgba(255,100,255,.3);
+}
+
+.closeBtn{
+    float:right;
+    cursor:pointer;
+    color:#aaa;
+}
+
+/* 中央訊息 */
+#message{
+    position:absolute;
+    z-index:50;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    display:none;
+}
+
+.messageBox{
+    min-width:320px;
+    padding:35px 45px;
+
+    background:rgba(5,8,30,.92);
+    border:1px solid #74ecff;
+    border-radius:25px;
+
+    box-shadow:
+        0 0 50px rgba(0,220,255,.3),
+        inset 0 0 30px rgba(80,80,255,.15);
+
+    backdrop-filter:blur(20px);
+}
+
+.messageBox h1{
+    margin:0 0 12px;
+    font-size:42px;
+    color:#8ff6ff;
+    text-shadow:0 0 20px #00d9ff;
+}
+
+.messageBox p{
+    color:#b8dfff;
+}
+
+.restart{
+    margin-top:15px;
+    padding:12px 28px;
+    border:none;
+    border-radius:30px;
+
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+
+    background:linear-gradient(90deg,#6d3cff,#00d9ff);
+    cursor:pointer;
+
+    box-shadow:0 0 20px rgba(0,220,255,.4);
+}
+
+.restart:hover{
+    transform:scale(1.05);
+}
+
+/* 波次按鈕 */
+#startWave{
+    position:absolute;
+    z-index:30;
+    right:25px;
+    top:85px;
+
+    padding:10px 18px;
+    border-radius:25px;
+
+    background:rgba(0,210,255,.1);
+    border:1px solid #65edff;
+    color:#9ff7ff;
+    cursor:pointer;
+
+    box-shadow:0 0 18px rgba(0,220,255,.2);
+}
+
+#startWave:hover{
+    background:rgba(0,210,255,.22);
+}
+
+/* 小螢幕 */
+@media(max-width:700px){
+    #hud{
+        padding:8px 10px;
+    }
+
+    .logo{
+        font-size:14px;
+    }
+
+    .stats{
+        gap:8px;
+        font-size:12px;
+    }
+
+    #towerPanel{
+        left:8px;
+        bottom:8px;
+        width:190px;
+    }
+
+    #upgradePanel{
+        right:8px;
+        bottom:8px;
+        width:190px;
+    }
+
+    #canvas{
+        width:96vw;
+        height:68vh;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="stars"></div>
+
+<div id="game">
+
+    <div id="hud">
+        <div class="logo">讓AI解決我的生活大小事_塔防</div>
+
+        <div class="stats">
+            <div>❤️ <span id="lives">20</span></div>
+            <div>💰 <span id="money">300</span></div>
+            <div>🌊 <span id="wave">0 / 10</span></div>
+        </div>
+    </div>
+
+    <button id="startWave" onclick="startWave()">啟動波次 ▶</button>
+
+    <canvas id="canvas"></canvas>
+
+    <div id="towerPanel">
+        <div class="panelTitle">◆ 防禦系統</div>
+
+        <div class="towerBtn" onclick="selectTower('laser')">
+            <span><span class="towerIcon">🔷</span> 雷射塔</span>
+            <span class="towerCost">💰 80</span>
+        </div>
+
+        <div class="towerBtn" onclick="selectTower('cannon')">
+            <span><span class="towerIcon">🟣</span> 能量炮</span>
+            <span class="towerCost">💰 120</span>
+        </div>
+
+        <div class="towerBtn" onclick="selectTower('missile')">
+            <span><span class="towerIcon">🔺</span> 導彈塔</span>
+            <span class="towerCost">💰 180</span>
+        </div>
+    </div>
+
+    <div id="upgradePanel">
+        <span class="closeBtn" onclick="closeUpgrade()">✕</span>
+        <h3>⚡ 防禦塔核心</h3>
+
+        <div id="towerInfo"></div>
+
+        <button class="upgradeBtn" onclick="upgradeDamage()">
+            ⚔ 傷害升級　💰 <span id="damageCost">50</span>
+        </button>
+
+        <button class="upgradeBtn" onclick="upgradeSpeed()">
+            ⚡ 射速升級　💰 <span id="speedCost">50</span>
+        </button>
+    </div>
+
+    <div id="hint">
+        點擊地圖放置防禦塔　｜　點擊已建造的塔進行升級
+    </div>
+
+    <div id="message">
+        <div class="messageBox">
+            <h1 id="messageTitle">VICTORY</h1>
+            <p id="messageText"></p>
+            <button class="restart" onclick="restartGame()">重新啟動系統</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let W,H;
+
+function resize(){
+    W = canvas.width = canvas.clientWidth;
+    H = canvas.height = canvas.clientHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+
+/* =========================
+   遊戲資料
+========================= */
+
+let money = 300;
+let lives = 20;
+let wave = 0;
+
+let selectedTower = null;
+let selectedBuiltTower = null;
+
+let enemies = [];
+let towers = [];
+let bullets = [];
+let particles = [];
+
+let waveRunning = false;
+let spawnLeft = 0;
+let spawnTimer = 0;
+
+let gameOver = false;
+
+
+/* =========================
+   路徑
+========================= */
+
+function pathPoints(){
+
+    return [
+        {x:0.02,y:0.25},
+        {x:0.22,y:0.25},
+        {x:0.30,y:0.55},
+        {x:0.52,y:0.55},
+        {x:0.62,y:0.25},
+        {x:0.83,y:0.25},
+        {x:0.92,y:0.70},
+        {x:1.02,y:0.70}
+    ].map(p=>({
+        x:p.x*W,
+        y:p.y*H
+    }));
+}
+
+function drawPath(){
+
+    const p=pathPoints();
+
+    ctx.save();
+
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+
+    /* 外圈光 */
+    ctx.beginPath();
+    ctx.moveTo(p[0].x,p[0].y);
+
+    for(let i=1;i<p.length;i++){
+        ctx.lineTo(p[i].x,p[i].y);
+    }
+
+    ctx.strokeStyle="rgba(0,220,255,.12)";
+    ctx.lineWidth=48;
+    ctx.stroke();
+
+    /* 道路 */
+    ctx.beginPath();
+    ctx.moveTo(p[0].x,p[0].y);
+
+    for(let i=1;i<p.length;i++){
+        ctx.lineTo(p[i].x,p[i].y);
+    }
+
+    ctx.strokeStyle="rgba(13,24,65,.95)";
+    ctx.lineWidth=34;
+    ctx.stroke();
+
+    /* 發光邊線 */
+    ctx.beginPath();
+    ctx.moveTo(p[0].x,p[0].y);
+
+    for(let i=1;i<p.length;i++){
+        ctx.lineTo(p[i].x,p[i].y);
+    }
+
+    ctx.strokeStyle="#1adfff";
+    ctx.lineWidth=2;
+    ctx.setLineDash([10,10]);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+
+/* =========================
+   路徑位置
+========================= */
+
+function getPointAtDistance(dist){
+
+    const p=pathPoints();
+
+    let remain=dist;
+
+    for(let i=0;i<p.length-1;i++){
+
+        const a=p[i];
+        const b=p[i+1];
+
+        const dx=b.x-a.x;
+        const dy=b.y-a.y;
+
+        const len=Math.sqrt(dx*dx+dy*dy);
+
+        if(remain<=len){
+
+            const t=remain/len;
+
+            return {
+                x:a.x+dx*t,
+                y:a.y+dy*t
+            };
+        }
+
+        remain-=len;
+    }
+
+    return p[p.length-1];
+}
+
+function pathLength(){
+
+    const p=pathPoints();
+    let total=0;
+
+    for(let i=0;i<p.length-1;i++){
+
+        const dx=p[i+1].x-p[i].x;
+        const dy=p[i+1].y-p[i].y;
+
+        total+=Math.sqrt(dx*dx+dy*dy);
+    }
+
+    return total;
+}
+
+
+/* =========================
+   敵人
+========================= */
+
+class Enemy{
+
+    constructor(type=0){
+
+        this.dist=0;
+
+        this.speed=0.7 + wave*0.025;
+
+        this.maxHp=40 + wave*15;
+
+        if(type===1){
+            this.speed*=1.5;
+            this.maxHp*=0.7;
+        }
+
+        if(type===2){
+            this.speed*=0.65;
+            this.maxHp*=2;
+        }
+
+        this.hp=this.maxHp;
+
+        this.radius=type===2?13:10;
+
+        this.reward=12+wave*2;
+
+        this.type=type;
+
+        this.dead=false;
+    }
+
+    update(){
+
+        this.dist+=this.speed;
+
+        if(this.dist>=pathLength()){
+
+            this.dead=true;
+            lives--;
+
+            updateHUD();
+
+            if(lives<=0){
+                endGame(false);
+            }
+        }
+    }
+
+    draw(){
+
+        const p=getPointAtDistance(this.dist);
+
+        ctx.save();
+
+        ctx.shadowBlur=18;
+
+        if(this.type===0){
+            ctx.shadowColor="#ff3d9a";
+            ctx.fillStyle="#ff4da6";
+        }
+        else if(this.type===1){
+            ctx.shadowColor="#ffd43b";
+            ctx.fillStyle="#ffe26a";
+        }
+        else{
+            ctx.shadowColor="#9b6cff";
+            ctx.fillStyle="#a98cff";
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,this.radius,0,Math.PI*2);
+        ctx.fill();
+
+        /* 核心 */
+        ctx.fillStyle="#fff";
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,3,0,Math.PI*2);
+        ctx.fill();
+
+        /* 血條 */
+        const bw=28;
+        const bh=4;
+
+        ctx.fillStyle="rgba(0,0,0,.7)";
+        ctx.fillRect(p.x-bw/2,p.y-this.radius-9,bw,bh);
+
+        ctx.fillStyle="#62ffbc";
+        ctx.fillRect(
+            p.x-bw/2,
+            p.y-this.radius-9,
+            bw*(this.hp/this.maxHp),
+            bh
+        );
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================
+   防禦塔
+========================= */
+
+const towerTypes={
+
+    laser:{
+        name:"雷射塔",
+        cost:80,
+        range:125,
+        damage:12,
+        fireRate:700,
+        color:"#5ff8ff"
+    },
+
+    cannon:{
+        name:"能量炮",
+        cost:120,
+        range:150,
+        damage:28,
+        fireRate:1200,
+        color:"#c77dff"
+    },
+
+    missile:{
+        name:"導彈塔",
+        cost:180,
+        range:185,
+        damage:55,
+        fireRate:1800,
+        color:"#ff75d8"
+    }
+};
+
+
+class Tower{
+
+    constructor(x,y,type){
+
+        const d=towerTypes[type];
+
+        this.x=x;
+        this.y=y;
+        this.type=type;
+
+        this.range=d.range;
+        this.damage=d.damage;
+        this.fireRate=d.fireRate;
+
+        this.lastShot=0;
+
+        this.damageLevel=1;
+        this.speedLevel=1;
+    }
+
+    update(time){
+
+        let target=null;
+        let bestDist=-1;
+
+        for(const e of enemies){
+
+            if(e.dead) continue;
+
+            const p=getPointAtDistance(e.dist);
+
+            const dx=p.x-this.x;
+            const dy=p.y-this.y;
+
+            const d=Math.sqrt(dx*dx+dy*dy);
+
+            if(d<=this.range && e.dist>bestDist){
+
+                bestDist=e.dist;
+                target=e;
+            }
+        }
+
+        if(
+            target &&
+            time-this.lastShot >
+            this.fireRate
+        ){
+
+            this.shoot(target);
+            this.lastShot=time;
+        }
+    }
+
+    shoot(target){
+
+        bullets.push(
+            new Bullet(
+                this,
+                target
+            )
+        );
+    }
+
+    draw(){
+
+        const d=towerTypes[this.type];
+
+        ctx.save();
+
+        /* 射程 */
+        if(selectedBuiltTower===this){
+
+            ctx.beginPath();
+            ctx.arc(this.x,this.y,this.range,0,Math.PI*2);
+
+            ctx.fillStyle="rgba(70,230,255,.04)";
+            ctx.fill();
+
+            ctx.strokeStyle="rgba(80,230,255,.35)";
+            ctx.stroke();
+        }
+
+        ctx.shadowBlur=25;
+        ctx.shadowColor=d.color;
+
+        /* 科技圓 */
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,18,0,Math.PI*2);
+
+        ctx.fillStyle="rgba(15,30,65,.95)";
+        ctx.fill();
+
+        ctx.strokeStyle=d.color;
+        ctx.lineWidth=2;
+        ctx.stroke();
+
+        /* 核心 */
+        ctx.fillStyle=d.color;
+
+        ctx.beginPath();
+
+        if(this.type==="laser"){
+
+            ctx.moveTo(this.x,this.y-11);
+            ctx.lineTo(this.x+10,this.y);
+            ctx.lineTo(this.x,this.y+11);
+            ctx.lineTo(this.x-10,this.y);
+            ctx.closePath();
+
+        }
+        else if(this.type==="cannon"){
+
+            ctx.arc(this.x,this.y,8,0,Math.PI*2);
+
+        }
+        else{
+
+            ctx.moveTo(this.x,this.y-12);
+            ctx.lineTo(this.x+10,this.y+9);
+            ctx.lineTo(this.x-10,this.y+9);
+            ctx.closePath();
+        }
+
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================
+   子彈
+========================= */
+
+class Bullet{
+
+    constructor(tower,target){
+
+        this.tower=tower;
+        this.target=target;
+
+        const p=getPointAtDistance(target.dist);
+
+        this.x=tower.x;
+        this.y=tower.y;
+
+        this.speed=8;
+
+        this.damage=tower.damage;
+
+        this.dead=false;
+
+        this.color=towerTypes[tower.type].color;
+    }
+
+    update(){
+
+        if(this.target.dead){
+            this.dead=true;
+            return;
+        }
+
+        const p=getPointAtDistance(this.target.dist);
+
+        const dx=p.x-this.x;
+        const dy=p.y-this.y;
+
+        const d=Math.sqrt(dx*dx+dy*dy);
+
+        if(d<this.speed){
+
+            this.target.hp-=this.damage;
+
+            createExplosion(
+                p.x,
+                p.y,
+                this.color
+            );
+
+            if(this.target.hp<=0){
+
+                this.target.dead=true;
+
+                money+=this.target.reward;
+
+                createExplosion(
+                    p.x,
+                    p.y,
+                    "#fff"
+                );
+            }
+
+            this.dead=true;
+
+        }else{
+
+            this.x+=dx/d*this.speed;
+            this.y+=dy/d*this.speed;
+        }
+    }
+
+    draw(){
+
+        ctx.save();
+
+        ctx.shadowBlur=15;
+        ctx.shadowColor=this.color;
+
+        ctx.fillStyle=this.color;
+
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,4,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================
+   粒子
+========================= */
+
+function createExplosion(x,y,color){
+
+    for(let i=0;i<10;i++){
+
+        particles.push({
+            x:x,
+            y:y,
+            vx:(Math.random()-.5)*4,
+            vy:(Math.random()-.5)*4,
+            life:1,
+            color:color
+        });
+    }
+}
+
+function updateParticles(){
+
+    for(const p of particles){
+
+        p.x+=p.vx;
+        p.y+=p.vy;
+        p.life-=.035;
+    }
+
+    particles=particles.filter(p=>p.life>0);
+}
+
+function drawParticles(){
+
+    for(const p of particles){
+
+        ctx.save();
+
+        ctx.globalAlpha=p.life;
+        ctx.fillStyle=p.color;
+
+        ctx.shadowBlur=10;
+        ctx.shadowColor=p.color;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+
+/* =========================
+   建塔
+========================= */
+
+function selectTower(type){
+
+    selectedTower=type;
+    selectedBuiltTower=null;
+
+    document.querySelectorAll(".towerBtn")
+        .forEach(x=>x.classList.remove("selected"));
+
+    event.currentTarget.classList.add("selected");
+
+    closeUpgrade();
+}
+
+
+function canPlace(x,y){
+
+    /* 避免蓋在道路 */
+    const p=pathPoints();
+
+    for(let i=0;i<p.length-1;i++){
+
+        const a=p[i];
+        const b=p[i+1];
+
+        const dx=b.x-a.x;
+        const dy=b.y-a.y;
+
+        const len2=dx*dx+dy*dy;
+
+        let t=((x-a.x)*dx+(y-a.y)*dy)/len2;
+
+        t=Math.max(0,Math.min(1,t));
+
+        const px=a.x+t*dx;
+        const py=a.y+t*dy;
+
+        const d=Math.sqrt(
+            (x-px)**2+
+            (y-py)**2
+        );
+
+        if(d<45) return false;
+    }
+
+    /* 避免塔重疊 */
+    for(const t of towers){
+
+        if(
+            Math.hypot(
+                x-t.x,
+                y-t.y
+            )<45
+        ){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+canvas.addEventListener("click",e=>{
+
+    if(gameOver) return;
+
+    const rect=canvas.getBoundingClientRect();
+
+    const x=e.clientX-rect.left;
+    const y=e.clientY-rect.top;
+
+    /* 點擊已有塔 */
+    for(const t of towers){
+
+        if(
+            Math.hypot(
+                x-t.x,
+                y-t.y
+            )<25
+        ){
+
+            selectedBuiltTower=t;
+            selectedTower=null;
+
+            openUpgrade(t);
+
+            return;
+        }
+    }
+
+    if(!selectedTower) return;
+
+    const data=towerTypes[selectedTower];
+
+    if(money<data.cost){
+
+        flashMessage("金幣不足！");
+        return;
+    }
+
+    if(!canPlace(x,y)){
+
+        flashMessage("此處無法建造！");
+        return;
+    }
+
+    money-=data.cost;
+
+    towers.push(
+        new Tower(
+            x,
+            y,
+            selectedTower
+        )
+    );
+
+    selectedTower=null;
+
+    document.querySelectorAll(".towerBtn")
+        .forEach(x=>x.classList.remove("selected"));
+
+    updateHUD();
+});
+
+
+/* =========================
+   升級
+========================= */
+
+function openUpgrade(t){
+
+    document.getElementById("upgradePanel")
+        .style.display="block";
+
+    updateUpgradePanel();
+}
+
+function closeUpgrade(){
+
+    document.getElementById("upgradePanel")
+        .style.display="none";
+
+    selectedBuiltTower=null;
+}
+
+function updateUpgradePanel(){
+
+    if(!selectedBuiltTower) return;
+
+    const t=selectedBuiltTower;
+
+    const d=towerTypes[t.type];
+
+    document.getElementById("towerInfo").innerHTML=
+        `
+        <b>${d.name}</b><br>
+        ⚔ 傷害：${t.damage}<br>
+        ⚡ 射速：${Math.round(60000/t.fireRate)} 發/分鐘<br>
+        🎯 射程：${t.range}<br>
+        <small>傷害 Lv.${t.damageLevel}　射速 Lv.${t.speedLevel}</small>
+        `;
+
+    document.getElementById("damageCost").textContent=
+        50*t.damageLevel;
+
+    document.getElementById("speedCost").textContent=
+        50*t.speedLevel;
+}
+
+function upgradeDamage(){
+
+    if(!selectedBuiltTower) return;
+
+    const cost=50*selectedBuiltTower.damageLevel;
+
+    if(money<cost){
+
+        flashMessage("金幣不足！");
+        return;
+    }
+
+    money-=cost;
+
+    selectedBuiltTower.damage+=10;
+    selectedBuiltTower.damageLevel++;
+
+    updateUpgradePanel();
+    updateHUD();
+}
+
+function upgradeSpeed(){
+
+    if(!selectedBuiltTower) return;
+
+    const cost=50*selectedBuiltTower.speedLevel;
+
+    if(money<cost){
+
+        flashMessage("金幣不足！");
+        return;
+    }
+
+    money-=cost;
+
+    selectedBuiltTower.fireRate=
+        Math.max(
+            250,
+            selectedBuiltTower.fireRate*.85
+        );
+
+    selectedBuiltTower.speedLevel++;
+
+    updateUpgradePanel();
+    updateHUD();
+}
+
+
+/* =========================
+   波次
+========================= */
+
+function startWave(){
+
+    if(waveRunning || gameOver) return;
+
+    if(wave>=10){
+
+        endGame(true);
+        return;
+    }
+
+    wave++;
+
+    waveRunning=true;
+
+    spawnLeft=8+wave*3;
+    spawnTimer=0;
+
+    updateHUD();
+}
+
+function spawnEnemy(){
+
+    let type=0;
+
+    const r=Math.random();
+
+    if(r>.82) type=2;
+    else if(r>.60) type=1;
+
+    enemies.push(
+        new Enemy(type)
+    );
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+function updateHUD(){
+
+    document.getElementById("money")
+        .textContent=Math.floor(money);
+
+    document.getElementById("lives")
+        .textContent=lives;
+
+    document.getElementById("wave")
+        .textContent=wave+" / 10";
+}
+
+
+/* =========================
+   訊息
+========================= */
+
+function flashMessage(text){
+
+    const old=document.getElementById("hint").textContent;
+
+    document.getElementById("hint").textContent=text;
+
+    setTimeout(()=>{
+
+        document.getElementById("hint")
+            .textContent=
+            "點擊地圖放置防禦塔　｜　點擊已建造的塔進行升級";
+
+    },1200);
+}
+
+
+/* =========================
+   遊戲結束
+========================= */
+
+function endGame(win){
+
+    gameOver=true;
+
+    const box=document.getElementById("message");
+
+    box.style.display="block";
+
+    if(win){
+
+        document.getElementById("messageTitle")
+            .textContent="✦ VICTORY ✦";
+
+        document.getElementById("messageText")
+            .textContent=
+            "所有敵方能量體已被消滅，夢幻防線成功守護！";
+
+    }else{
+
+        document.getElementById("messageTitle")
+            .textContent="SYSTEM FAILURE";
+
+        document.getElementById("messageText")
+            .textContent=
+            "防線已被突破，基地生命值歸零。";
+    }
+}
+
+function restartGame(){
+
+    money=300;
+    lives=20;
+    wave=0;
+
+    enemies=[];
+    towers=[];
+    bullets=[];
+    particles=[];
+
+    waveRunning=false;
+    gameOver=false;
+
+    selectedTower=null;
+    selectedBuiltTower=null;
+
+    document.getElementById("message")
+        .style.display="none";
+
+    closeUpgrade();
+
+    updateHUD();
+}
+
+
+/* =========================
+   主迴圈
+========================= */
+
+let lastTime=0;
+
+function gameLoop(time){
+
+    const dt=time-lastTime;
+    lastTime=time;
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+    /* 科技網格 */
+
+    ctx.save();
+
+    ctx.strokeStyle="rgba(60,150,255,.07)";
+    ctx.lineWidth=1;
+
+    const grid=45;
+
+    for(let x=0;x<W;x+=grid){
+
+        ctx.beginPath();
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,H);
+        ctx.stroke();
+    }
+
+    for(let y=0;y<H;y+=grid){
+
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(W,y);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+
+    drawPath();
+
+
+    /* 產生敵人 */
+
+    if(waveRunning){
+
+        spawnTimer-=dt;
+
+        if(
+            spawnLeft>0 &&
+            spawnTimer<=0
+        ){
+
+            spawnEnemy();
+
+            spawnLeft--;
+
+            spawnTimer=
+                Math.max(
+                    350,
+                    850-wave*35
+                );
+        }
+
+        if(
+            spawnLeft<=0 &&
+            enemies.length===0
+        ){
+
+            waveRunning=false;
+
+            if(wave>=10){
+
+                endGame(true);
+
+            }else{
+
+                money+=30;
+
+                flashMessage(
+                    "波次完成！獲得 30 金幣"
+                );
+
+                updateHUD();
+            }
+        }
+    }
+
+
+    /* 敵人 */
+
+    for(const e of enemies){
+
+        if(!e.dead)
+            e.update();
+
+        if(!e.dead)
+            e.draw();
+    }
+
+    enemies=
+        enemies.filter(e=>!e.dead);
+
+
+    /* 防禦塔 */
+
+    for(const t of towers){
+
+        t.update(time);
+        t.draw();
+    }
+
+
+    /* 子彈 */
+
+    for(const b of bullets){
+
+        if(!b.dead)
+            b.update();
+
+        if(!b.dead)
+            b.draw();
+    }
+
+    bullets=
+        bullets.filter(b=>!b.dead);
+
+
+    /* 粒子 */
+
+    updateParticles();
+    drawParticles();
+
+
+    requestAnimationFrame(gameLoop);
+}
+
+updateHUD();
+requestAnimationFrame(gameLoop);
+
+</script>
+
+</body>
+</html>
+

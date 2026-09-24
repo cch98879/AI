@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>讓AI解決我的生活大小事_抽獎器</title>
+
+<style>
+:root{
+  --bg1:#030014;
+  --bg2:#080b2a;
+  --cyan:#00f6ff;
+  --blue:#4f8cff;
+  --purple:#b86cff;
+  --pink:#ff4fd8;
+  --gold:#ffe66d;
+  --text:#f8fbff;
+  --muted:#aab6d3;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+}
+
+body{
+  font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  color:var(--text);
+  min-height:100svh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+  overflow-x:hidden;
+
+  background:
+    radial-gradient(circle at 20% 10%,rgba(0,246,255,.20),transparent 25%),
+    radial-gradient(circle at 80% 15%,rgba(184,108,255,.22),transparent 28%),
+    radial-gradient(circle at 50% 100%,rgba(255,79,216,.16),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+
+  position:relative;
+}
+
+/* =========================
+   星空背景
+========================= */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+
+  background-image:
+    radial-gradient(circle,rgba(255,255,255,.9) 1px,transparent 1px),
+    radial-gradient(circle,rgba(0,246,255,.7) 1px,transparent 1px),
+    radial-gradient(circle,rgba(255,79,216,.7) 1px,transparent 1px);
+
+  background-size:
+    90px 90px,
+    140px 140px,
+    190px 190px;
+
+  background-position:
+    0 0,
+    30px 50px,
+    80px 20px;
+
+  opacity:.35;
+  animation:starMove 18s linear infinite;
+}
+
+@keyframes starMove{
+  from{background-position:0 0,30px 50px,80px 20px;}
+  to{background-position:90px 90px,170px 190px,270px 160px;}
+}
+
+.wrap{
+  width:clamp(320px,95vw,1100px);
+  position:relative;
+  z-index:2;
+}
+
+/* =========================
+   標題
+========================= */
+
+.title{
+  text-align:center;
+  margin:5px 0 20px;
+
+  font-size:clamp(25px,4vw,42px);
+  font-weight:900;
+  letter-spacing:.08em;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan),
+      #ffffff,
+      var(--purple),
+      var(--pink),
+      var(--cyan)
+    );
+
+  background-size:300% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+
+  animation:titleGlow 4s linear infinite;
+
+  filter:
+    drop-shadow(0 0 8px rgba(0,246,255,.8))
+    drop-shadow(0 0 25px rgba(184,108,255,.5));
+}
+
+@keyframes titleGlow{
+  0%{background-position:0%;}
+  100%{background-position:300%;}
+}
+
+/* =========================
+   主面板
+========================= */
+
+.panel{
+  position:relative;
+
+  padding:18px;
+
+  border-radius:24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.015)
+    );
+
+  border:1px solid rgba(0,246,255,.35);
+
+  backdrop-filter:blur(15px);
+
+  box-shadow:
+    0 0 30px rgba(0,246,255,.12),
+    0 0 80px rgba(184,108,255,.10),
+    inset 0 0 35px rgba(0,246,255,.04);
+
+  overflow:hidden;
+}
+
+/* 面板流光 */
+
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(0,246,255,.6),
+      transparent,
+      rgba(255,79,216,.5),
+      transparent
+    );
+
+  background-size:300% 100%;
+  animation:borderFlow 6s linear infinite;
+
+  opacity:.45;
+  pointer-events:none;
+}
+
+@keyframes borderFlow{
+  0%{background-position:-300% 0;}
+  100%{background-position:300% 0;}
+}
+
+/* =========================
+   控制區
+========================= */
+
+.controls{
+  position:relative;
+  z-index:2;
+
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:12px;
+  align-items:end;
+}
+
+.ctrl{
+  grid-column:span 12;
+}
+
+@media(min-width:640px){
+
+  .ctrl.span4{grid-column:span 4;}
+  .ctrl.span3{grid-column:span 3;}
+  .ctrl.span2{grid-column:span 2;}
+
+}
+
+label{
+  display:block;
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+
+input[type="number"]{
+  width:100%;
+  padding:13px 14px;
+
+  border-radius:14px;
+
+  border:1px solid rgba(0,246,255,.25);
+
+  background:rgba(0,0,20,.65);
+
+  color:white;
+
+  font-size:16px;
+
+  outline:none;
+
+  transition:.25s;
+}
+
+input[type="number"]:focus{
+  border-color:var(--cyan);
+
+  box-shadow:
+    0 0 10px rgba(0,246,255,.4),
+    0 0 25px rgba(0,246,255,.15);
+}
+
+/* =========================
+   按鈕
+========================= */
+
+.btn{
+  width:100%;
+
+  min-height:48px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  padding:12px 16px;
+
+  border-radius:14px;
+
+  border:1px solid rgba(0,246,255,.4);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0,246,255,.22),
+      rgba(79,140,255,.12)
+    );
+
+  color:white;
+
+  font-weight:800;
+  letter-spacing:.06em;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 0 15px rgba(0,246,255,.15),
+    inset 0 0 15px rgba(0,246,255,.08);
+
+  transition:.2s;
+
+  position:relative;
+  overflow:hidden;
+}
+
+.btn::after{
+  content:"";
+
+  position:absolute;
+  top:0;
+  left:-100%;
+
+  width:60%;
+  height:100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.4),
+      transparent
+    );
+
+  transform:skewX(-20deg);
+
+  transition:.5s;
+}
+
+.btn:hover::after{
+  left:140%;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 0 18px rgba(0,246,255,.45),
+    0 0 35px rgba(79,140,255,.25);
+}
+
+.btn:active{
+  transform:scale(.97);
+}
+
+.btn.secondary{
+  border-color:rgba(184,108,255,.5);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(184,108,255,.25),
+      rgba(255,79,216,.12)
+    );
+}
+
+.btn.secondary:hover{
+  box-shadow:
+    0 0 20px rgba(184,108,255,.5),
+    0 0 40px rgba(255,79,216,.25);
+}
+
+/* =========================
+   狀態列
+========================= */
+
+.status{
+  position:relative;
+  z-index:2;
+
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+
+  align-items:center;
+  justify-content:space-between;
+
+  padding:12px 14px;
+
+  margin-top:15px;
+
+  border-radius:15px;
+
+  background:rgba(0,0,20,.45);
+
+  border:1px dashed rgba(0,246,255,.3);
+
+  font-size:15px;
+}
+
+.badge{
+  display:inline-block;
+
+  min-width:65px;
+
+  padding:6px 12px;
+
+  text-align:center;
+
+  border-radius:999px;
+
+  font-weight:900;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,246,255,.16),
+      rgba(184,108,255,.16)
+    );
+
+  border:1px solid rgba(0,246,255,.4);
+
+  box-shadow:
+    0 0 10px rgba(0,246,255,.15),
+    inset 0 0 10px rgba(0,246,255,.1);
+}
+
+/* =========================
+   抽獎格
+========================= */
+
+.grid{
+  position:relative;
+  z-index:2;
+
+  margin-top:20px;
+
+  display:grid;
+
+  grid-template-columns:repeat(10,1fr);
+
+  gap:8px;
+}
+
+.cell{
+  position:relative;
+
+  aspect-ratio:1/1;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-weight:900;
+
+  font-size:clamp(15px,2.1vw,22px);
+
+  color:#dce7ff;
+
+  border-radius:14px;
+
+  border:1px solid rgba(148,163,184,.22);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.05),
+      rgba(0,0,30,.45)
+    );
+
+  box-shadow:
+    inset 0 0 20px rgba(0,0,30,.7);
+
+  overflow:hidden;
+
+  transition:
+    transform .08s,
+    box-shadow .2s,
+    border-color .2s,
+    color .2s;
+}
+
+.cell::before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(0,246,255,.35),
+      transparent 60%
+    );
+
+  opacity:0;
+
+  transition:.2s;
+}
+
+.cell:hover{
+  transform:translateY(-2px) scale(1.02);
+
+  border-color:rgba(0,246,255,.7);
+
+  box-shadow:
+    0 0 15px rgba(0,246,255,.25);
+}
+
+/* =========================
+   抽獎中的格子
+========================= */
+
+.cell.active{
+  z-index:3;
+
+  color:#05051a;
+
+  border-color:white;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      white 0%,
+      #00f6ff 25%,
+      #4f8cff 55%,
+      #b86cff 100%
+    );
+
+  box-shadow:
+    0 0 10px white,
+    0 0 25px #00f6ff,
+    0 0 50px rgba(184,108,255,.9),
+    inset 0 0 25px white;
+
+  animation:
+    winnerPulse .65s ease-in-out infinite alternate;
+}
+
+.cell.active::before{
+  opacity:1;
+}
+
+@keyframes winnerPulse{
+
+  from{
+    transform:scale(1);
+    filter:brightness(1);
+  }
+
+  to{
+    transform:scale(1.08);
+    filter:brightness(1.35);
+  }
+
+}
+
+/* =========================
+   最終中獎號碼
+========================= */
+
+#winner{
+  font-size:18px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #00f6ff,
+      #ffffff,
+      #ff4fd8,
+      #ffe66d
+    );
+
+  background-size:300%;
+
+  -webkit-background-clip:text;
+  background-clip:text;
+
+  color:transparent;
+
+  animation:
+    winnerText 2s linear infinite;
+
+  text-shadow:none;
+}
+
+@keyframes winnerText{
+  from{background-position:0%;}
+  to{background-position:300%;}
+}
+
+/* =========================
+   火花粒子
+========================= */
+
+.spark{
+  position:fixed;
+
+  width:6px;
+  height:6px;
+
+  border-radius:50%;
+
+  pointer-events:none;
+
+  z-index:9999;
+
+  background:white;
+
+  box-shadow:
+    0 0 5px white,
+    0 0 12px #00f6ff,
+    0 0 20px #ff4fd8;
+
+  animation:
+    sparkFly 900ms cubic-bezier(.1,.7,.2,1) forwards;
+}
+
+@keyframes sparkFly{
+
+  0%{
+    transform:
+      translate(0,0)
+      scale(1.4);
+
+    opacity:1;
+  }
+
+  70%{
+    opacity:1;
+  }
+
+  100%{
+    transform:
+      translate(var(--x),var(--y))
+      scale(0);
+
+    opacity:0;
+  }
+
+}
+
+/* =========================
+   爆炸光圈
+========================= */
+
+.explosion{
+  position:fixed;
+
+  width:40px;
+  height:40px;
+
+  border-radius:50%;
+
+  border:3px solid white;
+
+  pointer-events:none;
+
+  z-index:9998;
+
+  transform:translate(-50%,-50%);
+
+  animation:
+    explosion .8s ease-out forwards;
+
+  box-shadow:
+    0 0 15px white,
+    0 0 40px #00f6ff,
+    0 0 80px #ff4fd8;
+}
+
+@keyframes explosion{
+
+  0%{
+    width:20px;
+    height:20px;
+    opacity:1;
+  }
+
+  100%{
+    width:300px;
+    height:300px;
+    opacity:0;
+  }
+
+}
+
+/* =========================
+   Footer
+========================= */
+
+.footer{
+  position:relative;
+  z-index:2;
+
+  text-align:center;
+
+  color:var(--muted);
+
+  margin-top:17px;
+
+  font-size:13px;
+}
+
+/* =========================
+   抽獎時整個畫面效果
+========================= */
+
+body.lottery-running .panel{
+  box-shadow:
+    0 0 30px rgba(0,246,255,.25),
+    0 0 100px rgba(184,108,255,.20),
+    inset 0 0 30px rgba(0,246,255,.08);
+}
+
+body.lottery-running .title{
+  animation:
+    titleGlow 1s linear infinite,
+    titleShake .12s infinite;
+}
+
+@keyframes titleShake{
+
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-1px);}
+  50%{transform:translateX(1px);}
+  75%{transform:translateX(-1px);}
+  100%{transform:translateX(0);}
+
+}
+
+/* =========================
+   小螢幕
+========================= */
+
+@media(max-width:500px){
+
+  body{
+    padding:10px;
+  }
+
+  .panel{
+    padding:12px;
+  }
+
+  .grid{
+    gap:5px;
+  }
+
+  .cell{
+    border-radius:9px;
+  }
+
+  .status{
+    font-size:13px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<main class="wrap">
+
+<h1 class="title">
+  讓AI解決我的生活大小事_抽獎器
+</h1>
+
+<section class="panel">
+
+<div class="controls">
+
+  <div class="ctrl span4">
+
+    <label for="count">
+      抽獎儲存格數量（1–500，預設 20）
+    </label>
+
+    <input
+      type="number"
+      id="count"
+      min="1"
+      max="500"
+      value="20"
+      inputmode="numeric"
+    >
+
+  </div>
+
+  <div class="ctrl span3">
+
+    <label for="seconds">
+      倒數秒數（1–60，預設 5）
+    </label>
+
+    <input
+      type="number"
+      id="seconds"
+      min="1"
+      max="60"
+      value="5"
+      inputmode="numeric"
+    >
+
+  </div>
+
+  <div class="ctrl span2">
+
+    <button
+      id="setupBtn"
+      class="btn"
+      type="button"
+    >
+      ⚙️ 設定
+    </button>
+
+  </div>
+
+  <div class="ctrl span3">
+
+    <button
+      id="startBtn"
+      class="btn secondary"
+      type="button"
+    >
+      🚀 開始抽獎
+    </button>
+
+  </div>
+
+</div>
+
+
+<div class="status" aria-live="polite">
+
+  <div>
+    ⏱️ 倒數：
+    <span id="countdown" class="badge">—</span>
+  </div>
+
+  <div>
+    🏆 最終中獎號碼：
+    <span id="winner" class="badge">—</span>
+  </div>
+
+</div>
+
+
+<div
+  id="grid"
+  class="grid"
+  role="grid"
+  aria-label="抽獎格"
+></div>
+
+
+<p class="footer">
+  ✨ 抽獎時高速閃爍　⚡ 中獎瞬間火花爆發　🎆 祝你好運！
+</p>
+
+<span
+  id="live"
+  class="sr-only"
+  aria-live="assertive"
+></span>
+
+</section>
+
+</main>
+
+
+<script>
+
+const $ = (sel) => document.querySelector(sel);
+
+const grid = $('#grid');
+const setupBtn = $('#setupBtn');
+const startBtn = $('#startBtn');
+
+const countdownEl = $('#countdown');
+const winnerEl = $('#winner');
+const liveEl = $('#live');
+
+let spinTimer = null;
+let countdownTimer = null;
+
+let running = false;
+let lastActive = null;
+
+
+/* =========================
+   數值限制
+========================= */
+
+function clamp(n,min,max){
+  return Math.max(min,Math.min(max,n));
+}
+
+
+/* =========================
+   建立抽獎格
+========================= */
+
+function buildGrid(total){
+
+  grid.innerHTML = '';
+
+  lastActive = null;
+
+  const frag = document.createDocumentFragment();
+
+  for(let i=1;i<=total;i++){
+
+    const cell = document.createElement('div');
+
+    cell.className = 'cell';
+
+    cell.role = 'gridcell';
+
+    cell.dataset.value = String(i);
+
+    cell.textContent = i;
+
+    frag.appendChild(cell);
+
+  }
+
+  grid.appendChild(frag);
+
+  winnerEl.textContent = '—';
+  countdownEl.textContent = '—';
+
+}
+
+
+/* =========================
+   隨機抽取
+========================= */
+
+function randomCell(){
+
+  const cells = grid.children;
+
+  if(!cells.length) return null;
+
+  const idx =
+    Math.floor(
+      Math.random() * cells.length
+    );
+
+  return cells[idx];
+
+}
+
+
+/* =========================
+   高亮
+========================= */
+
+function highlight(cell){
+
+  if(lastActive){
+
+    lastActive.classList.remove('active');
+
+  }
+
+  if(cell){
+
+    cell.classList.add('active');
+
+    lastActive = cell;
+
+  }
+
+}
+
+
+/* =========================
+   控制按鈕
+========================= */
+
+function setControlsDisabled(disabled){
+
+  $('#count').disabled = disabled;
+  $('#seconds').disabled = disabled;
+
+  setupBtn.disabled = disabled;
+  startBtn.disabled = disabled;
+
+  startBtn.style.cursor =
+    disabled
+      ? 'not-allowed'
+      : 'pointer';
+
+}
+
+
+/* =========================
+   火花爆炸
+========================= */
+
+function createExplosion(cell){
+
+  if(!cell) return;
+
+  const rect =
+    cell.getBoundingClientRect();
+
+  const centerX =
+    rect.left + rect.width / 2;
+
+  const centerY =
+    rect.top + rect.height / 2;
+
+
+  /* 光圈 */
+
+  const explosion =
+    document.createElement('div');
+
+  explosion.className =
+    'explosion';
+
+  explosion.style.left =
+    centerX + 'px';
+
+  explosion.style.top =
+    centerY + 'px';
+
+  document.body.appendChild(explosion);
+
+
+  setTimeout(()=>{
+    explosion.remove();
+  },900);
+
+
+  /* 火花 */
+
+  const sparkCount = 90;
+
+  for(let i=0;i<sparkCount;i++){
+
+    const spark =
+      document.createElement('div');
+
+    spark.className = 'spark';
+
+    spark.style.left =
+      centerX + 'px';
+
+    spark.style.top =
+      centerY + 'px';
+
+
+    const angle =
+      Math.random() *
+      Math.PI * 2;
+
+    const distance =
+      80 +
+      Math.random() * 260;
+
+
+    const x =
+      Math.cos(angle) *
+      distance;
+
+    const y =
+      Math.sin(angle) *
+      distance;
+
+
+    spark.style.setProperty(
+      '--x',
+      x + 'px'
+    );
+
+    spark.style.setProperty(
+      '--y',
+      y + 'px'
+    );
+
+
+    const size =
+      3 + Math.random() * 6;
+
+    spark.style.width =
+      size + 'px';
+
+    spark.style.height =
+      size + 'px';
+
+
+    document.body.appendChild(spark);
+
+
+    setTimeout(()=>{
+      spark.remove();
+    },950);
+
+  }
+
+}
+
+
+/* =========================
+   設定
+========================= */
+
+setupBtn.addEventListener(
+  'click',
+  ()=>{
+
+    if(running) return;
+
+    let total =
+      parseInt(
+        $('#count').value,
+        10
+      );
+
+    let secs =
+      parseFloat(
+        $('#seconds').value
+      );
+
+
+    if(Number.isNaN(total))
+      total = 20;
+
+    if(Number.isNaN(secs))
+      secs = 5;
+
+
+    total =
+      clamp(total,1,500);
+
+    secs =
+      clamp(secs,1,60);
+
+
+    $('#count').value = total;
+
+    $('#seconds').value = secs;
+
+
+    buildGrid(total);
+
+  }
+);
+
+
+/* =========================
+   開始抽獎
+========================= */
+
+startBtn.addEventListener(
+  'click',
+  ()=>{
+
+    if(running) return;
+
+
+    if(!grid.children.length){
+
+      buildGrid(
+        clamp(
+          parseInt(
+            $('#count').value,
+            10
+          ) || 20,
+          1,
+          500
+        )
+      );
+
+    }
+
+
+    const secs =
+      clamp(
+        parseFloat(
+          $('#seconds').value
+        ) || 5,
+        1,
+        60
+      );
+
+
+    running = true;
+
+    document.body.classList.add(
+      'lottery-running'
+    );
+
+    setControlsDisabled(true);
+
+
+    const endAt =
+      performance.now() +
+      secs * 1000;
+
+
+    /* =====================
+       高速閃爍
+    ===================== */
+
+    spinTimer =
+      setInterval(
+        ()=>{
+
+          const c =
+            randomCell();
+
+          if(c){
+
+            highlight(c);
+
+          }
+
+        },
+        100
+      );
+
+
+    /* =====================
+       倒數
+    ===================== */
+
+    countdownTimer =
+      setInterval(
+        ()=>{
+
+          const remain =
+            Math.max(
+              0,
+              endAt -
+              performance.now()
+            );
+
+
+          const sec10 =
+            Math.round(
+              remain / 100
+            );
+
+
+          countdownEl.textContent =
+            (sec10 / 10)
+              .toFixed(1)
+            + ' 秒';
+
+
+          if(remain <= 0){
+
+            finish();
+
+          }
+
+        },
+        100
+      );
+
+
+    /* =====================
+       結束抽獎
+    ===================== */
+
+    function finish(){
+
+      clearInterval(spinTimer);
+
+      spinTimer = null;
+
+
+      clearInterval(
+        countdownTimer
+      );
+
+      countdownTimer = null;
+
+
+      running = false;
+
+
+      document.body.classList.remove(
+        'lottery-running'
+      );
+
+
+      setControlsDisabled(false);
+
+
+      const finalCell =
+        lastActive ||
+        randomCell();
+
+
+      if(finalCell){
+
+        highlight(finalCell);
+
+
+        const val =
+          finalCell.dataset.value;
+
+
+        winnerEl.textContent =
+          '#' + val;
+
+
+        liveEl.textContent =
+          `中獎號碼為 ${val}`;
+
+
+        /* 火花爆炸 */
+
+        createExplosion(
+          finalCell
+        );
+
+
+        /* 中獎格再閃一次 */
+
+        finalCell.animate(
+
+          [
+            {
+              transform:
+                'scale(1)'
+            },
+
+            {
+              transform:
+                'scale(1.35)',
+              filter:
+                'brightness(2)'
+            },
+
+            {
+              transform:
+                'scale(1.08)',
+              filter:
+                'brightness(1.2)'
+            }
+
+          ],
+
+          {
+            duration:1000,
+            easing:'ease-out'
+          }
+
+        );
+
+      }
+
+    }
+
+  }
+);
+
+
+/* =========================
+   載入預設
+========================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  ()=>{
+    buildGrid(20);
+  }
+);
+
+</script>
+
+</body>
+</html>
+```
