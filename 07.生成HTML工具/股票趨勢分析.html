@@ -1,0 +1,1837 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_股票趨勢分析</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+
+    background:#f3f5f7;
+    color:#333;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+/* 標題 */
+
+.header{
+    background:white;
+    border-radius:16px;
+    padding:25px;
+    margin-bottom:20px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.08);
+}
+
+.header h1{
+    margin:0 0 8px 0;
+    text-align:center;
+    font-size:30px;
+}
+
+.header p{
+    margin:0;
+    text-align:center;
+    color:#777;
+}
+
+
+/* 控制區 */
+
+.control-box{
+    background:white;
+    padding:20px;
+    border-radius:16px;
+    margin-bottom:20px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.08);
+}
+
+.control-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    align-items:end;
+}
+
+.control-item{
+    flex:1;
+    min-width:180px;
+}
+
+.control-item label{
+    display:block;
+    margin-bottom:7px;
+    font-weight:bold;
+}
+
+select,
+input,
+button{
+
+    width:100%;
+
+    padding:11px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-size:16px;
+}
+
+button{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-weight:bold;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+
+/* 狀態 */
+
+.status{
+
+    margin-top:15px;
+
+    padding:10px;
+
+    border-radius:8px;
+
+    background:#f1f5f9;
+
+    color:#475569;
+
+    font-size:14px;
+
+}
+
+.status.loading{
+    background:#fff7ed;
+    color:#c2410c;
+}
+
+.status.success{
+    background:#f0fdf4;
+    color:#15803d;
+}
+
+.status.error{
+    background:#fef2f2;
+    color:#dc2626;
+}
+
+
+/* 股票資訊 */
+
+.info-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,1fr);
+
+    gap:15px;
+
+    margin-bottom:20px;
+}
+
+.info-card{
+
+    background:white;
+
+    padding:18px;
+
+    border-radius:14px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.07);
+
+}
+
+.info-title{
+
+    color:#777;
+
+    font-size:14px;
+
+    margin-bottom:8px;
+
+}
+
+.info-value{
+
+    font-size:24px;
+
+    font-weight:bold;
+
+}
+
+
+/* 漲跌 */
+
+.up{
+    color:#dc2626;
+}
+
+.down{
+    color:#16a34a;
+}
+
+.normal{
+    color:#333;
+}
+
+
+/* 圖表 */
+
+.chart-box{
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:16px;
+
+    margin-bottom:20px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.08);
+
+}
+
+.chart-title{
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+.chart-container{
+
+    position:relative;
+
+    width:100%;
+
+    height:450px;
+
+}
+
+
+/* 成交量 */
+
+.volume-container{
+
+    height:220px;
+
+}
+
+
+/* 資料表 */
+
+.table-box{
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:16px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.08);
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th,
+td{
+
+    padding:10px;
+
+    border-bottom:1px solid #eee;
+
+    text-align:right;
+
+}
+
+th:first-child,
+td:first-child{
+
+    text-align:left;
+
+}
+
+th{
+
+    background:#f8fafc;
+
+}
+
+
+/* 說明 */
+
+.note{
+
+    margin-top:15px;
+
+    font-size:13px;
+
+    color:#777;
+
+    line-height:1.7;
+
+}
+
+
+/* 手機 */
+
+@media(max-width:1000px){
+
+    .info-grid{
+
+        grid-template-columns:
+            repeat(3,1fr);
+
+    }
+
+}
+
+
+@media(max-width:600px){
+
+    .container{
+
+        padding:10px;
+
+    }
+
+    .header h1{
+
+        font-size:24px;
+
+    }
+
+    .info-grid{
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+    }
+
+    .info-value{
+
+        font-size:20px;
+
+    }
+
+    .chart-container{
+
+        height:330px;
+
+    }
+
+    .volume-container{
+
+        height:180px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- 標題 -->
+
+    <div class="header">
+
+        <h1>
+            📈 讓AI解決我的生活大小事_股票趨勢分析
+        </h1>
+
+        <p>
+            自動取得 FinMind 股票歷史資料
+        </p>
+
+    </div>
+
+
+    <!-- 控制區 -->
+
+    <div class="control-box">
+
+        <div class="control-row">
+
+
+            <!-- 股票 -->
+
+            <div class="control-item">
+
+                <label>
+                    選擇股票
+                </label>
+
+                <select id="stockSelect">
+
+                    <option value="2330">
+                        2330　台積電
+                    </option>
+
+                    <option value="2317">
+                        2317　鴻海
+                    </option>
+
+                    <option value="2454">
+                        2454　聯發科
+                    </option>
+
+                    <option value="2308">
+                        2308　台達電
+                    </option>
+
+                    <option value="0050">
+                        0050　元大台灣50
+                    </option>
+
+                    <option value="0056">
+                        0056　元大高股息
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- 自訂股票 -->
+
+            <div class="control-item">
+
+                <label>
+                    自訂股票代號
+                </label>
+
+                <input
+                    id="customStock"
+                    type="text"
+                    placeholder="例如：2881"
+                    maxlength="6"
+                >
+
+            </div>
+
+
+            <!-- 時間 -->
+
+            <div class="control-item">
+
+                <label>
+                    查詢期間
+                </label>
+
+                <select id="periodSelect">
+
+                    <option value="30">
+                        最近1個月
+                    </option>
+
+                    <option value="90">
+                        最近3個月
+                    </option>
+
+                    <option value="180">
+                        最近6個月
+                    </option>
+
+                    <option value="365" selected>
+                        最近1年
+                    </option>
+
+                    <option value="1095">
+                        最近3年
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- 按鈕 -->
+
+            <div class="control-item">
+
+                <label>
+                    &nbsp;
+                </label>
+
+                <button
+                    onclick="loadStockData()"
+                >
+                    🔄 更新資料
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="status"
+            class="status"
+        >
+            準備載入股票資料...
+        </div>
+
+    </div>
+
+
+    <!-- 股票資訊 -->
+
+    <div class="info-grid">
+
+
+        <div class="info-card">
+
+            <div class="info-title">
+                股票
+            </div>
+
+            <div
+                id="stockName"
+                class="info-value normal"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-title">
+                最新價格
+            </div>
+
+            <div
+                id="currentPrice"
+                class="info-value normal"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-title">
+                漲跌
+            </div>
+
+            <div
+                id="change"
+                class="info-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-title">
+                漲跌幅
+            </div>
+
+            <div
+                id="changePercent"
+                class="info-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-title">
+                期間最高
+            </div>
+
+            <div
+                id="highest"
+                class="info-value normal"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-title">
+                期間最低
+            </div>
+
+            <div
+                id="lowest"
+                class="info-value normal"
+            >
+                --
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- 股價圖 -->
+
+    <div class="chart-box">
+
+        <div class="chart-title">
+
+            📊 股價趨勢
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas
+                id="priceChart"
+            ></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- 成交量 -->
+
+    <div class="chart-box">
+
+        <div class="chart-title">
+
+            📊 成交量
+
+        </div>
+
+        <div class="chart-container volume-container">
+
+            <canvas
+                id="volumeChart"
+            ></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- 最新資料 -->
+
+    <div class="table-box">
+
+        <div class="chart-title">
+
+            📋 最近交易資料
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        日期
+                    </th>
+
+                    <th>
+                        開盤
+                    </th>
+
+                    <th>
+                        最高
+                    </th>
+
+                    <th>
+                        最低
+                    </th>
+
+                    <th>
+                        收盤
+                    </th>
+
+                    <th>
+                        成交量
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="dataTable">
+
+            </tbody>
+
+        </table>
+
+
+        <div class="note">
+
+            資料來源：
+            FinMind TaiwanStockPrice。
+
+            本頁面主要用於股票資料與趨勢觀察，
+            不構成投資建議。
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* ==========================================
+   FinMind API
+========================================== */
+
+const API_URL =
+    "https://api.finmindtrade.com/api/v4/data";
+
+
+/* 股票名稱 */
+
+const stockNames = {
+
+    "2330":"台積電",
+
+    "2317":"鴻海",
+
+    "2454":"聯發科",
+
+    "2308":"台達電",
+
+    "0050":"元大台灣50",
+
+    "0056":"元大高股息"
+
+};
+
+
+/* 圖表 */
+
+let priceChart = null;
+
+let volumeChart = null;
+
+
+/* ==========================================
+   日期格式
+========================================== */
+
+function formatDate(date){
+
+    const y =
+        date.getFullYear();
+
+    const m =
+        String(
+            date.getMonth()+1
+        ).padStart(2,"0");
+
+    const d =
+        String(
+            date.getDate()
+        ).padStart(2,"0");
+
+    return `${y}-${m}-${d}`;
+
+}
+
+
+/* ==========================================
+   取得開始日期
+========================================== */
+
+function getStartDate(days){
+
+    const date =
+        new Date();
+
+    date.setDate(
+        date.getDate()-days
+    );
+
+    return formatDate(date);
+
+}
+
+
+/* ==========================================
+   顯示狀態
+========================================== */
+
+function setStatus(
+    message,
+    type=""
+){
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+    status.innerText =
+        message;
+
+    status.className =
+        "status " + type;
+
+}
+
+
+/* ==========================================
+   取得股票代號
+========================================== */
+
+function getStockId(){
+
+    const custom =
+        document
+        .getElementById(
+            "customStock"
+        )
+        .value
+        .trim();
+
+    if(custom){
+
+        return custom;
+
+    }
+
+    return document
+        .getElementById(
+            "stockSelect"
+        )
+        .value;
+
+}
+
+
+/* ==========================================
+   取得股票名稱
+========================================== */
+
+function getStockName(
+    stockId
+){
+
+    if(
+        stockNames[stockId]
+    ){
+
+        return stockNames[stockId];
+
+    }
+
+    return "股票 " + stockId;
+
+}
+
+
+/* ==========================================
+   取得 FinMind 資料
+========================================== */
+
+async function loadStockData(){
+
+    const stockId =
+        getStockId();
+
+
+    const days =
+        Number(
+            document
+            .getElementById(
+                "periodSelect"
+            )
+            .value
+        );
+
+
+    if(!/^\d{4,6}$/.test(stockId)){
+
+        setStatus(
+            "請輸入正確的股票代號",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    setStatus(
+        "⏳ 正在從 FinMind 取得股票資料...",
+        "loading"
+    );
+
+
+    try{
+
+
+        const startDate =
+            getStartDate(days);
+
+
+        const today =
+            formatDate(
+                new Date()
+            );
+
+
+        const params =
+            new URLSearchParams({
+
+                dataset:
+                    "TaiwanStockPrice",
+
+                data_id:
+                    stockId,
+
+                start_date:
+                    startDate,
+
+                end_date:
+                    today
+
+            });
+
+
+        const url =
+            API_URL
+            + "?"
+            + params.toString();
+
+
+        const response =
+            await fetch(url);
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "API HTTP "
+                + response.status
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if(
+            !result.data ||
+            result.data.length === 0
+        ){
+
+            throw new Error(
+                "找不到此股票的資料"
+            );
+
+        }
+
+
+        /*
+        按日期排序
+        */
+
+        result.data.sort(
+            (a,b)=>
+                a.date.localeCompare(
+                    b.date
+                )
+        );
+
+
+        /*
+        顯示資料
+        */
+
+        renderStock(
+            stockId,
+            result.data
+        );
+
+
+        setStatus(
+
+            "✅ 資料更新完成，共取得 "
+            + result.data.length
+            + " 筆資料。",
+
+            "success"
+
+        );
+
+
+    }
+    catch(error){
+
+        console.error(error);
+
+
+        setStatus(
+
+            "❌ 取得股票資料失敗："
+            + error.message,
+
+            "error"
+
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   計算均線
+========================================== */
+
+function calculateMA(
+    data,
+    period
+){
+
+    return data.map(
+        (item,index)=>{
+
+            if(
+                index <
+                period-1
+            ){
+
+                return null;
+
+            }
+
+
+            let total=0;
+
+
+            for(
+                let i=
+                    index-period+1;
+
+                i<=index;
+
+                i++
+            ){
+
+                total +=
+                    Number(
+                        data[i].close
+                    );
+
+            }
+
+
+            return Number(
+                (
+                    total/period
+                ).toFixed(2)
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   顯示股票
+========================================== */
+
+function renderStock(
+    stockId,
+    data
+){
+
+    const stockName =
+        getStockName(
+            stockId
+        );
+
+
+    /*
+    最新資料
+    */
+
+    const latest =
+        data[data.length-1];
+
+
+    const previous =
+        data.length >= 2
+        ? data[data.length-2]
+        : null;
+
+
+    const price =
+        Number(
+            latest.close
+        );
+
+
+    const previousPrice =
+        previous
+        ? Number(
+            previous.close
+        )
+        : price;
+
+
+    const change =
+        price -
+        previousPrice;
+
+
+    const changePercent =
+        previousPrice !== 0
+        ? (
+            change /
+            previousPrice *
+            100
+        )
+        : 0;
+
+
+    /*
+    最高最低
+    */
+
+    const prices =
+        data.map(
+            item =>
+                Number(
+                    item.close
+                )
+        );
+
+
+    const highest =
+        Math.max(
+            ...prices
+        );
+
+
+    const lowest =
+        Math.min(
+            ...prices
+        );
+
+
+    /*
+    顯示基本資料
+    */
+
+    document.getElementById(
+        "stockName"
+    ).innerText =
+        stockId
+        + " "
+        + stockName;
+
+
+    document.getElementById(
+        "currentPrice"
+    ).innerText =
+        price.toFixed(2);
+
+
+    const changeElement =
+        document.getElementById(
+            "change"
+        );
+
+
+    const percentElement =
+        document.getElementById(
+            "changePercent"
+        );
+
+
+    changeElement.innerText =
+        (
+            change >= 0
+            ? "+"
+            : ""
+        )
+        +
+        change.toFixed(2);
+
+
+    percentElement.innerText =
+        (
+            changePercent >= 0
+            ? "+"
+            : ""
+        )
+        +
+        changePercent.toFixed(2)
+        +
+        "%";
+
+
+    changeElement.className =
+        "info-value "
+        +
+        (
+            change >= 0
+            ? "up"
+            : "down"
+        );
+
+
+    percentElement.className =
+        "info-value "
+        +
+        (
+            changePercent >= 0
+            ? "up"
+            : "down"
+        );
+
+
+    document.getElementById(
+        "highest"
+    ).innerText =
+        highest.toFixed(2);
+
+
+    document.getElementById(
+        "lowest"
+    ).innerText =
+        lowest.toFixed(2);
+
+
+    /*
+    畫圖
+    */
+
+    drawPriceChart(
+        data,
+        stockName
+    );
+
+
+    drawVolumeChart(
+        data,
+        stockName
+    );
+
+
+    /*
+    資料表
+    */
+
+    renderTable(data);
+
+}
+
+
+/* ==========================================
+   股價圖
+========================================== */
+
+function drawPriceChart(
+    data,
+    stockName
+){
+
+    if(priceChart){
+
+        priceChart.destroy();
+
+    }
+
+
+    const labels =
+        data.map(
+            item =>
+                item.date
+        );
+
+
+    const prices =
+        data.map(
+            item =>
+                Number(
+                    item.close
+                )
+        );
+
+
+    const ma5 =
+        calculateMA(
+            data,
+            5
+        );
+
+
+    const ma20 =
+        calculateMA(
+            data,
+            20
+        );
+
+
+    const ma60 =
+        calculateMA(
+            data,
+            60
+        );
+
+
+    const ctx =
+        document
+        .getElementById(
+            "priceChart"
+        )
+        .getContext("2d");
+
+
+    priceChart =
+        new Chart(
+            ctx,
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+
+                            label:
+                                stockName
+                                + " 收盤價",
+
+                            data:prices,
+
+                            borderWidth:2,
+
+                            pointRadius:0,
+
+                            tension:0.15
+
+                        },
+
+
+                        {
+
+                            label:"MA5",
+
+                            data:ma5,
+
+                            borderWidth:1.5,
+
+                            pointRadius:0,
+
+                            tension:0.1
+
+                        },
+
+
+                        {
+
+                            label:"MA20",
+
+                            data:ma20,
+
+                            borderWidth:1.5,
+
+                            pointRadius:0,
+
+                            tension:0.1
+
+                        },
+
+
+                        {
+
+                            label:"MA60",
+
+                            data:ma60,
+
+                            borderWidth:1.5,
+
+                            pointRadius:0,
+
+                            tension:0.1
+
+                        }
+
+                    ]
+
+                },
+
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+
+                    interaction:{
+
+                        mode:"index",
+
+                        intersect:false
+
+                    },
+
+
+                    plugins:{
+
+                        legend:{
+
+                            position:"top"
+
+                        },
+
+                        tooltip:{
+
+                            callbacks:{
+
+                                label:
+                                function(
+                                    context
+                                ){
+
+                                    return (
+
+                                        context
+                                        .dataset
+                                        .label
+
+                                        + "："
+
+                                        +
+
+                                        (
+                                            context
+                                            .parsed
+                                            .y
+                                            ??
+                                            "-"
+                                        )
+
+                                    );
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales:{
+
+                        x:{
+
+                            ticks:{
+
+                                maxTicksLimit:12
+
+                            }
+
+                        },
+
+
+                        y:{
+
+                            beginAtZero:false
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+}
+
+
+/* ==========================================
+   成交量圖
+========================================== */
+
+function drawVolumeChart(
+    data,
+    stockName
+){
+
+    if(volumeChart){
+
+        volumeChart.destroy();
+
+    }
+
+
+    const labels =
+        data.map(
+            item =>
+                item.date
+        );
+
+
+    const volumes =
+        data.map(
+            item =>
+                Number(
+                    item.Trading_Volume
+                    ??
+                    item.Trading_Volume
+                    ??
+                    0
+                )
+        );
+
+
+    const ctx =
+        document
+        .getElementById(
+            "volumeChart"
+        )
+        .getContext("2d");
+
+
+    volumeChart =
+        new Chart(
+            ctx,
+            {
+
+                type:"bar",
+
+                data:{
+
+                    labels:labels,
+
+                    datasets:[
+
+                        {
+
+                            label:
+                                stockName
+                                + " 成交量",
+
+                            data:volumes,
+
+                            borderWidth:0
+
+                        }
+
+                    ]
+
+                },
+
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+
+                    plugins:{
+
+                        legend:{
+
+                            display:true
+
+                        }
+
+                    },
+
+
+                    scales:{
+
+                        x:{
+
+                            ticks:{
+
+                                maxTicksLimit:12
+
+                            }
+
+                        },
+
+                        y:{
+
+                            beginAtZero:true
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        );
+
+}
+
+
+/* ==========================================
+   最近交易資料
+========================================== */
+
+function renderTable(data){
+
+    const tbody =
+        document.getElementById(
+            "dataTable"
+        );
+
+
+    tbody.innerHTML = "";
+
+
+    /*
+    最近10筆
+    */
+
+    const latestData =
+        data
+        .slice(-10)
+        .reverse();
+
+
+    latestData.forEach(
+        item => {
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${item.date}
+                </td>
+
+                <td>
+                    ${formatNumber(item.open)}
+                </td>
+
+                <td>
+                    ${formatNumber(item.max)}
+                </td>
+
+                <td>
+                    ${formatNumber(item.min)}
+                </td>
+
+                <td>
+                    ${formatNumber(item.close)}
+                </td>
+
+                <td>
+                    ${formatVolume(item.Trading_Volume)}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   數字格式
+========================================== */
+
+function formatNumber(value){
+
+    const n =
+        Number(value);
+
+    if(
+        Number.isNaN(n)
+    ){
+
+        return "-";
+
+    }
+
+    return n.toFixed(2);
+
+}
+
+
+/* ==========================================
+   成交量格式
+========================================== */
+
+function formatVolume(value){
+
+    const n =
+        Number(value);
+
+
+    if(
+        Number.isNaN(n)
+    ){
+
+        return "-";
+
+    }
+
+
+    return n.toLocaleString();
+
+}
+
+
+/* ==========================================
+   股票選單
+========================================== */
+
+document
+.getElementById(
+    "stockSelect"
+)
+.addEventListener(
+    "change",
+    function(){
+
+        document
+        .getElementById(
+            "customStock"
+        )
+        .value = "";
+
+    }
+);
+
+
+/* ==========================================
+   Enter 查詢
+========================================== */
+
+document
+.getElementById(
+    "customStock"
+)
+.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key === "Enter"
+        ){
+
+            loadStockData();
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   啟動
+========================================== */
+
+loadStockData();
+
+</script>
+
+
+</body>
+</html>
+```
