@@ -3,42 +3,280 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>簡單計算機</title>
+
+<title>計算機</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#f2f2f2;font-family:Arial,"Microsoft JhengHei",sans-serif}
-.calculator{width:320px;background:#222;padding:20px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.display{width:100%;height:70px;margin-bottom:15px;padding:10px;border:0;border-radius:10px;background:#fff;text-align:right;font-size:32px;outline:0}
-.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-button{height:60px;border:0;border-radius:12px;font-size:22px;cursor:pointer;background:#444;color:#fff}
-button:hover{background:#555}button:active{transform:scale(.95)}
-.operator{background:#f39c12}.operator:hover{background:#e67e22}
-.clear{background:#e74c3c}.clear:hover{background:#c0392b}
-.equal{background:#27ae60}.equal:hover{background:#219150}
-.zero{grid-column:span 2}
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f2f2f2;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+    }
+
+    .calculator {
+        width: 320px;
+        background: #222;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .display {
+        width: 100%;
+        height: 70px;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background: white;
+        text-align: right;
+        font-size: 32px;
+        outline: none;
+    }
+
+    .buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    button {
+        height: 60px;
+        border: none;
+        border-radius: 12px;
+        font-size: 22px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+    }
+
+    button:hover {
+        background: #555;
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    .operator {
+        background: #f39c12;
+    }
+
+    .operator:hover {
+        background: #e67e22;
+    }
+
+    .clear {
+        background: #e74c3c;
+    }
+
+    .clear:hover {
+        background: #c0392b;
+    }
+
+    .equal {
+        background: #27ae60;
+    }
+
+    .equal:hover {
+        background: #219150;
+    }
+
+    .zero {
+        grid-column: span 2;
+    }
+
+    /* 設計者文字 */
+    .designer {
+        margin-top: 15px;
+        text-align: center;
+        color: white;
+        font-size: 18px;
+        letter-spacing: 2px;
+    }
 </style>
 </head>
+
 <body>
+
 <div class="calculator">
-<input type="text" id="display" class="display" value="0" readonly>
-<div class="buttons">
-<button class="clear" onclick="clearDisplay()">C</button>
-<button onclick="deleteLast()">⌫</button>
-<button onclick="addOperator('%')">%</button>
-<button class="operator" onclick="addOperator('/')">÷</button>
-<button onclick="addNumber('7')">7</button><button onclick="addNumber('8')">8</button><button onclick="addNumber('9')">9</button><button class="operator" onclick="addOperator('*')">×</button>
-<button onclick="addNumber('4')">4</button><button onclick="addNumber('5')">5</button><button onclick="addNumber('6')">6</button><button class="operator" onclick="addOperator('-')">−</button>
-<button onclick="addNumber('1')">1</button><button onclick="addNumber('2')">2</button><button onclick="addNumber('3')">3</button><button class="operator" onclick="addOperator('+')">+</button>
-<button class="zero" onclick="addNumber('0')">0</button><button onclick="addNumber('.')">.</button><button class="equal" onclick="calculate()">=</button>
-</div></div>
+
+
+    <!-- 設計者 -->
+    <div class="designer"><b>彰化社區大學 計算機<B>
+	</div>
+
+    <input
+        type="text"
+        id="display"
+        class="display"
+        value="0"
+        readonly
+    >
+
+    <div class="buttons">
+
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="deleteLast()">⌫</button>
+        <button onclick="addOperator('%')">%</button>
+        <button class="operator" onclick="addOperator('/')">÷</button>
+
+        <button onclick="addNumber('7')">7</button>
+        <button onclick="addNumber('8')">8</button>
+        <button onclick="addNumber('9')">9</button>
+        <button class="operator" onclick="addOperator('*')">×</button>
+
+        <button onclick="addNumber('4')">4</button>
+        <button onclick="addNumber('5')">5</button>
+        <button onclick="addNumber('6')">6</button>
+        <button class="operator" onclick="addOperator('-')">−</button>
+
+        <button onclick="addNumber('1')">1</button>
+        <button onclick="addNumber('2')">2</button>
+        <button onclick="addNumber('3')">3</button>
+        <button class="operator" onclick="addOperator('+')">+</button>
+
+        <button class="zero" onclick="addNumber('0')">0</button>
+        <button onclick="addNumber('.')">.</button>
+        <button class="equal" onclick="calculate()">=</button>
+
+    </div>
+
+
+
+</div>
+
 <script>
-let display=document.getElementById("display"),expression="";
-function addNumber(n){if(expression==="0")expression="";expression+=n;display.value=expression}
-function addOperator(o){if(!expression)return;let l=expression.slice(-1);if("+-*/%".includes(l))expression=expression.slice(0,-1);expression+=o;display.value=expression}
-function clearDisplay(){expression="";display.value="0"}
-function deleteLast(){expression=expression.slice(0,-1);display.value=expression||"0"}
-function calculate(){if(!expression)return;try{let l=expression.slice(-1);if("+-*/%".includes(l))expression=expression.slice(0,-1);let result=Function('"use strict";return ('+expression+')')();result=Math.round(result*100000000)/100000000;display.value=result;expression=String(result)}catch(e){display.value="錯誤";expression=""}}
-document.addEventListener("keydown",e=>{let k=e.key;if((k>="0"&&k<="9")||k===".")addNumber(k);else if("+-*/%".includes(k))addOperator(k);else if(k==="Enter"||k==="=")calculate();else if(k==="Backspace")deleteLast();else if(k==="Escape")clearDisplay()});
+
+let display = document.getElementById("display");
+let expression = "";
+
+// 輸入數字
+function addNumber(number) {
+
+    if (expression === "0") {
+        expression = "";
+    }
+
+    expression += number;
+
+    display.value = expression;
+}
+
+// 輸入運算符號
+function addOperator(operator) {
+
+    if (expression === "") {
+        return;
+    }
+
+    let lastChar = expression.slice(-1);
+
+    if ("+-*/%".includes(lastChar)) {
+        expression = expression.slice(0, -1);
+    }
+
+    expression += operator;
+
+    display.value = expression;
+}
+
+// 清除
+function clearDisplay() {
+
+    expression = "";
+    display.value = "0";
+}
+
+// 刪除最後一個字元
+function deleteLast() {
+
+    expression = expression.slice(0, -1);
+
+    if (expression === "") {
+        display.value = "0";
+    } else {
+        display.value = expression;
+    }
+}
+
+// 計算
+function calculate() {
+
+    if (expression === "") {
+        return;
+    }
+
+    try {
+
+        let lastChar = expression.slice(-1);
+
+        if ("+-*/%".includes(lastChar)) {
+            expression = expression.slice(0, -1);
+        }
+
+        let result = Function(
+            '"use strict"; return (' + expression + ')'
+        )();
+
+        result = Math.round(result * 100000000) / 100000000;
+
+        display.value = result;
+        expression = String(result);
+
+    } catch (error) {
+
+        display.value = "錯誤";
+        expression = "";
+    }
+}
+
+// 鍵盤操作
+document.addEventListener("keydown", function(event) {
+
+    let key = event.key;
+
+    if (
+        (key >= "0" && key <= "9") ||
+        key === "."
+    ) {
+        addNumber(key);
+    }
+
+    else if (
+        key === "+" ||
+        key === "-" ||
+        key === "*" ||
+        key === "/" ||
+        key === "%"
+    ) {
+        addOperator(key);
+    }
+
+    else if (key === "Enter" || key === "=") {
+        calculate();
+    }
+
+    else if (key === "Backspace") {
+        deleteLast();
+    }
+
+    else if (key === "Escape") {
+        clearDisplay();
+    }
+
+});
+
 </script>
+
 </body>
 </html>
+
