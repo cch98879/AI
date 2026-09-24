@@ -123,28 +123,6 @@ button:hover{
     box-shadow:0 0 12px rgba(0,234,255,.25);
 }
 
-.knob-row{
-    display:flex;
-    gap:15px;
-    justify-content:center;
-}
-
-.knob-box{
-    flex:1;
-    text-align:center;
-}
-
-input[type=range]{
-    width:100%;
-    accent-color:#00eaff;
-    cursor:pointer;
-}
-
-.value{
-    font-size:12px;
-    color:#9df7ff;
-}
-
 .octave{
     display:flex;
     align-items:center;
@@ -162,6 +140,17 @@ input[type=range]{
     text-align:center;
     color:#74ffff;
     font-weight:bold;
+}
+
+input[type=range]{
+    width:100%;
+    accent-color:#00eaff;
+    cursor:pointer;
+}
+
+.value{
+    font-size:12px;
+    color:#9df7ff;
 }
 
 .scope{
@@ -194,6 +183,12 @@ canvas{
     margin-top:18px;
 }
 
+/* =========================
+   25鍵電子琴
+   18白鍵 + 7黑鍵
+   C3 ～ C5
+========================= */
+
 .keyboard{
     position:relative;
     height:270px;
@@ -201,60 +196,95 @@ canvas{
     justify-content:center;
     user-select:none;
     touch-action:none;
+    overflow:hidden;
 }
 
-.key{
-    position:relative;
-    cursor:pointer;
-    transition:.06s;
-}
-
+/* 白鍵 */
 .white{
-    width:calc(100% / 15);
-    max-width:72px;
+    flex:1;
+    min-width:0;
     height:250px;
+
     background:
-        linear-gradient(90deg,#d8fbff,#ffffff 45%,#9bd4dc);
+        linear-gradient(
+            90deg,
+            #d8fbff,
+            #ffffff 45%,
+            #9bd4dc
+        );
+
     border:1px solid #426d76;
     border-radius:0 0 9px 9px;
+
     box-shadow:
         inset 0 -10px 15px rgba(0,100,120,.25),
         0 5px 10px #000;
+
     z-index:1;
+    cursor:pointer;
+    position:relative;
+    transition:.06s;
 }
 
 .white:hover{
-    background:linear-gradient(#ffffff,#b7faff);
+    background:
+        linear-gradient(#ffffff,#b7faff);
 }
 
 .white.active{
     transform:translateY(5px);
+
     background:
         linear-gradient(#79ffff,#22c9e0);
+
     box-shadow:
         0 0 10px #00eaff,
         0 0 30px #00eaff,
         inset 0 -15px 25px rgba(0,80,120,.6);
 }
 
+/* 黑鍵 */
 .black{
     position:absolute;
-    width:42px;
+
+    width:4.2%;
+    max-width:42px;
+    min-width:28px;
+
     height:155px;
     top:0;
+
     z-index:5;
+
     background:
-        linear-gradient(90deg,#071018,#253b46 45%,#03070a);
+        linear-gradient(
+            90deg,
+            #071018,
+            #253b46 45%,
+            #03070a
+        );
+
     border:1px solid #3f7680;
     border-radius:0 0 7px 7px;
+
     box-shadow:
         0 8px 12px #000,
         inset 0 0 10px rgba(0,255,255,.12);
+
+    cursor:pointer;
+    transition:.06s;
 }
 
 .black.active{
     transform:translateY(5px);
-    background:linear-gradient(#0bffff,#007e9a,#03141b);
+
+    background:
+        linear-gradient(
+            #0bffff,
+            #007e9a,
+            #03141b
+        );
+
     box-shadow:
         0 0 10px #00eaff,
         0 0 25px #00eaff;
@@ -265,15 +295,16 @@ canvas{
     bottom:13px;
     width:100%;
     text-align:center;
-    font-size:12px;
+    font-size:11px;
     color:#19434c;
     font-weight:bold;
+    pointer-events:none;
 }
 
 .black .key-label{
     bottom:10px;
     color:#72f7ff;
-    font-size:10px;
+    font-size:9px;
 }
 
 .info{
@@ -316,6 +347,7 @@ canvas{
     border:1px solid #00eaff;
     border-radius:20px;
     background:#061321;
+
     box-shadow:
         0 0 30px rgba(0,234,255,.25),
         inset 0 0 30px rgba(0,234,255,.06);
@@ -344,6 +376,7 @@ canvas{
 }
 
 @media(max-width:800px){
+
     .controls{
         grid-template-columns:repeat(2,1fr);
     }
@@ -352,21 +385,25 @@ canvas{
         height:220px;
         overflow-x:auto;
         justify-content:flex-start;
-        padding:0 5px;
+        padding:0;
     }
 
     .white{
         min-width:55px;
         height:205px;
+        flex:none;
+        width:55px;
     }
 
     .black{
         height:125px;
         width:34px;
+        min-width:34px;
     }
 }
 
 @media(max-width:500px){
+
     .controls{
         grid-template-columns:1fr;
     }
@@ -385,456 +422,1373 @@ canvas{
 <body>
 
 <div class="start-overlay" id="startOverlay">
+
     <div class="start-card">
+
         <h1>電子琴</h1>
+
         <p>
-讓AI解決我的生活大小事
+            讓AI解決我的生活大小事
         </p>
+
         <button class="start-btn" id="startBtn">
             ▶ 開始
         </button>
+
     </div>
+
 </div>
 
 <div class="container">
 
     <div class="header">
-        <div class="logo">讓AI解決我的生活大小事_電子琴</div>
+
+        <div class="logo">
+            讓AI解決我的生活大小事_電子琴
+        </div>
 
         <div class="status">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">AUDIO OFFLINE</span>
+
+            <span
+                class="status-dot"
+                id="statusDot">
+            </span>
+
+            <span id="statusText">
+                AUDIO OFFLINE
+            </span>
+
         </div>
+
     </div>
+
 
     <div class="panel controls">
 
         <div>
-            <div class="control-title">WAVEFORM / 波形</div>
-            <select id="waveform">
-                <option value="sine">SINE 正弦波</option>
-                <option value="square">SQUARE 方波</option>
-                <option value="sawtooth">SAWTOOTH 鋸齒波</option>
-                <option value="triangle">TRIANGLE 三角波</option>
-            </select>
-        </div>
 
-        <div>
-            <div class="control-title">OCTAVE / 八度</div>
-            <div class="octave">
-                <button id="octDown">−</button>
-                <div class="octave-value" id="octaveValue">OCT 0</div>
-                <button id="octUp">＋</button>
+            <div class="control-title">
+                WAVEFORM / 波形
             </div>
+
+            <select id="waveform">
+
+                <option value="sine">
+                    SINE 正弦波
+                </option>
+
+                <option value="square">
+                    SQUARE 方波
+                </option>
+
+                <option value="sawtooth">
+                    SAWTOOTH 鋸齒波
+                </option>
+
+                <option value="triangle">
+                    TRIANGLE 三角波
+                </option>
+
+            </select>
+
         </div>
 
-        <div>
-            <div class="control-title">FILTER / 濾波器</div>
-            <input id="filter" type="range" min="100" max="12000" value="5000">
-            <div class="value" id="filterValue">5000 Hz</div>
-        </div>
 
         <div>
-            <div class="control-title">VOLUME / 音量</div>
-            <input id="volume" type="range" min="0" max="1" step=".01" value=".65">
-            <div class="value" id="volumeValue">65%</div>
+
+            <div class="control-title">
+                OCTAVE / 八度
+            </div>
+
+            <div class="octave">
+
+                <button id="octDown">
+                    −
+                </button>
+
+                <div
+                    class="octave-value"
+                    id="octaveValue">
+                    OCT 0
+                </div>
+
+                <button id="octUp">
+                    ＋
+                </button>
+
+            </div>
+
         </div>
 
-        <div>
-            <div class="control-title">ATTACK / 起音</div>
-            <input id="attack" type="range" min=".005" max="1" step=".005" value=".03">
-            <div class="value" id="attackValue">0.03 s</div>
-        </div>
 
         <div>
-            <div class="control-title">DECAY / 衰減</div>
-            <input id="decay" type="range" min=".01" max="2" step=".01" value=".35">
-            <div class="value" id="decayValue">0.35 s</div>
+
+            <div class="control-title">
+                FILTER / 濾波器
+            </div>
+
+            <input
+                id="filter"
+                type="range"
+                min="100"
+                max="12000"
+                value="5000">
+
+            <div
+                class="value"
+                id="filterValue">
+                5000 Hz
+            </div>
+
         </div>
 
-        <div>
-            <div class="control-title">SUSTAIN / 延音</div>
-            <input id="sustain" type="range" min="0" max="1" step=".01" value=".7">
-            <div class="value" id="sustainValue">70%</div>
-        </div>
 
         <div>
-            <div class="control-title">RELEASE / 釋放</div>
-            <input id="release" type="range" min=".01" max="2" step=".01" value=".5">
-            <div class="value" id="releaseValue">0.50 s</div>
+
+            <div class="control-title">
+                VOLUME / 音量
+            </div>
+
+            <input
+                id="volume"
+                type="range"
+                min="0"
+                max="1"
+                step=".01"
+                value=".65">
+
+            <div
+                class="value"
+                id="volumeValue">
+                65%
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div class="control-title">
+                ATTACK / 起音
+            </div>
+
+            <input
+                id="attack"
+                type="range"
+                min=".005"
+                max="1"
+                step=".005"
+                value=".03">
+
+            <div
+                class="value"
+                id="attackValue">
+                0.03 s
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div class="control-title">
+                DECAY / 衰減
+            </div>
+
+            <input
+                id="decay"
+                type="range"
+                min=".01"
+                max="2"
+                step=".01"
+                value=".35">
+
+            <div
+                class="value"
+                id="decayValue">
+                0.35 s
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div class="control-title">
+                SUSTAIN / 延音
+            </div>
+
+            <input
+                id="sustain"
+                type="range"
+                min="0"
+                max="1"
+                step=".01"
+                value=".7">
+
+            <div
+                class="value"
+                id="sustainValue">
+                70%
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <div class="control-title">
+                RELEASE / 釋放
+            </div>
+
+            <input
+                id="release"
+                type="range"
+                min=".01"
+                max="2"
+                step=".01"
+                value=".5">
+
+            <div
+                class="value"
+                id="releaseValue">
+                0.50 s
+            </div>
+
         </div>
 
     </div>
+
 
     <div class="scope">
-        <canvas id="scope" width="1200" height="180"></canvas>
-        <div class="scope-label">◉ REALTIME OSCILLOSCOPE</div>
+
+        <canvas
+            id="scope"
+            width="1200"
+            height="180">
+        </canvas>
+
+        <div class="scope-label">
+            ◉ REALTIME OSCILLOSCOPE
+        </div>
+
     </div>
 
+
     <div class="keyboard-area panel">
-        <div class="keyboard" id="keyboard"></div>
+
+        <div
+            class="keyboard"
+            id="keyboard">
+        </div>
+
 
         <div class="info">
-            <div>ACTIVE NOTE：<strong id="activeNote">---</strong></div>
-            <div>FREQUENCY：<strong id="frequency">---</strong></div>
-            <div>OCTAVE：<strong id="octDisplay">0</strong></div>
+
+            <div>
+                ACTIVE NOTE：
+                <strong id="activeNote">
+                    ---
+                </strong>
+            </div>
+
+            <div>
+                FREQUENCY：
+                <strong id="frequency">
+                    ---
+                </strong>
+            </div>
+
+            <div>
+                OCTAVE：
+                <strong id="octDisplay">
+                    0
+                </strong>
+            </div>
+
         </div>
 
+
         <div class="hint">
-            COMPUTER KEYBOARD：A W S E D F T G Y H U J K O L P ; ＋滑鼠／觸控
+
+            COMPUTER KEYBOARD：
+            A W S E D F T G Y H U J K O L P ; ＋滑鼠／觸控
+
         </div>
+
     </div>
 
 </div>
 
+
 <script>
+
 let audioCtx = null;
 let masterGain = null;
 let analyser = null;
 let filterNode = null;
 
 let octave = 0;
+
 let activeVoices = new Map();
 
-const notes = [
-    {name:"C",  midi:60, key:"a", type:"white"},
-    {name:"C#", midi:61, key:"w", type:"black"},
-    {name:"D",  midi:62, key:"s", type:"white"},
-    {name:"D#", midi:63, key:"e", type:"black"},
-    {name:"E",  midi:64, key:"d", type:"white"},
-    {name:"F",  midi:65, key:"f", type:"white"},
-    {name:"F#", midi:66, key:"t", type:"black"},
-    {name:"G",  midi:67, key:"g", type:"white"},
-    {name:"G#", midi:68, key:"y", type:"black"},
-    {name:"A",  midi:69, key:"h", type:"white"},
-    {name:"A#", midi:70, key:"u", type:"black"},
-    {name:"B",  midi:71, key:"j", type:"white"},
-    {name:"C2", midi:72, key:"k", type:"white"},
-    {name:"C#2",midi:73, key:"o", type:"black"},
-    {name:"D2", midi:74, key:"l", type:"white"},
-    {name:"D#2",midi:75, key:"p", type:"black"},
-    {name:"E2", midi:76, key:";", type:"white"}
+
+/*
+==================================================
+25鍵標準排列
+
+C3 ～ C5
+
+白鍵：
+C D E F G A B
+C D E F G A B
+C
+
+共 18 個白鍵
+
+黑鍵：
+C# D# F# G# A#
+C# D#
+
+共 7 個黑鍵
+
+總數：
+18 + 7 = 25鍵
+
+最重要：
+
+任何「2個黑鍵」的左邊第一個白鍵就是 C。
+==================================================
+*/
+
+
+const noteNames = [
+
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+    "A",
+    "A#",
+    "B"
+
 ];
 
-const keyboard = document.getElementById("keyboard");
 
-/* 建立白鍵 */
-notes.filter(n => n.type === "white").forEach((n,i)=>{
-    const key = document.createElement("div");
-    key.className = "key white";
-    key.dataset.key = n.key;
-    key.dataset.midi = n.midi;
-    key.innerHTML = `<div class="key-label">${n.name}<br>[${n.key.toUpperCase()}]</div>`;
+/*
+電腦鍵盤配置
+
+白鍵：
+A S D F G H J K L ; Q
+
+黑鍵：
+W E T Y U O P
+
+前面使用：
+A W S E D F T G Y H U J K O L P ;
+
+25鍵中只需要17個電腦按鍵
+剩餘鍵仍可用滑鼠／觸控
+*/
+
+
+const computerKeys = [
+
+    "a",
+    "w",
+    "s",
+    "e",
+    "d",
+    "f",
+    "t",
+    "g",
+    "y",
+    "h",
+    "u",
+    "j",
+    "k",
+    "o",
+    "l",
+    "p",
+    ";"
+
+];
+
+
+/*
+==================================================
+建立25個琴鍵
+
+從 C3 MIDI 48 開始
+
+48 ～ 72
+
+共25個MIDI音符
+==================================================
+*/
+
+const notes = [];
+
+
+/*
+鍵盤位置：
+C3 = MIDI 48
+C4 = MIDI 60
+C5 = MIDI 72
+*/
+
+for(let i=0;i<25;i++){
+
+    const midi = 48 + i;
+
+    const noteIndex = midi % 12;
+
+    const octaveNumber =
+        Math.floor(midi / 12) - 1;
+
+    const name =
+        noteNames[noteIndex] +
+        octaveNumber;
+
+    const isBlack =
+        [1,3,6,8,10].includes(noteIndex);
+
+    /*
+    讓電腦鍵盤依序配置
+    */
+
+    const key =
+        computerKeys[i] || "";
+
+    notes.push({
+
+        name:name,
+
+        shortName:noteNames[noteIndex],
+
+        midi:midi,
+
+        key:key,
+
+        type:isBlack ? "black" : "white"
+
+    });
+
+}
+
+
+/*
+==================================================
+建立白鍵
+==================================================
+*/
+
+const keyboard =
+    document.getElementById("keyboard");
+
+
+const whiteNotes =
+    notes.filter(n => n.type === "white");
+
+
+whiteNotes.forEach((n,i)=>{
+
+    const key =
+        document.createElement("div");
+
+    key.className =
+        "key white";
+
+    key.dataset.key =
+        n.key;
+
+    key.dataset.midi =
+        n.midi;
+
+    key.dataset.note =
+        n.name;
+
+
+    key.innerHTML = `
+
+        <div class="key-label">
+
+            ${n.shortName}
+
+            <br>
+
+            ${n.key
+                ? "[" + n.key.toUpperCase() + "]"
+                : ""}
+
+        </div>
+
+    `;
+
+
     keyboard.appendChild(key);
+
 });
 
-/* 建立黑鍵位置 */
-const blackPositions = {
+
+/*
+==================================================
+定位黑鍵
+
+重點：
+
+不要再使用原本的：
+
+blackPositions = {
     "w":1,
     "e":2,
-    "t":4,
-    "y":5,
-    "u":6,
-    "o":8,
-    "p":9
-};
+    ...
+}
 
-notes.filter(n => n.type === "black").forEach(n=>{
-    const key = document.createElement("div");
-    key.className = "key black";
-    key.dataset.key = n.key;
-    key.dataset.midi = n.midi;
+而是根據：
 
-    const whiteWidth = 100 / 10.5;
+「黑鍵左側的白鍵」
+
+自動定位。
+
+因此：
+
+C# → C與D之間
+D# → D與E之間
+F# → F與G之間
+G# → G與A之間
+A# → A與B之間
+
+這正好符合：
+
+找到2個黑鍵
+→ 左邊第一個白鍵就是C
+==================================================
+*/
+
+
+const whiteElements =
+    [...keyboard.querySelectorAll(".white")];
+
+
+let whiteIndex = 0;
+
+
+/*
+每一個黑鍵都找它左側的白鍵
+
+黑鍵音高的 MIDI：
+
+C# = C + 1
+D# = D + 1
+F# = F + 1
+G# = G + 1
+A# = A + 1
+*/
+
+
+notes
+.filter(n => n.type === "black")
+.forEach(n=>{
+
+    /*
+    找到黑鍵左側的白鍵
+
+    例如：
+
+    C#3 MIDI49
+
+    左邊白鍵：
+    C3 MIDI48
+    */
+
+    const leftWhite =
+        notes.find(
+            w =>
+                w.type === "white" &&
+                w.midi === n.midi - 1
+        );
+
+
+    if(!leftWhite) return;
+
+
+    const leftIndex =
+        whiteNotes.indexOf(leftWhite);
+
+
+    const key =
+        document.createElement("div");
+
+    key.className =
+        "key black";
+
+    key.dataset.key =
+        n.key;
+
+    key.dataset.midi =
+        n.midi;
+
+    key.dataset.note =
+        n.name;
+
+
+    /*
+    黑鍵中心位置：
+
+    左側白鍵的右邊界
+    再往左一半黑鍵寬度
+
+    18個白鍵平均分配
+    */
+
+    const whiteWidth =
+        100 / whiteNotes.length;
+
+
+    const left =
+        (leftIndex + 1) * whiteWidth;
+
+
     key.style.left =
-        `calc(${blackPositions[n.key] * whiteWidth}% - 21px)`;
+        `calc(${left}% - 2.1%)`;
 
-    key.innerHTML =
-        `<div class="key-label">${n.name}<br>${n.key.toUpperCase()}</div>`;
+
+    key.innerHTML = `
+
+        <div class="key-label">
+
+            ${n.shortName}
+
+            <br>
+
+            ${n.key
+                ? n.key.toUpperCase()
+                : ""}
+
+        </div>
+
+    `;
+
 
     keyboard.appendChild(key);
+
 });
+
+
+/*
+==================================================
+Audio
+==================================================
+*/
 
 function initAudio(){
 
     if(audioCtx) return;
 
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    masterGain = audioCtx.createGain();
+    audioCtx =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
 
-    filterNode = audioCtx.createBiquadFilter();
-    filterNode.type = "lowpass";
+
+    masterGain =
+        audioCtx.createGain();
+
+
+    filterNode =
+        audioCtx.createBiquadFilter();
+
+
+    filterNode.type =
+        "lowpass";
+
+
     filterNode.frequency.value =
-        Number(document.getElementById("filter").value);
+        Number(
+            document.getElementById("filter").value
+        );
 
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 2048;
+
+    analyser =
+        audioCtx.createAnalyser();
+
+
+    analyser.fftSize =
+        2048;
+
 
     masterGain.gain.value =
-        Number(document.getElementById("volume").value);
+        Number(
+            document.getElementById("volume").value
+        );
+
 
     masterGain
         .connect(filterNode)
         .connect(analyser)
         .connect(audioCtx.destination);
 
-    document.getElementById("startOverlay").style.display="none";
-    document.getElementById("statusDot").classList.add("active");
-    document.getElementById("statusText").textContent="AUDIO ONLINE";
+
+    document.getElementById(
+        "startOverlay"
+    ).style.display="none";
+
+
+    document.getElementById(
+        "statusDot"
+    ).classList.add("active");
+
+
+    document.getElementById(
+        "statusText"
+    ).textContent =
+        "AUDIO ONLINE";
+
 
     drawScope();
+
 }
 
-document.getElementById("startBtn").addEventListener("click",()=>{
+
+document
+.getElementById("startBtn")
+.addEventListener("click",()=>{
+
     initAudio();
+
     if(audioCtx.state === "suspended"){
+
         audioCtx.resume();
+
     }
+
 });
 
+
+/*
+==================================================
+頻率
+==================================================
+*/
+
 function midiToFreq(midi){
-    return 440 * Math.pow(2,(midi-69)/12);
+
+    return 440 *
+        Math.pow(
+            2,
+            (midi-69)/12
+        );
+
 }
 
+
+/*
+==================================================
+參數
+==================================================
+*/
+
 function getParams(){
+
     return {
-        waveform:document.getElementById("waveform").value,
-        attack:Number(document.getElementById("attack").value),
-        decay:Number(document.getElementById("decay").value),
-        sustain:Number(document.getElementById("sustain").value),
-        release:Number(document.getElementById("release").value)
+
+        waveform:
+            document.getElementById(
+                "waveform"
+            ).value,
+
+        attack:
+            Number(
+                document.getElementById(
+                    "attack"
+                ).value
+            ),
+
+        decay:
+            Number(
+                document.getElementById(
+                    "decay"
+                ).value
+            ),
+
+        sustain:
+            Number(
+                document.getElementById(
+                    "sustain"
+                ).value
+            ),
+
+        release:
+            Number(
+                document.getElementById(
+                    "release"
+                ).value
+            )
+
     };
+
 }
+
+
+/*
+==================================================
+播放
+==================================================
+*/
 
 function noteOn(note){
 
     if(!audioCtx) return;
+
     if(activeVoices.has(note.key)) return;
 
-    const params = getParams();
+
+    const params =
+        getParams();
+
 
     const midi =
-        note.midi + octave * 12;
+        note.midi +
+        octave * 12;
 
-    const freq = midiToFreq(midi);
 
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const freq =
+        midiToFreq(midi);
 
-    osc.type = params.waveform;
-    osc.frequency.value = freq;
 
-    const now = audioCtx.currentTime;
+    const osc =
+        audioCtx.createOscillator();
 
-    gain.gain.setValueAtTime(0.0001,now);
+
+    const gain =
+        audioCtx.createGain();
+
+
+    osc.type =
+        params.waveform;
+
+
+    osc.frequency.value =
+        freq;
+
+
+    const now =
+        audioCtx.currentTime;
+
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
 
     gain.gain.exponentialRampToValueAtTime(
         0.8,
         now + params.attack
     );
 
+
     gain.gain.exponentialRampToValueAtTime(
-        Math.max(params.sustain,0.0001),
-        now + params.attack + params.decay
+        Math.max(
+            params.sustain,
+            0.0001
+        ),
+        now +
+        params.attack +
+        params.decay
     );
 
+
     osc.connect(gain);
+
     gain.connect(masterGain);
 
     osc.start();
 
-    activeVoices.set(note.key,{
-        osc,
-        gain
-    });
 
-    setVisual(note,true);
+    activeVoices.set(
+        note.key,
+        {
+            osc,
+            gain
+        }
+    );
 
-    document.getElementById("activeNote").textContent =
+
+    setVisual(
+        note,
+        true
+    );
+
+
+    document.getElementById(
+        "activeNote"
+    ).textContent =
         note.name;
 
-    document.getElementById("frequency").textContent =
-        freq.toFixed(2)+" Hz";
 
-    document.getElementById("octDisplay").textContent =
+    document.getElementById(
+        "frequency"
+    ).textContent =
+        freq.toFixed(2) +
+        " Hz";
+
+
+    document.getElementById(
+        "octDisplay"
+    ).textContent =
         octave;
+
 }
+
+
+/*
+==================================================
+停止
+==================================================
+*/
 
 function noteOff(note){
 
     if(!audioCtx) return;
 
-    const voice = activeVoices.get(note.key);
+
+    const voice =
+        activeVoices.get(
+            note.key
+        );
+
+
     if(!voice) return;
 
+
     const release =
-        Number(document.getElementById("release").value);
+        Number(
+            document.getElementById(
+                "release"
+            ).value
+        );
 
-    const now = audioCtx.currentTime;
 
-    voice.gain.gain.cancelScheduledValues(now);
-    voice.gain.gain.setValueAtTime(
-        Math.max(voice.gain.gain.value,0.0001),
+    const now =
+        audioCtx.currentTime;
+
+
+    voice.gain.gain.cancelScheduledValues(
         now
     );
+
+
+    voice.gain.gain.setValueAtTime(
+        Math.max(
+            voice.gain.gain.value,
+            0.0001
+        ),
+        now
+    );
+
 
     voice.gain.gain.exponentialRampToValueAtTime(
         0.0001,
         now + release
     );
 
-    voice.osc.stop(now + release + .03);
 
-    activeVoices.delete(note.key);
+    voice.osc.stop(
+        now + release + .03
+    );
 
-    setVisual(note,false);
+
+    activeVoices.delete(
+        note.key
+    );
+
+
+    setVisual(
+        note,
+        false
+    );
+
 
     if(activeVoices.size===0){
-        document.getElementById("activeNote").textContent="---";
-        document.getElementById("frequency").textContent="---";
+
+        document.getElementById(
+            "activeNote"
+        ).textContent =
+            "---";
+
+        document.getElementById(
+            "frequency"
+        ).textContent =
+            "---";
+
     }
+
 }
+
+
+/*
+==================================================
+視覺效果
+==================================================
+*/
 
 function setVisual(note,on){
 
     const el =
-        document.querySelector(`[data-key="${note.key}"]`);
+        document.querySelector(
+            `[data-key="${note.key}"]`
+        );
+
 
     if(el){
-        el.classList.toggle("active",on);
+
+        el.classList.toggle(
+            "active",
+            on
+        );
+
     }
+
 }
 
-/* 滑鼠 */
-document.querySelectorAll(".key").forEach(el=>{
+
+/*
+==================================================
+滑鼠 / 觸控
+==================================================
+*/
+
+document
+.querySelectorAll(".key")
+.forEach(el=>{
 
     const note =
-        notes.find(n=>n.key===el.dataset.key);
+        notes.find(
+            n =>
+                n.midi ==
+                Number(el.dataset.midi)
+        );
 
-    el.addEventListener("pointerdown",e=>{
+
+    el.addEventListener(
+        "pointerdown",
+        e=>{
+
+            e.preventDefault();
+
+            initAudio();
+
+
+            if(
+                audioCtx.state ===
+                "suspended"
+            ){
+
+                audioCtx.resume();
+
+            }
+
+
+            noteOn(note);
+
+        }
+    );
+
+
+    el.addEventListener(
+        "pointerup",
+        e=>{
+
+            e.preventDefault();
+
+            noteOff(note);
+
+        }
+    );
+
+
+    el.addEventListener(
+        "pointerleave",
+        ()=>{
+
+            if(
+                activeVoices.has(
+                    note.key
+                )
+            ){
+
+                noteOff(note);
+
+            }
+
+        }
+    );
+
+});
+
+
+/*
+==================================================
+電腦鍵盤
+==================================================
+*/
+
+const pressed =
+    new Set();
+
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        if(e.repeat) return;
+
+
+        const key =
+            e.key.toLowerCase();
+
+
+        const note =
+            notes.find(
+                n =>
+                    n.key === key
+            );
+
+
+        if(!note) return;
+
+
         e.preventDefault();
+
+
+        if(pressed.has(key)) return;
+
+
+        pressed.add(key);
+
+
         initAudio();
 
-        if(audioCtx.state==="suspended"){
+
+        if(
+            audioCtx.state ===
+            "suspended"
+        ){
+
             audioCtx.resume();
+
         }
+
 
         noteOn(note);
-    });
 
-    el.addEventListener("pointerup",e=>{
-        e.preventDefault();
-        noteOff(note);
-    });
-
-    el.addEventListener("pointerleave",()=>{
-        if(activeVoices.has(note.key)){
-            noteOff(note);
-        }
-    });
-});
-
-/* 電腦鍵盤 */
-const pressed = new Set();
-
-document.addEventListener("keydown",e=>{
-
-    if(e.repeat) return;
-
-    const key = e.key.toLowerCase();
-
-    const note =
-        notes.find(n=>n.key===key);
-
-    if(!note) return;
-
-    e.preventDefault();
-
-    if(pressed.has(key)) return;
-
-    pressed.add(key);
-
-    initAudio();
-
-    if(audioCtx.state==="suspended"){
-        audioCtx.resume();
     }
+);
 
-    noteOn(note);
-});
 
-document.addEventListener("keyup",e=>{
+document.addEventListener(
+    "keyup",
+    e=>{
 
-    const key=e.key.toLowerCase();
+        const key =
+            e.key.toLowerCase();
 
-    const note =
-        notes.find(n=>n.key===key);
 
-    if(!note) return;
+        const note =
+            notes.find(
+                n =>
+                    n.key === key
+            );
 
-    pressed.delete(key);
 
-    noteOff(note);
-});
+        if(!note) return;
 
-/* 八度 */
+
+        pressed.delete(key);
+
+
+        noteOff(note);
+
+    }
+);
+
+
+/*
+==================================================
+八度
+==================================================
+*/
+
 function updateOctave(){
-    document.getElementById("octaveValue").textContent =
-        "OCT " + (octave>=0?"+":"") + octave;
 
-    document.getElementById("octDisplay").textContent=octave;
+    document.getElementById(
+        "octaveValue"
+    ).textContent =
+        "OCT " +
+        (
+            octave>=0
+            ? "+"
+            : ""
+        ) +
+        octave;
+
+
+    document.getElementById(
+        "octDisplay"
+    ).textContent =
+        octave;
+
 }
 
-document.getElementById("octUp").onclick=()=>{
-    octave=Math.min(3,octave+1);
+
+document
+.getElementById("octUp")
+.onclick=()=>{
+
+    octave =
+        Math.min(
+            3,
+            octave+1
+        );
+
     updateOctave();
+
 };
 
-document.getElementById("octDown").onclick=()=>{
-    octave=Math.max(-3,octave-1);
+
+document
+.getElementById("octDown")
+.onclick=()=>{
+
+    octave =
+        Math.max(
+            -3,
+            octave-1
+        );
+
     updateOctave();
+
 };
 
-/* 控制器 */
-const filter=document.getElementById("filter");
+
+/*
+==================================================
+Filter
+==================================================
+*/
+
+const filter =
+    document.getElementById(
+        "filter"
+    );
+
+
 filter.oninput=()=>{
-    const value=Number(filter.value);
 
-    document.getElementById("filterValue").textContent =
-        value+" Hz";
+    const value =
+        Number(
+            filter.value
+        );
+
+
+    document.getElementById(
+        "filterValue"
+    ).textContent =
+        value +
+        " Hz";
+
 
     if(filterNode){
+
         filterNode.frequency.setTargetAtTime(
             value,
             audioCtx.currentTime,
             .01
         );
+
     }
+
 };
 
-const volume=document.getElementById("volume");
-volume.oninput=()=>{
-    const value=Number(volume.value);
 
-    document.getElementById("volumeValue").textContent =
-        Math.round(value*100)+"%";
+/*
+==================================================
+Volume
+==================================================
+*/
+
+const volume =
+    document.getElementById(
+        "volume"
+    );
+
+
+volume.oninput=()=>{
+
+    const value =
+        Number(
+            volume.value
+        );
+
+
+    document.getElementById(
+        "volumeValue"
+    ).textContent =
+        Math.round(
+            value*100
+        ) +
+        "%";
+
 
     if(masterGain){
+
         masterGain.gain.setTargetAtTime(
             value,
             audioCtx.currentTime,
             .01
         );
+
     }
+
 };
 
-function rangeText(id,target,formatter){
-    document.getElementById(id).oninput=function(){
-        document.getElementById(target).textContent =
-            formatter(Number(this.value));
+
+/*
+==================================================
+其他控制
+==================================================
+*/
+
+function rangeText(
+    id,
+    target,
+    formatter
+){
+
+    document.getElementById(
+        id
+    ).oninput=function(){
+
+        document.getElementById(
+            target
+        ).textContent =
+            formatter(
+                Number(this.value)
+            );
+
     };
+
 }
+
 
 rangeText(
     "attack",
@@ -842,11 +1796,13 @@ rangeText(
     v=>v.toFixed(2)+" s"
 );
 
+
 rangeText(
     "decay",
     "decayValue",
     v=>v.toFixed(2)+" s"
 );
+
 
 rangeText(
     "sustain",
@@ -854,75 +1810,155 @@ rangeText(
     v=>Math.round(v*100)+"%"
 );
 
+
 rangeText(
     "release",
     "releaseValue",
     v=>v.toFixed(2)+" s"
 );
 
-/* 示波器 */
-const canvas=document.getElementById("scope");
-const ctx=canvas.getContext("2d");
+
+/*
+==================================================
+示波器
+==================================================
+*/
+
+const canvas =
+    document.getElementById(
+        "scope"
+    );
+
+
+const ctx =
+    canvas.getContext("2d");
+
 
 function drawScope(){
 
     if(!analyser) return;
 
-    requestAnimationFrame(drawScope);
+
+    requestAnimationFrame(
+        drawScope
+    );
+
 
     const data =
-        new Uint8Array(analyser.fftSize);
+        new Uint8Array(
+            analyser.fftSize
+        );
 
-    analyser.getByteTimeDomainData(data);
+
+    analyser.getByteTimeDomainData(
+        data
+    );
+
 
     ctx.clearRect(
-        0,0,
+        0,
+        0,
         canvas.width,
         canvas.height
     );
 
+
     ctx.beginPath();
 
-    for(let i=0;i<data.length;i++){
+
+    for(
+        let i=0;
+        i<data.length;
+        i++
+    ){
 
         const x =
-            i/(data.length-1)*canvas.width;
+            i /
+            (data.length-1) *
+            canvas.width;
+
 
         const y =
             canvas.height/2 +
             (data[i]-128)*.9;
 
+
         if(i===0){
-            ctx.moveTo(x,y);
+
+            ctx.moveTo(
+                x,
+                y
+            );
+
         }else{
-            ctx.lineTo(x,y);
+
+            ctx.lineTo(
+                x,
+                y
+            );
+
         }
+
     }
 
-    ctx.strokeStyle="#00eaff";
-    ctx.lineWidth=2;
 
-    ctx.shadowBlur=12;
-    ctx.shadowColor="#00eaff";
+    ctx.strokeStyle =
+        "#00eaff";
+
+    ctx.lineWidth =
+        2;
+
+    ctx.shadowBlur =
+        12;
+
+    ctx.shadowColor =
+        "#00eaff";
+
 
     ctx.stroke();
 
-    ctx.shadowBlur=0;
 
-    /* 中央基準線 */
+    ctx.shadowBlur =
+        0;
+
+
+    /*
+    中央基準線
+    */
+
     ctx.beginPath();
-    ctx.moveTo(0,canvas.height/2);
-    ctx.lineTo(canvas.width,canvas.height/2);
 
-    ctx.strokeStyle="rgba(0,234,255,.12)";
-    ctx.lineWidth=1;
+    ctx.moveTo(
+        0,
+        canvas.height/2
+    );
+
+    ctx.lineTo(
+        canvas.width,
+        canvas.height/2
+    );
+
+
+    ctx.strokeStyle =
+        "rgba(0,234,255,.12)";
+
+    ctx.lineWidth =
+        1;
+
     ctx.stroke();
+
 }
 
-/* 初始值 */
+
+/*
+==================================================
+初始
+==================================================
+*/
+
 updateOctave();
+
 </script>
 
 </body>
 </html>
-
