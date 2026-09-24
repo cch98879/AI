@@ -1,0 +1,1812 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_中秋吃月餅大賽</title>
+
+<style>
+
+/* ================================
+   基本設定
+================================ */
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    font-family:
+        Arial,
+        "Microsoft JhengHei",
+        sans-serif;
+}
+
+body {
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            #394a8a 0%,
+            #151936 45%,
+            #070914 100%
+        );
+
+    color: white;
+}
+
+
+/* ================================
+   星空
+================================ */
+
+.star {
+    position: fixed;
+
+    width: 3px;
+    height: 3px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    opacity: 0.8;
+
+    animation:
+        twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+
+    from {
+        opacity: 0.2;
+        transform: scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.4);
+    }
+
+}
+
+
+/* ================================
+   月亮
+================================ */
+
+.moon {
+    position: fixed;
+
+    top: 45px;
+    right: 8%;
+
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #fffde8,
+            #ffe58a 60%,
+            #ffc85c
+        );
+
+    box-shadow:
+        0 0 25px #fff1a8,
+        0 0 60px rgba(255,230,120,0.6);
+
+    z-index: 0;
+}
+
+
+/* ================================
+   遊戲區
+================================ */
+
+.game {
+
+    position: relative;
+
+    width: min(900px, 96vw);
+    height: min(720px, 92vh);
+
+    margin: 20px auto;
+
+    overflow: hidden;
+
+    border:
+        2px solid rgba(255,255,255,0.2);
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            rgba(20,25,60,0.45),
+            rgba(5,8,25,0.7)
+        );
+
+    box-shadow:
+        0 0 40px rgba(100,130,255,0.25),
+        inset 0 0 40px rgba(255,255,255,0.04);
+
+    backdrop-filter: blur(5px);
+}
+
+
+/* ================================
+   標題
+================================ */
+
+.title {
+
+    position: absolute;
+
+    top: 15px;
+    left: 0;
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size:
+        clamp(22px, 4vw, 36px);
+
+    font-weight: bold;
+
+    text-shadow:
+        0 0 10px #fff,
+        0 0 25px #8ab4ff;
+
+    z-index: 10;
+}
+
+
+/* ================================
+   資訊列
+================================ */
+
+.info {
+
+    position: absolute;
+
+    top: 65px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    gap: 12px;
+
+    z-index: 10;
+}
+
+.info-box {
+
+    min-width: 105px;
+
+    padding: 8px 14px;
+
+    text-align: center;
+
+    border:
+        1px solid rgba(255,255,255,0.25);
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 0 15px
+        rgba(130,160,255,0.15);
+
+    font-size: 15px;
+}
+
+.info-value {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    color: #ffe88a;
+}
+
+
+/* ================================
+   掉落物
+================================ */
+
+.mooncake {
+
+    position: absolute;
+
+    width: 62px;
+    height: 62px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    font-size: 43px;
+
+    border-radius: 50%;
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            rgba(255,210,100,0.8)
+        );
+
+    z-index: 5;
+
+    animation:
+        rotateMooncake
+        1.5s
+        ease-in-out
+        infinite;
+}
+
+@keyframes rotateMooncake {
+
+    0% {
+        transform: rotate(-8deg);
+    }
+
+    50% {
+        transform: rotate(8deg);
+    }
+
+    100% {
+        transform: rotate(-8deg);
+    }
+
+}
+
+
+/* ================================
+   炸彈
+================================ */
+
+.bomb {
+
+    filter:
+        drop-shadow(
+            0 0 10px red
+        );
+}
+
+
+/* ================================
+   玩家
+================================ */
+
+.player {
+
+    position: absolute;
+
+    bottom: 20px;
+
+    width: 110px;
+    height: 70px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    font-size: 65px;
+
+    z-index: 8;
+
+    filter:
+        drop-shadow(
+            0 0 10px
+            rgba(255,255,255,0.6)
+        );
+
+    will-change: left, transform;
+}
+
+
+/* ================================
+   地面
+================================ */
+
+.ground {
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 15px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6f54ff,
+            #54c8ff,
+            #c76cff,
+            #6f54ff
+        );
+
+    box-shadow:
+        0 0 20px #6f54ff;
+
+    z-index: 7;
+}
+
+
+/* ================================
+   開始 / 結束畫面
+================================ */
+
+.start-screen,
+.game-over {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    background:
+        rgba(5,8,25,0.72);
+
+    backdrop-filter:
+        blur(8px);
+
+    z-index: 20;
+}
+
+.panel {
+
+    width: min(500px, 88%);
+
+    padding: 35px;
+
+    text-align: center;
+
+    border:
+        1px solid rgba(255,255,255,0.2);
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(70,80,160,0.3),
+            rgba(20,20,60,0.6)
+        );
+
+    box-shadow:
+        0 0 40px
+        rgba(110,130,255,0.3);
+}
+
+.panel h2 {
+
+    margin-top: 0;
+
+    font-size: 34px;
+
+    text-shadow:
+        0 0 15px #9bbcff;
+}
+
+.panel p {
+
+    line-height: 1.8;
+
+    color: #dfe7ff;
+}
+
+
+/* ================================
+   開始按鈕
+================================ */
+
+.start-button {
+
+    margin-top: 15px;
+
+    padding: 14px 45px;
+
+    border: none;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7567ff,
+            #4dc9ff
+        );
+
+    color: white;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 20px
+        rgba(80,180,255,0.5);
+
+    transition: 0.2s;
+}
+
+.start-button:hover {
+
+    transform: scale(1.06);
+
+    box-shadow:
+        0 0 30px
+        rgba(80,200,255,0.8);
+}
+
+
+/* ================================
+   隱藏
+================================ */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ================================
+   遊戲提示
+================================ */
+
+.hint {
+
+    position: absolute;
+
+    bottom: 35px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    font-size: 14px;
+
+    color:
+        rgba(255,255,255,0.65);
+
+    z-index: 9;
+}
+
+
+/* ================================
+   手機控制
+================================ */
+
+.mobile-controls {
+
+    position: fixed;
+
+    bottom: 15px;
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    gap: 20px;
+
+    z-index: 30;
+}
+
+.control-btn {
+
+    width: 65px;
+    height: 55px;
+
+    border:
+        1px solid rgba(255,255,255,0.3);
+
+    border-radius: 18px;
+
+    background:
+        rgba(40,50,100,0.7);
+
+    color: white;
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+    touch-action: none;
+
+    box-shadow:
+        0 0 15px
+        rgba(100,150,255,0.3);
+}
+
+.control-btn:active {
+
+    transform: scale(0.9);
+}
+
+
+/* 電腦隱藏手機按鈕 */
+
+@media (min-width: 800px) {
+
+    .mobile-controls {
+        display: none;
+    }
+
+}
+
+
+/* ================================
+   小螢幕
+================================ */
+
+@media (max-width: 500px) {
+
+    .game {
+
+        width: 100vw;
+        height: 100vh;
+
+        margin: 0;
+
+        border-radius: 0;
+    }
+
+    .moon {
+
+        width: 75px;
+        height: 75px;
+
+        top: 50px;
+        right: 5%;
+    }
+
+    .info {
+
+        top: 65px;
+
+        gap: 5px;
+    }
+
+    .info-box {
+
+        min-width: 85px;
+
+        padding: 6px;
+
+        font-size: 12px;
+    }
+
+    .info-value {
+        font-size: 18px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================================
+     星空
+================================ -->
+
+<div class="star" style="left:10%;top:15%;"></div>
+<div class="star" style="left:18%;top:30%;"></div>
+<div class="star" style="left:28%;top:10%;"></div>
+<div class="star" style="left:42%;top:22%;"></div>
+<div class="star" style="left:55%;top:8%;"></div>
+<div class="star" style="left:65%;top:28%;"></div>
+<div class="star" style="left:78%;top:17%;"></div>
+<div class="star" style="left:88%;top:35%;"></div>
+<div class="star" style="left:94%;top:10%;"></div>
+<div class="star" style="left:35%;top:42%;"></div>
+
+
+<!-- 月亮 -->
+
+<div class="moon"></div>
+
+
+<!-- ================================
+     遊戲
+================================ -->
+
+<div class="game" id="game">
+
+
+    <!-- 標題 -->
+
+    <div class="title">
+        🌕讓AI解決我的生活大小事_中秋吃月餅大賽🥮
+    </div>
+
+
+    <!-- 資訊 -->
+
+    <div class="info">
+
+        <div class="info-box">
+
+            分數
+
+            <div
+                class="info-value"
+                id="score"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+            時間
+
+            <div
+                class="info-value"
+                id="time"
+            >
+                60
+            </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+            生命
+
+            <div
+                class="info-value"
+                id="lives"
+            >
+                ❤️❤️❤️
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================
+         開始畫面
+    ================================= -->
+
+    <div
+        class="start-screen"
+        id="startScreen"
+    >
+
+        <div class="panel">
+
+            <h2>
+                🥮 吃月餅！
+            </h2>
+
+            <p>
+                月餅正在從天上掉下來！
+                <br>
+                快控制嘴巴把月餅吃掉！
+            </p>
+
+            <p>
+                🥮 月餅：+10 分
+                <br>
+                💣 炸彈：-20 分
+                <br>
+                ❤️ 共有 3 次生命
+            </p>
+
+            <p>
+                ⌨️
+                <b>按住 ← → 或 A / D</b>
+                持續移動
+            </p>
+
+            <button
+                class="start-button"
+                id="startButton"
+            >
+                開始吃月餅！
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================
+         遊戲結束
+    ================================= -->
+
+    <div
+        class="game-over hidden"
+        id="gameOver"
+    >
+
+        <div class="panel">
+
+            <h2>
+                🌕 遊戲結束
+            </h2>
+
+            <p>
+                本次得分
+            </p>
+
+            <div
+                id="finalScore"
+                style="
+                    font-size:50px;
+                    color:#ffe88a;
+                    font-weight:bold;
+                "
+            >
+                0
+            </div>
+
+            <p id="bestText"></p>
+
+            <button
+                class="start-button"
+                id="restartButton"
+            >
+                再玩一次
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- 玩家 -->
+
+    <div
+        class="player"
+        id="player"
+    >
+        👄
+    </div>
+
+
+    <!-- 提示 -->
+
+    <div class="hint">
+        🥮 接月餅　💣 小心炸彈！
+    </div>
+
+
+    <!-- 地面 -->
+
+    <div class="ground"></div>
+
+
+</div>
+
+
+<!-- ================================
+     手機控制
+================================ -->
+
+<div class="mobile-controls">
+
+    <button
+        class="control-btn"
+        id="leftButton"
+    >
+        ◀
+    </button>
+
+    <button
+        class="control-btn"
+        id="rightButton"
+    >
+        ▶
+    </button>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   取得 HTML 元件
+================================================== */
+
+const game =
+    document.getElementById("game");
+
+const player =
+    document.getElementById("player");
+
+const scoreText =
+    document.getElementById("score");
+
+const timeText =
+    document.getElementById("time");
+
+const livesText =
+    document.getElementById("lives");
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const gameOver =
+    document.getElementById("gameOver");
+
+const startButton =
+    document.getElementById("startButton");
+
+const restartButton =
+    document.getElementById("restartButton");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const bestText =
+    document.getElementById("bestText");
+
+const leftButton =
+    document.getElementById("leftButton");
+
+const rightButton =
+    document.getElementById("rightButton");
+
+
+/* ==================================================
+   遊戲變數
+================================================== */
+
+let score = 0;
+
+let time = 60;
+
+let lives = 3;
+
+let playerX = 0;
+
+let gameRunning = false;
+
+let items = [];
+
+let gameTimer = null;
+
+let createTimer = null;
+
+
+/* ==================================================
+   鍵盤狀態
+================================================== */
+
+let keyLeft = false;
+
+let keyRight = false;
+
+
+/* ==================================================
+   玩家移動速度
+================================================== */
+
+/*
+   數字越大，移動越快。
+
+   原本：
+   一次按鍵移動 45px
+
+   現在：
+   每一幀持續移動 9px
+
+   按住按鍵即可連續移動。
+*/
+
+const moveSpeed = 9;
+
+
+/* ==================================================
+   最高分
+================================================== */
+
+let bestScore =
+    Number(
+        localStorage.getItem(
+            "mooncakeBestScore"
+        )
+    ) || 0;
+
+
+/* ==================================================
+   初始化玩家
+================================================== */
+
+function resetPlayer() {
+
+    playerX =
+        (
+            game.clientWidth -
+            player.offsetWidth
+        ) / 2;
+
+    player.style.left =
+        playerX + "px";
+}
+
+
+/* ==================================================
+   開始遊戲
+================================================== */
+
+function startGame() {
+
+    /* 隱藏開始 / 結束畫面 */
+
+    startScreen.classList.add("hidden");
+
+    gameOver.classList.add("hidden");
+
+
+    /* 重設資料 */
+
+    score = 0;
+
+    time = 60;
+
+    lives = 3;
+
+
+    /* 更新畫面 */
+
+    scoreText.textContent =
+        score;
+
+    timeText.textContent =
+        time;
+
+    livesText.textContent =
+        "❤️❤️❤️";
+
+
+    /* 清除舊月餅 */
+
+    items.forEach(
+        item => item.element.remove()
+    );
+
+    items = [];
+
+
+    /* 重設玩家 */
+
+    resetPlayer();
+
+
+    /* 遊戲開始 */
+
+    gameRunning = true;
+
+
+    /* 倒數計時 */
+
+    clearInterval(gameTimer);
+
+    gameTimer =
+        setInterval(
+            () => {
+
+                if (!gameRunning) {
+                    return;
+                }
+
+                time--;
+
+                timeText.textContent =
+                    time;
+
+                if (time <= 0) {
+
+                    endGame();
+
+                }
+
+            },
+            1000
+        );
+
+
+    /* 產生月餅 */
+
+    clearInterval(createTimer);
+
+    createTimer =
+        setInterval(
+            createItem,
+            650
+        );
+
+}
+
+
+/* ==================================================
+   建立月餅 / 炸彈
+================================================== */
+
+function createItem() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    const item =
+        document.createElement("div");
+
+
+    /* 12% 機率是炸彈 */
+
+    const isBomb =
+        Math.random() < 0.12;
+
+
+    item.className =
+        "mooncake" +
+        (
+            isBomb
+                ? " bomb"
+                : ""
+        );
+
+
+    item.textContent =
+        isBomb
+            ? "💣"
+            : "🥮";
+
+
+    const maxX =
+        game.clientWidth - 70;
+
+
+    const x =
+        Math.random() * maxX;
+
+
+    item.style.left =
+        x + "px";
+
+
+    item.style.top =
+        "110px";
+
+
+    game.appendChild(item);
+
+
+    items.push({
+
+        element: item,
+
+        x: x,
+
+        y: 110,
+
+        speed:
+            3 +
+            Math.random() * 3,
+
+        bomb: isBomb
+
+    });
+
+}
+
+
+/* ==================================================
+   玩家鍵盤移動
+================================================== */
+
+function updatePlayerMovement() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    /* 左 */
+
+    if (keyLeft) {
+
+        playerX -=
+            moveSpeed;
+
+    }
+
+
+    /* 右 */
+
+    if (keyRight) {
+
+        playerX +=
+            moveSpeed;
+
+    }
+
+
+    /* 左邊界 */
+
+    if (playerX < 0) {
+
+        playerX = 0;
+
+    }
+
+
+    /* 右邊界 */
+
+    const maxX =
+        game.clientWidth -
+        player.offsetWidth;
+
+
+    if (playerX > maxX) {
+
+        playerX = maxX;
+
+    }
+
+
+    /* 更新位置 */
+
+    player.style.left =
+        playerX + "px";
+
+}
+
+
+/* ==================================================
+   鍵盤按下
+================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        const key =
+            event.key.toLowerCase();
+
+
+        /* 左 */
+
+        if (
+            event.key === "ArrowLeft" ||
+            key === "a"
+        ) {
+
+            event.preventDefault();
+
+            keyLeft = true;
+
+        }
+
+
+        /* 右 */
+
+        if (
+            event.key === "ArrowRight" ||
+            key === "d"
+        ) {
+
+            event.preventDefault();
+
+            keyRight = true;
+
+        }
+
+
+        /* 空白鍵開始 */
+
+        if (
+            event.code === "Space" &&
+            !gameRunning
+        ) {
+
+            event.preventDefault();
+
+            if (
+                !startScreen
+                    .classList
+                    .contains("hidden")
+            ) {
+
+                startGame();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   鍵盤放開
+================================================== */
+
+document.addEventListener(
+    "keyup",
+    function(event) {
+
+        const key =
+            event.key.toLowerCase();
+
+
+        /* 左 */
+
+        if (
+            event.key === "ArrowLeft" ||
+            key === "a"
+        ) {
+
+            keyLeft = false;
+
+        }
+
+
+        /* 右 */
+
+        if (
+            event.key === "ArrowRight" ||
+            key === "d"
+        ) {
+
+            keyRight = false;
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   防止視窗失焦後按鍵卡住
+================================================== */
+
+window.addEventListener(
+    "blur",
+    function() {
+
+        keyLeft = false;
+
+        keyRight = false;
+
+    }
+);
+
+
+/* ==================================================
+   滑鼠控制
+================================================== */
+
+game.addEventListener(
+    "mousemove",
+    function(event) {
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        const rect =
+            game.getBoundingClientRect();
+
+
+        playerX =
+            event.clientX -
+            rect.left -
+            player.offsetWidth / 2;
+
+
+        const maxX =
+            game.clientWidth -
+            player.offsetWidth;
+
+
+        if (playerX < 0) {
+            playerX = 0;
+        }
+
+
+        if (playerX > maxX) {
+            playerX = maxX;
+        }
+
+
+        player.style.left =
+            playerX + "px";
+
+    }
+);
+
+
+/* ==================================================
+   手機按鈕
+================================================== */
+
+function startMobileMove(
+    direction
+) {
+
+    if (direction === "left") {
+
+        keyLeft = true;
+
+    }
+
+    if (direction === "right") {
+
+        keyRight = true;
+
+    }
+
+}
+
+
+function stopMobileMove(
+    direction
+) {
+
+    if (direction === "left") {
+
+        keyLeft = false;
+
+    }
+
+    if (direction === "right") {
+
+        keyRight = false;
+
+    }
+
+}
+
+
+/* 左按鈕 */
+
+leftButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        startMobileMove("left");
+
+    }
+);
+
+
+leftButton.addEventListener(
+    "pointerup",
+    function() {
+
+        stopMobileMove("left");
+
+    }
+);
+
+
+leftButton.addEventListener(
+    "pointerleave",
+    function() {
+
+        stopMobileMove("left");
+
+    }
+);
+
+
+/* 右按鈕 */
+
+rightButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        startMobileMove("right");
+
+    }
+);
+
+
+rightButton.addEventListener(
+    "pointerup",
+    function() {
+
+        stopMobileMove("right");
+
+    }
+);
+
+
+rightButton.addEventListener(
+    "pointerleave",
+    function() {
+
+        stopMobileMove("right");
+
+    }
+);
+
+
+/* ==================================================
+   碰撞偵測
+================================================== */
+
+function checkCollision(
+    rect1,
+    rect2
+) {
+
+    return (
+
+        rect1.bottom >= rect2.top &&
+
+        rect1.top <= rect2.bottom &&
+
+        rect1.right >= rect2.left &&
+
+        rect1.left <= rect2.right
+
+    );
+
+}
+
+
+/* ==================================================
+   遊戲主迴圈
+================================================== */
+
+function gameLoop() {
+
+    /* 玩家移動 */
+
+    updatePlayerMovement();
+
+
+    if (gameRunning) {
+
+        const playerRect =
+            player.getBoundingClientRect();
+
+
+        /*
+           使用倒序處理陣列，
+           避免刪除物件時跳過下一個物件。
+        */
+
+        for (
+            let i = items.length - 1;
+            i >= 0;
+            i--
+        ) {
+
+            const item =
+                items[i];
+
+
+            /* 月餅往下掉 */
+
+            item.y +=
+                item.speed;
+
+
+            item.element.style.top =
+                item.y + "px";
+
+
+            /* 取得碰撞位置 */
+
+            const itemRect =
+                item.element
+                    .getBoundingClientRect();
+
+
+            /* ============================
+               接到物品
+            ============================ */
+
+            if (
+                checkCollision(
+                    itemRect,
+                    playerRect
+                )
+            ) {
+
+                /* 炸彈 */
+
+                if (item.bomb) {
+
+                    score -= 20;
+
+                    if (score < 0) {
+                        score = 0;
+                    }
+
+                    lives--;
+
+                    livesText.textContent =
+                        "❤️".repeat(lives);
+
+
+                    /* 玩家閃爍 */
+
+                    player.style.transform =
+                        "scale(0.8)";
+
+                    setTimeout(
+                        () => {
+
+                            player.style.transform =
+                                "scale(1)";
+
+                        },
+                        150
+                    );
+
+                }
+
+                /* 月餅 */
+
+                else {
+
+                    score += 10;
+
+
+                    /* 吃東西動畫 */
+
+                    player.style.transform =
+                        "scale(1.25)";
+
+
+                    setTimeout(
+                        () => {
+
+                            player.style.transform =
+                                "scale(1)";
+
+                        },
+                        120
+                    );
+
+                }
+
+
+                scoreText.textContent =
+                    score;
+
+
+                /* 移除物品 */
+
+                item.element.remove();
+
+                items.splice(i, 1);
+
+
+                /* 生命歸零 */
+
+                if (lives <= 0) {
+
+                    endGame();
+
+                }
+
+
+                continue;
+
+            }
+
+
+            /* ============================
+               掉到底部
+            ============================ */
+
+            if (
+                item.y >
+                game.clientHeight
+            ) {
+
+                item.element.remove();
+
+                items.splice(i, 1);
+
+            }
+
+        }
+
+    }
+
+
+    /* 下一幀 */
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* ==================================================
+   遊戲結束
+================================================== */
+
+function endGame() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    gameRunning = false;
+
+
+    /* 停止計時器 */
+
+    clearInterval(gameTimer);
+
+    clearInterval(createTimer);
+
+
+    /* 清除所有掉落物 */
+
+    items.forEach(
+        item => item.element.remove()
+    );
+
+    items = [];
+
+
+    /* 最高分 */
+
+    if (score > bestScore) {
+
+        bestScore =
+            score;
+
+
+        localStorage.setItem(
+            "mooncakeBestScore",
+            bestScore
+        );
+
+
+        bestText.textContent =
+            "🎉 恭喜！創下新的最高分！";
+
+    }
+
+    else {
+
+        bestText.textContent =
+            "🏆 目前最高分：" +
+            bestScore;
+
+    }
+
+
+    /* 顯示結果 */
+
+    finalScore.textContent =
+        score;
+
+
+    gameOver.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* ==================================================
+   開始按鈕
+================================================== */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* ==================================================
+   再玩一次
+================================================== */
+
+restartButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* ==================================================
+   視窗大小改變
+================================================== */
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        const maxX =
+            game.clientWidth -
+            player.offsetWidth;
+
+
+        if (playerX > maxX) {
+
+            playerX = maxX;
+
+        }
+
+
+        if (playerX < 0) {
+
+            playerX = 0;
+
+        }
+
+
+        player.style.left =
+            playerX + "px";
+
+    }
+);
+
+
+/* ==================================================
+   初始化
+================================================== */
+
+resetPlayer();
+
+
+/* 啟動遊戲主迴圈 */
+
+requestAnimationFrame(
+    gameLoop
+);
+
+</script>
+
+</body>
+
+</html>
