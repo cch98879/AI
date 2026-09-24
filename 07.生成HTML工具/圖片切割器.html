@@ -1,0 +1,2475 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事器_圖片編輯/切割器</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at top,#313b55,#111522 65%);
+
+    color:#fff;
+    min-height:100vh;
+}
+
+/* ================= 頁首 ================= */
+
+header{
+    padding:20px;
+    text-align:center;
+
+    background:rgba(0,0,0,.25);
+
+    border-bottom:
+        1px solid rgba(255,255,255,.1);
+}
+
+header h1{
+    margin:0;
+    font-size:28px;
+}
+
+header p{
+    margin:7px 0 0;
+    opacity:.7;
+}
+
+/* ================= 主容器 ================= */
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
+
+    display:grid;
+    grid-template-columns:330px 1fr;
+
+    gap:20px;
+}
+
+/* ================= 控制面板 ================= */
+
+.panel{
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    backdrop-filter:
+        blur(15px);
+}
+
+.panel h2{
+    font-size:18px;
+    margin:0 0 15px;
+}
+
+.group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+
+    margin-bottom:7px;
+
+    font-size:14px;
+
+    color:#ddd;
+}
+
+input[type="file"]{
+    width:100%;
+}
+
+input[type="text"],
+select{
+
+    width:100%;
+
+    padding:11px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#202638;
+
+    color:white;
+}
+
+input[type="range"]{
+    width:100%;
+}
+
+.value{
+    float:right;
+
+    font-size:12px;
+
+    color:#aaa;
+}
+
+button{
+
+    border:0;
+
+    border-radius:10px;
+
+    padding:11px 14px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    background:#30384e;
+
+    color:white;
+
+    transition:.2s;
+}
+
+button:hover{
+
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.15);
+}
+
+button.primary{
+    background:#00b894;
+}
+
+button.danger{
+    background:#d63031;
+}
+
+button.preset{
+
+    width:100%;
+
+    margin-bottom:7px;
+
+    text-align:left;
+}
+
+.button-row{
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+}
+
+/* ================= 工作區 ================= */
+
+.editor-area{
+    min-width:0;
+}
+
+.workspace{
+
+    background:#080b12;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    min-height:600px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    overflow:hidden;
+}
+
+/* ================= Canvas ================= */
+
+.canvas-wrap{
+
+    position:relative;
+
+    max-width:100%;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+#memeCanvas{
+
+    display:block;
+
+    max-width:100%;
+
+    max-height:80vh;
+
+    width:auto;
+
+    height:auto;
+
+    border-radius:10px;
+
+    background:#222;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.5);
+
+    touch-action:none;
+
+    cursor:
+        default;
+}
+
+/* ================= 操作提示 ================= */
+
+.status{
+
+    margin-top:15px;
+
+    color:#aaa;
+
+    text-align:center;
+
+    font-size:13px;
+
+    line-height:1.6;
+}
+
+/* ================= 圖片選擇 ================= */
+
+.sticker-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:7px;
+}
+
+.sticker{
+
+    aspect-ratio:1;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    border:
+        2px solid transparent;
+
+    background:#222;
+}
+
+.sticker:hover{
+
+    border-color:#00cec9;
+}
+
+.sticker img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+}
+
+/* ================= 裁切按鈕 ================= */
+
+.crop-buttons{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:7px;
+}
+
+.crop-buttons button.active{
+
+    background:#00b894;
+}
+
+/* ================= 說明 ================= */
+
+.info{
+
+    background:
+        rgba(255,255,255,.06);
+
+    border-radius:10px;
+
+    padding:10px;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    color:#bbb;
+}
+
+/* ================= 分隔線 ================= */
+
+hr{
+
+    border:0;
+
+    border-top:
+        1px solid rgba(255,255,255,.1);
+
+    margin:
+        20px 0;
+}
+
+/* ================= LINE貼圖預覽 ================= */
+
+.preview-grid{
+
+    width:100%;
+
+    max-width:760px;
+
+    margin-top:20px;
+
+    display:grid;
+
+    gap:10px;
+}
+
+.preview-grid.grid1{
+
+    grid-template-columns:1fr;
+}
+
+.preview-grid.grid4{
+
+    grid-template-columns:
+        repeat(2,1fr);
+}
+
+.preview-grid.grid9{
+
+    grid-template-columns:
+        repeat(3,1fr);
+}
+
+.preview-grid.grid16{
+
+    grid-template-columns:
+        repeat(4,1fr);
+}
+
+.preview-item{
+
+    background:#111;
+
+    border-radius:8px;
+
+    padding:5px;
+
+    border:
+        1px solid rgba(255,255,255,.1);
+
+    overflow:hidden;
+}
+
+.preview-item canvas{
+
+    display:block;
+
+    width:100%;
+
+    height:auto;
+}
+
+/* ================= 手機 ================= */
+
+@media(max-width:850px){
+
+    .container{
+
+        grid-template-columns:1fr;
+
+        padding:10px;
+    }
+
+    .workspace{
+
+        min-height:auto;
+
+        padding:10px;
+    }
+
+    header h1{
+
+        font-size:23px;
+    }
+
+    #memeCanvas{
+
+        max-height:none;
+
+        width:100%;
+
+        height:auto;
+    }
+
+}
+
+/* ================= 小手機 ================= */
+
+@media(max-width:480px){
+
+    .container{
+
+        padding:7px;
+    }
+
+    .panel{
+
+        padding:14px;
+    }
+
+    .button-row button{
+
+        flex:1;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>讓AI解決我的生活大小事器_圖片編輯/切割器</h1>
+
+<p>
+可製作LINE貼圖
+</p>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =========================================================
+     左側控制區
+========================================================= -->
+
+<div class="panel">
+
+
+<h2>🖼️ 圖片</h2>
+
+
+<!-- 上傳圖片 -->
+
+<div class="group">
+
+<label>
+上傳自己的圖片
+</label>
+
+<input
+    type="file"
+    id="imageUpload"
+    accept="image/*">
+
+</div>
+
+
+
+
+
+<!-- =========================================================
+     LINE貼圖裁切
+========================================================= -->
+
+<h2>
+✂️ 圖片切割數量
+</h2>
+
+
+<div class="group">
+
+<div class="crop-buttons">
+
+<button
+    id="crop1"
+    class="active"
+    onclick="setGrid(1)">
+    1格
+</button>
+
+<button
+    id="crop4"
+    onclick="setGrid(4)">
+    4格
+</button>
+
+<button
+    id="crop9"
+    onclick="setGrid(9)">
+    9格
+</button>
+
+<button
+    id="crop16"
+    onclick="setGrid(16)">
+    16格
+</button>
+
+</div>
+
+</div>
+
+<hr>
+
+
+<!-- =========================================================
+     文字設定
+========================================================= -->
+
+<h2>
+✏️ 文字輸入
+</h2>
+
+
+<div class="group">
+
+<label>
+第1段文字
+</label>
+
+<input
+    type="text"
+    id="topText"
+    value=""
+    oninput="draw()">
+
+</div>
+
+
+<div class="group">
+
+<label>
+第2段文字
+</label>
+
+<input
+    type="text"
+    id="bottomText"
+    value=""
+    oninput="draw()">
+
+</div>
+
+
+<!-- 字型大小 -->
+
+<div class="group">
+
+<label>
+
+字型大小
+
+<span
+    class="value"
+    id="fontValue">
+55
+</span>
+
+</label>
+
+
+<input
+    type="range"
+    id="fontSize"
+    min="20"
+    max="150"
+    value="55"
+    oninput="
+        updateValue(
+            'fontValue',
+            this.value
+        );
+        draw();
+    ">
+
+</div>
+
+
+<!-- 輪廓 -->
+
+<div class="group">
+
+<label>
+
+文字輪廓
+
+<span
+    class="value"
+    id="strokeValue">
+8
+</span>
+
+</label>
+
+
+<input
+    type="range"
+    id="strokeWidth"
+    min="0"
+    max="25"
+    value="8"
+    oninput="
+        updateValue(
+            'strokeValue',
+            this.value
+        );
+        draw();
+    ">
+
+</div>
+
+
+<!-- 字型 -->
+
+<div class="group">
+
+<label>
+字型
+</label>
+
+
+<select
+    id="fontFamily"
+    onchange="draw()">
+
+<option value="Impact">
+Impact
+</option>
+
+<option value="Arial Black">
+Arial Black
+</option>
+
+<option value="Noto Sans TC">
+Noto Sans TC
+</option>
+
+<option value="Microsoft JhengHei">
+Microsoft JhengHei
+</option>
+
+</select>
+
+</div>
+
+
+<!-- 文字顏色 -->
+
+<div class="group">
+
+<label>
+文字顏色
+</label>
+
+<input
+    type="color"
+    id="textColor"
+    value="#ffffff"
+    oninput="draw()">
+
+</div>
+
+
+<!-- 輪廓顏色 -->
+
+<div class="group">
+
+<label>
+輪廓顏色
+</label>
+
+<input
+    type="color"
+    id="strokeColor"
+    value="#000000"
+    oninput="draw()">
+
+</div>
+
+
+<!-- =========================================================
+     操作按鈕
+========================================================= -->
+
+<div class="button-row">
+
+
+<button
+    class="primary"
+    onclick="downloadMeme()">
+
+⬇️ 下載整張圖片
+
+</button>
+
+
+<button
+    onclick="downloadAll()">
+
+✂️ 下載切割後的圖片
+
+</button>
+
+
+<button
+    class="danger"
+    onclick="resetMeme()">
+
+🔄 重置
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+<!-- =========================================================
+     右側編輯區
+========================================================= -->
+
+<div class="editor-area">
+
+
+<div class="workspace">
+
+
+<div class="canvas-wrap">
+
+<canvas
+    id="memeCanvas">
+</canvas>
+
+</div>
+
+
+<div class="status">
+
+👆可以直接用滑鼠或手指拖曳「文字」
+
+</div>
+
+
+<div
+    id="previewGrid"
+    class="preview-grid grid1">
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   基本設定
+========================================================= */
+
+const canvas =
+    document.getElementById(
+        "memeCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+let image =
+    new Image();
+
+
+let currentGrid = 1;
+
+
+/*
+    文字位置使用「比例」儲存。
+
+    例如：
+    0.5 = 圖片寬度的50%
+
+    這樣不管圖片是：
+    直式
+    橫式
+    正方形
+
+    文字都能維持正確位置。
+*/
+
+let topPX = 0.5;
+let topPY = 0.12;
+
+let bottomPX = 0.5;
+let bottomPY = 0.88;
+
+
+/* 拖曳 */
+
+let dragging = null;
+
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+
+/* =========================================================
+   初始圖片
+========================================================= */
+
+image.crossOrigin = "anonymous";
+
+image.src =
+    "";
+
+
+image.onload = function(){
+
+    fitCanvasToImage();
+
+    draw();
+
+};
+
+
+/* =========================================================
+   Canvas依照圖片比例自動調整
+========================================================= */
+
+function fitCanvasToImage(){
+
+    if(
+        !image.naturalWidth ||
+        !image.naturalHeight
+    ){
+        return;
+    }
+
+
+    /*
+        最大畫布尺寸。
+
+        注意：
+
+        這只是限制「Canvas實際解析度」，
+        不是強制圖片變成這個比例。
+    */
+
+    const MAX_WIDTH = 1200;
+
+    const MAX_HEIGHT = 1200;
+
+
+    let width =
+        image.naturalWidth;
+
+    let height =
+        image.naturalHeight;
+
+
+    /*
+        如果圖片太大，
+        等比例縮小。
+
+        如果圖片沒有超過限制，
+        保持原始尺寸。
+    */
+
+    const scale =
+        Math.min(
+            1,
+            MAX_WIDTH / width,
+            MAX_HEIGHT / height
+        );
+
+
+    canvas.width =
+        Math.round(
+            width * scale
+        );
+
+    canvas.height =
+        Math.round(
+            height * scale
+        );
+
+}
+
+
+/* =========================================================
+   上傳圖片
+========================================================= */
+
+document
+.getElementById("imageUpload")
+.addEventListener(
+    "change",
+    function(e){
+
+        const file =
+            e.target.files[0];
+
+        if(!file){
+            return;
+        }
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(event){
+
+                const newImage =
+                    new Image();
+
+
+                newImage.onload =
+                    function(){
+
+                        image =
+                            newImage;
+
+
+                        /*
+                            新圖片載入後，
+                            重新依比例設定 Canvas
+                        */
+
+                        fitCanvasToImage();
+
+
+                        /*
+                            新圖片時，
+                            文字重新放回預設位置
+                        */
+
+                        topPX = 0.5;
+                        topPY = 0.12;
+
+                        bottomPX = 0.5;
+                        bottomPY = 0.88;
+
+
+                        draw();
+
+                    };
+
+
+                newImage.src =
+                    event.target.result;
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================================================
+   載入預設圖片
+========================================================= */
+
+function loadPresetImage(url){
+
+    const newImage =
+        new Image();
+
+
+    newImage.crossOrigin =
+        "anonymous";
+
+
+    newImage.onload =
+        function(){
+
+            image =
+                newImage;
+
+
+            fitCanvasToImage();
+
+
+            topPX = 0.5;
+            topPY = 0.12;
+
+            bottomPX = 0.5;
+            bottomPY = 0.88;
+
+
+            draw();
+
+        };
+
+
+    newImage.src =
+        url;
+
+}
+
+
+/* =========================================================
+   更新數值
+========================================================= */
+
+function updateValue(
+    id,
+    value
+){
+
+    document
+    .getElementById(id)
+    .textContent = value;
+
+}
+
+
+/* =========================================================
+   取得文字設定
+========================================================= */
+
+function getTextSettings(){
+
+    return {
+
+        fontSize:
+            parseInt(
+                document
+                .getElementById(
+                    "fontSize"
+                ).value
+            ),
+
+        strokeWidth:
+            parseInt(
+                document
+                .getElementById(
+                    "strokeWidth"
+                ).value
+            ),
+
+        fontFamily:
+            document
+            .getElementById(
+                "fontFamily"
+            ).value,
+
+        textColor:
+            document
+            .getElementById(
+                "textColor"
+            ).value,
+
+        strokeColor:
+            document
+            .getElementById(
+                "strokeColor"
+            ).value
+
+    };
+
+}
+
+
+/* =========================================================
+   文字繪製
+========================================================= */
+
+function drawText(
+    text,
+    x,
+    y
+){
+
+    if(!text){
+        return;
+    }
+
+
+    const setting =
+        getTextSettings();
+
+
+    /*
+        文字大小依照 Canvas寬度比例。
+
+        讓直式圖片與橫式圖片都能
+        有合理的文字比例。
+    */
+
+    const scale =
+        canvas.width / 900;
+
+
+    const fontSize =
+        setting.fontSize *
+        scale;
+
+
+    const strokeWidth =
+        setting.strokeWidth *
+        scale;
+
+
+    ctx.font =
+        "900 " +
+        fontSize +
+        "px '" +
+        setting.fontFamily +
+        "'";
+
+
+    ctx.textAlign =
+        "center";
+
+
+    ctx.textBaseline =
+        "middle";
+
+
+    ctx.lineJoin =
+        "round";
+
+
+    /*
+        黑色輪廓
+    */
+
+    ctx.lineWidth =
+        strokeWidth;
+
+
+    ctx.strokeStyle =
+        setting.strokeColor;
+
+
+    ctx.strokeText(
+        text,
+        x,
+        y
+    );
+
+
+    /*
+        文字
+    */
+
+    ctx.fillStyle =
+        setting.textColor;
+
+
+    ctx.fillText(
+        text,
+        x,
+        y
+    );
+
+}
+
+
+/* =========================================================
+   畫面
+========================================================= */
+
+function draw(){
+
+    if(
+        !image ||
+        !image.complete ||
+        !image.naturalWidth
+    ){
+        return;
+    }
+
+
+    /*
+        確保 Canvas與圖片比例一致
+    */
+
+    fitCanvasToImage();
+
+
+    /*
+        清除
+    */
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        ------------------------------------------------
+        重點：
+        不使用 cover
+        不使用固定 900×600
+
+        直接按照圖片原始比例繪製。
+        ------------------------------------------------
+    */
+
+    ctx.drawImage(
+        image,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        淡淡的黑色漸層
+    */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            canvas.height
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(0,0,0,.18)"
+    );
+
+    gradient.addColorStop(
+        .5,
+        "rgba(0,0,0,0)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(0,0,0,.18)"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        將比例位置轉成實際 Canvas位置
+    */
+
+    const topX =
+        topPX *
+        canvas.width;
+
+    const topY =
+        topPY *
+        canvas.height;
+
+
+    const bottomX =
+        bottomPX *
+        canvas.width;
+
+    const bottomY =
+        bottomPY *
+        canvas.height;
+
+
+    /*
+        頂部文字
+    */
+
+    drawText(
+        document
+        .getElementById(
+            "topText"
+        ).value,
+
+        topX,
+        topY
+    );
+
+
+    /*
+        底部文字
+    */
+
+    drawText(
+        document
+        .getElementById(
+            "bottomText"
+        ).value,
+
+        bottomX,
+        bottomY
+    );
+
+}
+
+
+/* =========================================================
+   取得滑鼠／手指位置
+========================================================= */
+
+function getPointerPosition(e){
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    let clientX;
+    let clientY;
+
+
+    if(
+        e.touches &&
+        e.touches.length
+    ){
+
+        clientX =
+            e.touches[0].clientX;
+
+        clientY =
+            e.touches[0].clientY;
+
+    }else{
+
+        clientX =
+            e.clientX;
+
+        clientY =
+            e.clientY;
+
+    }
+
+
+    return {
+
+        x:
+            (clientX - rect.left)
+            *
+            (
+                canvas.width /
+                rect.width
+            ),
+
+        y:
+            (clientY - rect.top)
+            *
+            (
+                canvas.height /
+                rect.height
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   判斷文字位置
+========================================================= */
+
+function pointerDown(e){
+
+    e.preventDefault();
+
+
+    const p =
+        getPointerPosition(e);
+
+
+    const topX =
+        topPX *
+        canvas.width;
+
+    const topY =
+        topPY *
+        canvas.height;
+
+
+    const bottomX =
+        bottomPX *
+        canvas.width;
+
+    const bottomY =
+        bottomPY *
+        canvas.height;
+
+
+    const distanceTop =
+        Math.hypot(
+            p.x - topX,
+            p.y - topY
+        );
+
+
+    const distanceBottom =
+        Math.hypot(
+            p.x - bottomX,
+            p.y - bottomY
+        );
+
+
+    /*
+        判斷範圍加大，
+        手機比較容易選到。
+    */
+
+    const hitRange =
+        Math.max(
+            100,
+            canvas.width * 0.12
+        );
+
+
+    if(
+        distanceTop <
+        hitRange
+    ){
+
+        dragging =
+            "top";
+
+
+        dragOffsetX =
+            p.x - topX;
+
+        dragOffsetY =
+            p.y - topY;
+
+
+        canvas.style.cursor =
+            "grabbing";
+
+
+        return;
+
+    }
+
+
+    if(
+        distanceBottom <
+        hitRange
+    ){
+
+        dragging =
+            "bottom";
+
+
+        dragOffsetX =
+            p.x - bottomX;
+
+        dragOffsetY =
+            p.y - bottomY;
+
+
+        canvas.style.cursor =
+            "grabbing";
+
+    }
+
+}
+
+
+/* =========================================================
+   拖曳文字
+========================================================= */
+
+function pointerMove(e){
+
+    if(!dragging){
+        return;
+    }
+
+
+    e.preventDefault();
+
+
+    const p =
+        getPointerPosition(e);
+
+
+    if(
+        dragging ===
+        "top"
+    ){
+
+        const x =
+            p.x -
+            dragOffsetX;
+
+        const y =
+            p.y -
+            dragOffsetY;
+
+
+        topPX =
+            x /
+            canvas.width;
+
+        topPY =
+            y /
+            canvas.height;
+
+    }
+
+
+    if(
+        dragging ===
+        "bottom"
+    ){
+
+        const x =
+            p.x -
+            dragOffsetX;
+
+        const y =
+            p.y -
+            dragOffsetY;
+
+
+        bottomPX =
+            x /
+            canvas.width;
+
+        bottomPY =
+            y /
+            canvas.height;
+
+    }
+
+
+    /*
+        限制文字不要拖出圖片太遠
+    */
+
+    if(
+        dragging ===
+        "top"
+    ){
+
+        topPX =
+            Math.max(
+                0.05,
+                Math.min(
+                    0.95,
+                    topPX
+                )
+            );
+
+        topPY =
+            Math.max(
+                0.03,
+                Math.min(
+                    0.97,
+                    topPY
+                )
+            );
+
+    }
+
+
+    if(
+        dragging ===
+        "bottom"
+    ){
+
+        bottomPX =
+            Math.max(
+                0.05,
+                Math.min(
+                    0.95,
+                    bottomPX
+                )
+            );
+
+        bottomPY =
+            Math.max(
+                0.03,
+                Math.min(
+                    0.97,
+                    bottomPY
+                )
+            );
+
+    }
+
+
+    draw();
+
+}
+
+
+/* =========================================================
+   放開滑鼠
+========================================================= */
+
+function pointerUp(){
+
+    dragging =
+        null;
+
+
+    canvas.style.cursor =
+        "default";
+
+}
+
+
+/* =========================================================
+   滑鼠事件
+========================================================= */
+
+canvas.addEventListener(
+    "mousedown",
+    pointerDown
+);
+
+canvas.addEventListener(
+    "mousemove",
+    pointerMove
+);
+
+canvas.addEventListener(
+    "mouseup",
+    pointerUp
+);
+
+canvas.addEventListener(
+    "mouseleave",
+    pointerUp
+);
+
+
+/* =========================================================
+   手機觸控事件
+========================================================= */
+
+canvas.addEventListener(
+    "touchstart",
+    pointerDown,
+    {
+        passive:false
+    }
+);
+
+canvas.addEventListener(
+    "touchmove",
+    pointerMove,
+    {
+        passive:false
+    }
+);
+
+canvas.addEventListener(
+    "touchend",
+    pointerUp
+);
+
+
+/* =========================================================
+   經典迷因版面
+========================================================= */
+
+function applyMeme(type){
+
+    if(
+        type ===
+        "classic"
+    ){
+
+        document
+        .getElementById(
+            "topText"
+        ).value =
+            "";
+
+
+        document
+        .getElementById(
+            "bottomText"
+        ).value =
+            "";
+
+
+        document
+        .getElementById(
+            "fontSize"
+        ).value =
+            55;
+
+
+        document
+        .getElementById(
+            "strokeWidth"
+        ).value =
+            8;
+
+
+        topPX = .5;
+        topPY = .12;
+
+        bottomPX = .5;
+        bottomPY = .88;
+
+    }
+
+
+    if(
+        type ===
+        "impact"
+    ){
+
+        document
+        .getElementById(
+            "topText"
+        ).value =
+            "WHEN YOU SAY";
+
+
+        document
+        .getElementById(
+            "bottomText"
+        ).value =
+            "IT'S JUST A LITTLE CHANGE";
+
+
+        document
+        .getElementById(
+            "fontSize"
+        ).value =
+            65;
+
+
+        document
+        .getElementById(
+            "strokeWidth"
+        ).value =
+            10;
+
+
+        document
+        .getElementById(
+            "fontFamily"
+        ).value =
+            "Impact";
+
+
+        topPX = .5;
+        topPY = .12;
+
+        bottomPX = .5;
+        bottomPY = .88;
+
+    }
+
+
+    if(
+        type ===
+        "top"
+    ){
+
+        document
+        .getElementById(
+            "topText"
+        ).value =
+            "今天也要加油！";
+
+
+        document
+        .getElementById(
+            "bottomText"
+        ).value =
+            "";
+
+
+        topPX = .5;
+        topPY = .12;
+
+    }
+
+
+    if(
+        type ===
+        "bottom"
+    ){
+
+        document
+        .getElementById(
+            "topText"
+        ).value =
+            "";
+
+
+        document
+        .getElementById(
+            "bottomText"
+        ).value =
+            "這一刻，我只想靜靜地待著";
+
+
+        bottomPX = .5;
+        bottomPY = .88;
+
+    }
+
+
+    updateValue(
+        "fontValue",
+        document
+        .getElementById(
+            "fontSize"
+        ).value
+    );
+
+
+    updateValue(
+        "strokeValue",
+        document
+        .getElementById(
+            "strokeWidth"
+        ).value
+    );
+
+
+    draw();
+
+}
+
+
+/* =========================================================
+   設定裁切格數
+========================================================= */
+
+function setGrid(num){
+
+    currentGrid =
+        num;
+
+
+    document
+    .querySelectorAll(
+        ".crop-buttons button"
+    )
+    .forEach(
+        function(btn){
+
+            btn.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    document
+    .getElementById(
+        "crop" + num
+    )
+    .classList.add(
+        "active"
+    );
+
+
+    const grid =
+        document
+        .getElementById(
+            "previewGrid"
+        );
+
+
+    grid.className =
+        "preview-grid grid" +
+        num;
+
+
+    generatePreview();
+
+}
+
+
+/* =========================================================
+   產生 LINE貼圖裁切預覽
+========================================================= */
+
+function generatePreview(){
+
+    const grid =
+        document
+        .getElementById(
+            "previewGrid"
+        );
+
+
+    grid.innerHTML =
+        "";
+
+
+    /*
+        1格不需要預覽
+    */
+
+    if(
+        currentGrid ===
+        1
+    ){
+
+        return;
+
+    }
+
+
+    const n =
+        Math.sqrt(
+            currentGrid
+        );
+
+
+    /*
+        使用原始圖片比例。
+
+        每一格不是強迫變成正方形，
+        而是依照原圖比例切割。
+    */
+
+    const sourceWidth =
+        image.naturalWidth;
+
+    const sourceHeight =
+        image.naturalHeight;
+
+
+    const cropWidth =
+        sourceWidth / n;
+
+    const cropHeight =
+        sourceHeight / n;
+
+
+    for(
+        let row = 0;
+        row < n;
+        row++
+    ){
+
+        for(
+            let col = 0;
+            col < n;
+            col++
+        ){
+
+            const item =
+                document
+                .createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "preview-item";
+
+
+            const mini =
+                document
+                .createElement(
+                    "canvas"
+                );
+
+
+            /*
+                預覽解析度
+            */
+
+            const previewWidth =
+                500;
+
+
+            const previewHeight =
+                Math.round(
+                    previewWidth *
+                    cropHeight /
+                    cropWidth
+                );
+
+
+            mini.width =
+                previewWidth;
+
+            mini.height =
+                previewHeight;
+
+
+            const mctx =
+                mini.getContext(
+                    "2d"
+                );
+
+
+            const sx =
+                col *
+                cropWidth;
+
+            const sy =
+                row *
+                cropHeight;
+
+
+            /*
+                完整比例裁切
+            */
+
+            mctx.drawImage(
+
+                image,
+
+                sx,
+                sy,
+
+                cropWidth,
+                cropHeight,
+
+                0,
+                0,
+
+                previewWidth,
+                previewHeight
+
+            );
+
+
+            item.appendChild(
+                mini
+            );
+
+
+            grid.appendChild(
+                item
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   下載完整迷因
+========================================================= */
+
+function downloadMeme(){
+
+    draw();
+
+
+    const link =
+        document
+        .createElement(
+            "a"
+        );
+
+
+    link.download =
+        "整張圖片.png";
+
+
+    link.href =
+        canvas.toDataURL(
+            "image/png"
+        );
+
+
+    link.click();
+
+}
+
+
+/* =========================================================
+   下載所有 LINE貼圖
+========================================================= */
+
+function downloadAll(){
+
+    /*
+        1格就是直接下載完整迷因
+    */
+
+    if(
+        currentGrid ===
+        1
+    ){
+
+        downloadMeme();
+
+        return;
+
+    }
+
+
+    const n =
+        Math.sqrt(
+            currentGrid
+        );
+
+
+    const sourceWidth =
+        image.naturalWidth;
+
+    const sourceHeight =
+        image.naturalHeight;
+
+
+    const cropWidth =
+        sourceWidth / n;
+
+    const cropHeight =
+        sourceHeight / n;
+
+
+    let index = 1;
+
+
+    for(
+        let row = 0;
+        row < n;
+        row++
+    ){
+
+        for(
+            let col = 0;
+            col < n;
+            col++
+        ){
+
+            /*
+                保留原始裁切比例
+            */
+
+            const outputWidth =
+                Math.min(
+                    1200,
+                    Math.round(
+                        cropWidth
+                    )
+                );
+
+
+            const outputHeight =
+                Math.round(
+                    outputWidth *
+                    cropHeight /
+                    cropWidth
+                );
+
+
+            const out =
+                document
+                .createElement(
+                    "canvas"
+                );
+
+
+            out.width =
+                outputWidth;
+
+            out.height =
+                outputHeight;
+
+
+            const octx =
+                out.getContext(
+                    "2d"
+                );
+
+
+            const sx =
+                col *
+                cropWidth;
+
+            const sy =
+                row *
+                cropHeight;
+
+
+            /*
+                裁切圖片
+            */
+
+            octx.drawImage(
+
+                image,
+
+                sx,
+                sy,
+
+                cropWidth,
+                cropHeight,
+
+                0,
+                0,
+
+                outputWidth,
+                outputHeight
+
+            );
+
+
+            /*
+                LINE貼圖裁切時，
+                保留每一格的原始圖片，
+                不進行拉伸。
+            */
+
+
+            const link =
+                document
+                .createElement(
+                    "a"
+                );
+
+
+            link.download =
+                "切割圖片_" +
+                String(index)
+                .padStart(2,"0") +
+                ".png";
+
+
+            link.href =
+                out.toDataURL(
+                    "image/png"
+                );
+
+
+            link.click();
+
+
+            index++;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   重置
+========================================================= */
+
+function resetMeme(){
+
+    document
+    .getElementById(
+        "topText"
+    ).value =
+        "";
+
+
+    document
+    .getElementById(
+        "bottomText"
+    ).value =
+        "";
+
+
+    document
+    .getElementById(
+        "fontSize"
+    ).value =
+        55;
+
+
+    document
+    .getElementById(
+        "strokeWidth"
+    ).value =
+        8;
+
+
+    document
+    .getElementById(
+        "fontFamily"
+    ).value =
+        "Impact";
+
+
+    document
+    .getElementById(
+        "textColor"
+    ).value =
+        "#ffffff";
+
+
+    document
+    .getElementById(
+        "strokeColor"
+    ).value =
+        "#000000";
+
+
+    topPX = .5;
+    topPY = .12;
+
+    bottomPX = .5;
+    bottomPY = .88;
+
+
+    setGrid(1);
+
+
+    updateValue(
+        "fontValue",
+        55
+    );
+
+
+    updateValue(
+        "strokeValue",
+        8
+    );
+
+
+    draw();
+
+}
+
+
+/* =========================================================
+   鍵盤快捷鍵
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        /*
+            Ctrl + R
+            重置
+        */
+
+        if(
+            e.ctrlKey &&
+            e.key.toLowerCase()
+            === "r"
+        ){
+
+            e.preventDefault();
+
+            resetMeme();
+
+        }
+
+
+        /*
+            Ctrl + D
+            下載
+        */
+
+        if(
+            e.ctrlKey &&
+            e.key.toLowerCase()
+            === "d"
+        ){
+
+            e.preventDefault();
+
+            downloadMeme();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   初始化
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        draw();
+
+    }
+);
+
+
+</script>
+
+</body>
+</html>
