@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_互動式金額分析</title>
+
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+<!-- SheetJS：Excel 匯出 -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at 10% 10%,rgba(110,180,255,.25),transparent 30%),
+        radial-gradient(circle at 90% 20%,rgba(190,120,255,.22),transparent 30%),
+        linear-gradient(135deg,#eef3ff,#f8f9ff 45%,#eef5ff);
+
+    min-height:100vh;
+    color:#263247;
+}
+
+/* ===== 主容器 ===== */
+
+.container{
+    width:min(1450px,96%);
+    margin:30px auto;
+}
+
+/* ===== 標題 ===== */
+
+.header{
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.8);
+    border-radius:24px;
+    padding:28px 30px;
+    margin-bottom:20px;
+
+    box-shadow:
+        0 15px 40px rgba(55,75,120,.12);
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.title-area h1{
+    margin:0 0 8px;
+    font-size:30px;
+    letter-spacing:1px;
+}
+
+.title-area p{
+    margin:0;
+    color:#718096;
+}
+
+/* ===== 統計 ===== */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.summary-card{
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(15px);
+
+    border-radius:20px;
+    padding:20px;
+
+    border:1px solid rgba(255,255,255,.8);
+
+    box-shadow:
+        0 10px 30px rgba(50,70,110,.1);
+
+    transition:.25s;
+}
+
+.summary-card:hover{
+    transform:translateY(-3px);
+    box-shadow:
+        0 15px 35px rgba(50,70,110,.16);
+}
+
+.summary-title{
+    color:#718096;
+    font-size:14px;
+}
+
+.summary-value{
+    margin-top:6px;
+    font-size:26px;
+    font-weight:bold;
+}
+
+/* ===== 按鈕 ===== */
+
+.toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+}
+
+button{
+    border:0;
+    border-radius:12px;
+    padding:11px 17px;
+
+    font-size:15px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:
+        transform .18s,
+        box-shadow .18s,
+        opacity .18s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(40,60,100,.15);
+}
+
+button:active{
+    transform:scale(.96);
+}
+
+.btn-add{
+    background:#4f7cff;
+    color:white;
+}
+
+.btn-sort{
+    background:#eef2ff;
+    color:#4255a5;
+}
+
+.btn-excel{
+    background:#20a86b;
+    color:white;
+}
+
+.btn-clear{
+    background:#fff0f0;
+    color:#d64545;
+}
+
+.chart-btn{
+    background:#f2f4f8;
+    color:#556070;
+}
+
+.chart-btn.active{
+    background:#263247;
+    color:white;
+}
+
+/* ===== 主內容 ===== */
+
+.main-grid{
+    display:grid;
+    grid-template-columns:430px 1fr;
+    gap:20px;
+}
+
+/* ===== 卡片 ===== */
+
+.card{
+    background:rgba(255,255,255,.82);
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.9);
+
+    border-radius:22px;
+
+    box-shadow:
+        0 15px 45px rgba(55,75,120,.12);
+
+    overflow:hidden;
+}
+
+.card-title{
+    padding:20px 22px;
+    font-size:18px;
+    font-weight:bold;
+
+    border-bottom:1px solid #edf0f5;
+}
+
+/* ===== 表格 ===== */
+
+.table-wrapper{
+    padding:15px;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0 8px;
+}
+
+thead th{
+    color:#7a8597;
+    font-size:14px;
+    text-align:left;
+    padding:8px 10px;
+}
+
+tbody tr{
+    background:#f8faff;
+
+    transition:
+        transform .18s,
+        box-shadow .18s,
+        background .18s;
+}
+
+tbody tr:hover{
+    background:#f0f5ff;
+    box-shadow:0 6px 15px rgba(50,80,130,.08);
+}
+
+tbody td{
+    padding:8px 6px;
+}
+
+tbody td:first-child{
+    border-radius:12px 0 0 12px;
+}
+
+tbody td:last-child{
+    border-radius:0 12px 12px 0;
+}
+
+input{
+    width:100%;
+
+    border:1px solid transparent;
+    background:transparent;
+
+    padding:10px 8px;
+
+    font-size:15px;
+    color:#263247;
+
+    outline:none;
+
+    border-radius:9px;
+
+    transition:.2s;
+}
+
+input:focus{
+    background:white;
+    border-color:#6d8cff;
+    box-shadow:0 0 0 3px rgba(109,140,255,.12);
+}
+
+.money{
+    text-align:right;
+}
+
+.percent{
+    width:65px;
+    text-align:center;
+    color:#60708c;
+    font-size:13px;
+}
+
+/* ===== 拖曳 ===== */
+
+.drag-handle{
+    width:35px;
+    text-align:center;
+    cursor:grab;
+    color:#9aa5b5;
+    user-select:none;
+}
+
+.drag-handle:active{
+    cursor:grabbing;
+}
+
+.dragging{
+    opacity:.45;
+    transform:scale(.98);
+}
+
+.drag-over{
+    outline:2px dashed #6d8cff;
+}
+
+/* ===== 刪除 ===== */
+
+.delete-btn{
+    width:36px;
+    height:36px;
+    padding:0;
+
+    border-radius:10px;
+
+    background:#fff0f0;
+    color:#d84c4c;
+}
+
+.delete-btn:hover{
+    background:#ffe0e0;
+}
+
+/* ===== 圖表 ===== */
+
+.chart-area{
+    padding:15px;
+}
+
+#chart{
+    width:100%;
+    height:550px;
+}
+
+/* ===== 圖表切換 ===== */
+
+.chart-switch{
+    display:flex;
+    gap:8px;
+    padding:15px 20px 0;
+}
+
+/* ===== 百分比條 ===== */
+
+.progress{
+    width:100%;
+    height:6px;
+
+    background:#e8edf5;
+
+    border-radius:20px;
+
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #6687ff,
+        #9a7cff
+    );
+
+    border-radius:20px;
+
+    transition:width .4s ease;
+}
+
+/* ===== 提示 ===== */
+
+.tip{
+    padding:12px 20px;
+    font-size:13px;
+    color:#7c8798;
+    background:#fafbfe;
+    border-top:1px solid #edf0f5;
+}
+
+/* ===== 手機 ===== */
+
+@media(max-width:1000px){
+
+    .main-grid{
+        grid-template-columns:1fr;
+    }
+
+    .summary{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    #chart{
+        height:450px;
+    }
+
+}
+
+@media(max-width:650px){
+
+    .container{
+        width:94%;
+        margin:15px auto;
+    }
+
+    .header{
+        padding:20px;
+        border-radius:18px;
+    }
+
+    .title-area h1{
+        font-size:23px;
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+    }
+
+    .toolbar{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+    }
+
+    .toolbar button{
+        width:100%;
+    }
+
+    .card{
+        border-radius:18px;
+    }
+
+    #chart{
+        height:390px;
+    }
+
+    .table-wrapper{
+        padding:8px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 標題 -->
+
+    <div class="header">
+
+        <div class="title-area">
+
+            <h1>📊 互動式金額分析</h1>
+
+            <p>
+                讓AI解決我的生活大小事
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- 統計 -->
+
+    <div class="summary">
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                項目數
+            </div>
+
+            <div class="summary-value" id="itemCount">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                總金額
+            </div>
+
+            <div class="summary-value" id="totalAmount">
+                $0
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                平均金額
+            </div>
+
+            <div class="summary-value" id="averageAmount">
+                $0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- 工具列 -->
+
+    <div class="toolbar">
+
+        <button
+            class="btn-add"
+            onclick="addRow()">
+            ＋ 新增項目
+        </button>
+
+        <button
+            class="btn-sort"
+            onclick="sortAmount(true)">
+            ↕ 金額由大到小
+        </button>
+
+        <button
+            class="btn-sort"
+            onclick="sortAmount(false)">
+            ↕ 金額由小到大
+        </button>
+
+        <button
+            class="btn-excel"
+            onclick="exportExcel()">
+            📥 匯出 Excel
+        </button>
+
+        <button
+            class="btn-clear"
+            onclick="clearAll()">
+            🗑️ 清空
+        </button>
+
+    </div>
+
+
+    <!-- 主內容 -->
+
+    <div class="main-grid">
+
+
+        <!-- 表格 -->
+
+        <div class="card">
+
+            <div class="card-title">
+                📝 金額資料
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th></th>
+
+                            <th>
+                                項目
+                            </th>
+
+                            <th>
+                                金額
+                            </th>
+
+                            <th>
+                                %
+                            </th>
+
+                            <th></th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="dataBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="tip">
+                💡 可直接修改資料，也可以拖曳左側 ☷ 調整項目順序
+            </div>
+
+        </div>
+
+
+        <!-- 圖表 -->
+
+        <div class="card">
+
+            <div class="card-title">
+                📈 即時圖表分析
+            </div>
+
+
+            <div class="chart-switch">
+
+                <button
+                    id="pieBtn"
+                    class="chart-btn active"
+                    onclick="changeChart('pie')">
+                    🍩 圓餅圖
+                </button>
+
+                <button
+                    id="lineBtn"
+                    class="chart-btn"
+                    onclick="changeChart('line')">
+                    📈 折線圖
+                </button>
+
+            </div>
+
+
+            <div class="chart-area">
+
+                <div id="chart"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   初始資料
+================================================== */
+
+let data = [
+
+    {
+        name:"醫療費用",
+        amount:120000
+    },
+
+    {
+        name:"教育費用",
+        amount:80000
+    },
+
+    {
+        name:"生活費",
+        amount:60000
+    },
+
+    {
+        name:"交通費",
+        amount:30000
+    },
+
+    {
+        name:"娛樂費",
+        amount:20000
+    }
+
+];
+
+
+let chartType = "pie";
+
+let dragIndex = null;
+
+
+/* ==================================================
+   初始化
+================================================== */
+
+renderTable();
+
+updateAll();
+
+
+/* ==================================================
+   數字格式
+================================================== */
+
+function formatMoney(value){
+
+    return Number(value || 0)
+        .toLocaleString("zh-TW");
+
+}
+
+
+/* ==================================================
+   建立表格
+================================================== */
+
+function renderTable(){
+
+    const body =
+        document.getElementById("dataBody");
+
+    body.innerHTML = "";
+
+    data.forEach((item,index)=>{
+
+        const tr =
+            document.createElement("tr");
+
+        tr.draggable = true;
+
+        tr.dataset.index = index;
+
+
+        tr.innerHTML = `
+
+            <td class="drag-handle">
+                ☷
+            </td>
+
+            <td>
+                <input
+                    type="text"
+                    value="${escapeHTML(item.name)}"
+                    placeholder="輸入項目"
+                    oninput="changeName(${index},this.value)">
+            </td>
+
+            <td>
+                <input
+                    class="money"
+                    type="number"
+                    value="${item.amount}"
+                    min="0"
+                    step="1"
+                    oninput="changeAmount(${index},this.value)">
+            </td>
+
+            <td>
+
+                <div class="percent">
+                    <span id="percent-${index}">
+                        0%
+                    </span>
+                </div>
+
+            </td>
+
+            <td>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteRow(${index})">
+                    ×
+                </button>
+
+            </td>
+
+        `;
+
+
+        /* 拖曳 */
+
+        tr.addEventListener(
+            "dragstart",
+            ()=>{
+                dragIndex = index;
+                tr.classList.add("dragging");
+            }
+        );
+
+
+        tr.addEventListener(
+            "dragend",
+            ()=>{
+                tr.classList.remove("dragging");
+            }
+        );
+
+
+        tr.addEventListener(
+            "dragover",
+            e=>{
+                e.preventDefault();
+                tr.classList.add("drag-over");
+            }
+        );
+
+
+        tr.addEventListener(
+            "dragleave",
+            ()=>{
+                tr.classList.remove("drag-over");
+            }
+        );
+
+
+        tr.addEventListener(
+            "drop",
+            e=>{
+
+                e.preventDefault();
+
+                tr.classList.remove("drag-over");
+
+                const targetIndex = index;
+
+                if(
+                    dragIndex === null ||
+                    dragIndex === targetIndex
+                ){
+                    return;
+                }
+
+                const moved =
+                    data.splice(dragIndex,1)[0];
+
+                data.splice(
+                    targetIndex,
+                    0,
+                    moved
+                );
+
+                dragIndex = null;
+
+                renderTable();
+
+                updateAll();
+
+            }
+        );
+
+
+        body.appendChild(tr);
+
+    });
+
+}
+
+
+/* ==================================================
+   HTML安全
+================================================== */
+
+function escapeHTML(str){
+
+    return String(str)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* ==================================================
+   修改名稱
+================================================== */
+
+function changeName(index,value){
+
+    data[index].name = value;
+
+    updateChart();
+
+}
+
+
+/* ==================================================
+   修改金額
+================================================== */
+
+function changeAmount(index,value){
+
+    data[index].amount =
+        Number(value) || 0;
+
+    updateAll();
+
+}
+
+
+/* ==================================================
+   新增
+================================================== */
+
+function addRow(){
+
+    data.push({
+
+        name:"新項目",
+
+        amount:0
+
+    });
+
+    renderTable();
+
+    updateAll();
+
+    setTimeout(()=>{
+
+        const inputs =
+            document.querySelectorAll(
+                "#dataBody input[type=text]"
+            );
+
+        if(inputs.length){
+
+            inputs[inputs.length-1].focus();
+
+            inputs[inputs.length-1].select();
+
+        }
+
+    },50);
+
+}
+
+
+/* ==================================================
+   刪除
+================================================== */
+
+function deleteRow(index){
+
+    data.splice(index,1);
+
+    renderTable();
+
+    updateAll();
+
+}
+
+
+/* ==================================================
+   清空
+================================================== */
+
+function clearAll(){
+
+    if(!confirm("確定要清空所有資料嗎？")){
+        return;
+    }
+
+    data = [];
+
+    renderTable();
+
+    updateAll();
+
+}
+
+
+/* ==================================================
+   排序
+================================================== */
+
+function sortAmount(desc){
+
+    data.sort((a,b)=>{
+
+        return desc
+            ? b.amount-a.amount
+            : a.amount-b.amount;
+
+    });
+
+    renderTable();
+
+    updateAll();
+
+}
+
+
+/* ==================================================
+   更新全部
+================================================== */
+
+function updateAll(){
+
+    updateSummary();
+
+    updatePercent();
+
+    updateChart();
+
+}
+
+
+/* ==================================================
+   統計
+================================================== */
+
+function updateSummary(){
+
+    const count = data.length;
+
+    const total =
+        data.reduce(
+            (sum,item)=>sum + Number(item.amount || 0),
+            0
+        );
+
+    const average =
+        count
+        ? total/count
+        : 0;
+
+
+    document.getElementById(
+        "itemCount"
+    ).textContent =
+        count;
+
+
+    document.getElementById(
+        "totalAmount"
+    ).textContent =
+        "$" + formatMoney(total);
+
+
+    document.getElementById(
+        "averageAmount"
+    ).textContent =
+        "$" + formatMoney(
+            Math.round(average)
+        );
+
+}
+
+
+/* ==================================================
+   百分比
+================================================== */
+
+function updatePercent(){
+
+    const total =
+        data.reduce(
+            (sum,item)=>sum + Number(item.amount || 0),
+            0
+        );
+
+
+    data.forEach((item,index)=>{
+
+        const percentage =
+            total > 0
+            ? item.amount / total * 100
+            : 0;
+
+
+        const element =
+            document.getElementById(
+                "percent-" + index
+            );
+
+
+        if(element){
+
+            element.textContent =
+                percentage.toFixed(1) + "%";
+
+        }
+
+    });
+
+}
+
+
+/* ==================================================
+   圖表
+================================================== */
+
+function updateChart(){
+
+    const validData =
+        data.filter(
+            item =>
+                item.name.trim() !== "" &&
+                Number(item.amount) > 0
+        );
+
+
+    const seriesData =
+        validData.map(item=>({
+
+            name:item.name,
+
+            y:Number(item.amount)
+
+        }));
+
+
+    if(chartType === "pie"){
+
+        createPieChart(seriesData);
+
+    }else{
+
+        createLineChart(seriesData);
+
+    }
+
+}
+
+
+/* ==================================================
+   圓餅圖
+================================================== */
+
+function createPieChart(seriesData){
+
+    Highcharts.chart(
+        "chart",
+        {
+
+            chart:{
+                type:"pie",
+
+                backgroundColor:"transparent",
+
+                animation:{
+                    duration:500
+                }
+            },
+
+
+            title:{
+                text:"金額比例分析"
+            },
+
+
+            subtitle:{
+                text:"即時資料"
+            },
+
+
+            tooltip:{
+
+                useHTML:true,
+
+                formatter:function(){
+
+                    const total =
+                        this.series.data.reduce(
+                            (sum,p)=>sum+p.y,
+                            0
+                        );
+
+                    const percentage =
+                        this.y/total*100;
+
+
+                    return `
+                        <b>${this.point.name}</b><br>
+                        金額：
+                        <b>$${formatMoney(this.y)}</b><br>
+                        佔比：
+                        <b>${percentage.toFixed(1)}%</b>
+                    `;
+
+                }
+
+            },
+
+
+            plotOptions:{
+
+                pie:{
+
+                    allowPointSelect:true,
+
+                    cursor:"pointer",
+
+                    innerSize:"55%",
+
+                    depth:35,
+
+                    dataLabels:{
+
+                        enabled:true,
+
+                        formatter:function(){
+
+                            return `
+                                ${this.point.name}
+                                <b>${this.percentage.toFixed(1)}%</b>
+                            `;
+
+                        }
+
+                    },
+
+                    showInLegend:true
+
+                }
+
+            },
+
+
+            legend:{
+
+                enabled:true
+
+            },
+
+
+            series:[{
+
+                name:"金額",
+
+                colorByPoint:true,
+
+                data:seriesData
+
+            }],
+
+
+            credits:{
+                enabled:false
+            },
+
+
+            exporting:{
+                enabled:true
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   折線圖
+================================================== */
+
+function createLineChart(seriesData){
+
+    Highcharts.chart(
+        "chart",
+        {
+
+            chart:{
+
+                type:"line",
+
+                backgroundColor:"transparent",
+
+                animation:{
+                    duration:500
+                }
+
+            },
+
+
+            title:{
+                text:"金額比較分析"
+            },
+
+
+            xAxis:{
+
+                categories:
+                    seriesData.map(
+                        item=>item.name
+                    ),
+
+                title:{
+                    text:"項目"
+                }
+
+            },
+
+
+            yAxis:{
+
+                min:0,
+
+                title:{
+                    text:"金額"
+                },
+
+                labels:{
+
+                    formatter:function(){
+
+                        return "$" +
+                            Highcharts.numberFormat(
+                                this.value,
+                                0
+                            );
+
+                    }
+
+                }
+
+            },
+
+
+            tooltip:{
+
+                shared:true,
+
+                formatter:function(){
+
+                    return `
+                        <b>${this.x}</b><br>
+                        金額：
+                        <b>$${formatMoney(this.y)}</b>
+                    `;
+
+                }
+
+            },
+
+
+            plotOptions:{
+
+                line:{
+
+                    dataLabels:{
+
+                        enabled:true,
+
+                        formatter:function(){
+
+                            return "$" +
+                                formatMoney(this.y);
+
+                        }
+
+                    },
+
+                    marker:{
+
+                        radius:6,
+
+                        symbol:"circle"
+
+                    },
+
+                    lineWidth:4
+
+                }
+
+            },
+
+
+            series:[{
+
+                name:"金額",
+
+                data:
+                    seriesData.map(
+                        item=>item.y
+                    )
+
+            }],
+
+
+            credits:{
+                enabled:false
+            },
+
+
+            exporting:{
+                enabled:true
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   圖表切換
+================================================== */
+
+function changeChart(type){
+
+    chartType = type;
+
+
+    document
+        .getElementById("pieBtn")
+        .classList.toggle(
+            "active",
+            type==="pie"
+        );
+
+
+    document
+        .getElementById("lineBtn")
+        .classList.toggle(
+            "active",
+            type==="line"
+        );
+
+
+    updateChart();
+
+}
+
+
+/* ==================================================
+   Excel
+================================================== */
+
+function exportExcel(){
+
+    if(data.length === 0){
+
+        alert("目前沒有資料可以匯出。");
+
+        return;
+
+    }
+
+
+    const total =
+        data.reduce(
+            (sum,item)=>sum+Number(item.amount||0),
+            0
+        );
+
+
+    const excelData =
+        data.map((item,index)=>({
+
+            "排序":index+1,
+
+            "項目":item.name,
+
+            "金額":Number(item.amount)||0,
+
+            "百分比":
+                total
+                ? Number(
+                    (
+                        item.amount /
+                        total *
+                        100
+                    ).toFixed(2)
+                  ) + "%"
+                : "0%"
+
+        }));
+
+
+    excelData.push({
+
+        "排序":"",
+
+        "項目":"合計",
+
+        "金額":total,
+
+        "百分比":"100%"
+
+    });
+
+
+    const worksheet =
+        XLSX.utils.json_to_sheet(
+            excelData
+        );
+
+
+    worksheet["!cols"] = [
+
+        {wch:8},
+
+        {wch:25},
+
+        {wch:15},
+
+        {wch:15}
+
+    ];
+
+
+    const workbook =
+        XLSX.utils.book_new();
+
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "金額分析"
+    );
+
+
+    XLSX.writeFile(
+        workbook,
+        "金額分析_" +
+        new Date()
+            .toISOString()
+            .slice(0,10) +
+        ".xlsx"
+    );
+
+}
+
+</script>
+
+</body>
+</html>
