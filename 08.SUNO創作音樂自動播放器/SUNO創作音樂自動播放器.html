@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_SUNO創作音樂分享</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;
+    background:
+        radial-gradient(circle at top,#263b70 0%,#11182e 45%,#070b18 100%);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.player{
+    width:90%;
+    max-width:650px;
+    padding:35px;
+    border-radius:25px;
+
+    background:rgba(255,255,255,0.10);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,0.18);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,0.5);
+
+    text-align:center;
+}
+
+h1{
+    margin:0 0 25px 0;
+    font-size:30px;
+    letter-spacing:1px;
+}
+
+.folderInfo{
+    margin-bottom:18px;
+    padding:10px;
+    border-radius:10px;
+
+    background:rgba(0,0,0,0.20);
+
+    font-size:14px;
+    color:#dce6ff;
+}
+
+#musicSelect{
+
+    width:100%;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    border:none;
+
+    outline:none;
+
+    font-size:17px;
+
+    color:#222;
+
+    background:white;
+
+    cursor:pointer;
+}
+
+#fileName{
+
+    margin-top:25px;
+
+    min-height:30px;
+
+    font-size:19px;
+
+    font-weight:bold;
+
+    word-break:break-all;
+}
+
+#statusText{
+
+    margin-top:10px;
+
+    min-height:24px;
+
+    font-size:14px;
+
+    opacity:0.85;
+}
+
+audio{
+
+    width:100%;
+
+    margin-top:25px;
+}
+
+.loading{
+
+    display:inline-block;
+
+    animation:loading 1.2s infinite;
+}
+
+@keyframes loading{
+
+    0%{
+        opacity:.3;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:.3;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="player">
+
+    <h1>讓AI解決我的生活大小事🎵 SUNO創作音樂分享</h1>
+
+    <div class="folderInfo">
+
+        📁 音樂來源：
+        <strong>mp3</strong>
+
+    </div>
+
+    <select id="musicSelect">
+
+        <option value="">
+            🔄 正在自動搜尋 MP3...
+        </option>
+
+    </select>
+
+    <div id="fileName">
+
+        <span class="loading">
+            正在搜尋 MP3 音樂……
+        </span>
+
+    </div>
+
+    <div id="statusText">
+
+        LOADING · 正在讀取 mp3 資料夾
+
+    </div>
+
+    <audio
+        id="audio"
+        controls
+        preload="metadata">
+    </audio>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   GitHub 設定
+   ================================================== */
+
+/*
+   你的 GitHub 帳號
+*/
+const GITHUB_USER = "cch98879";
+
+
+/*
+   你的 GitHub 儲存庫
+*/
+const GITHUB_REPO = "AI";
+
+
+/*
+   MP3 資料夾
+*/
+const MP3_FOLDER = "mp3";
+
+
+/* ==================================================
+   取得網頁元件
+   ================================================== */
+
+const musicSelect =
+    document.getElementById("musicSelect");
+
+const audio =
+    document.getElementById("audio");
+
+const fileName =
+    document.getElementById("fileName");
+
+const statusText =
+    document.getElementById("statusText");
+
+
+let musicFiles = [];
+
+
+/* ==================================================
+   自動讀取 MP3
+   ================================================== */
+
+async function loadMP3Files(){
+
+    try{
+
+        musicSelect.innerHTML = `
+            <option value="">
+                🔄 正在搜尋 MP3...
+            </option>
+        `;
+
+        fileName.innerHTML = `
+            <span class="loading">
+                正在搜尋 MP3 音樂……
+            </span>
+        `;
+
+        statusText.textContent =
+            "LOADING · 正在讀取 mp3 資料夾";
+
+
+        /* ------------------------------------------
+           GitHub API
+           ------------------------------------------ */
+
+        const apiURL =
+            "https://api.github.com/repos/" +
+            encodeURIComponent(GITHUB_USER) +
+            "/" +
+            encodeURIComponent(GITHUB_REPO) +
+            "/contents/" +
+            encodeURIComponent(MP3_FOLDER);
+
+
+        console.log(
+            "正在讀取：",
+            apiURL
+        );
+
+
+        /* ------------------------------------------
+           連線 GitHub
+           ------------------------------------------ */
+
+        const response =
+            await fetch(apiURL,{
+
+                headers:{
+                    "Accept":
+                    "application/vnd.github+json"
+                }
+
+            });
+
+
+        /* ------------------------------------------
+           判斷 GitHub 回應
+           ------------------------------------------ */
+
+        if(!response.ok){
+
+            let errorMessage =
+                "GitHub API 錯誤：" +
+                response.status;
+
+            try{
+
+                const errorData =
+                    await response.json();
+
+                if(errorData.message){
+
+                    errorMessage +=
+                        " - " +
+                        errorData.message;
+
+                }
+
+            }catch(e){}
+
+            throw new Error(
+                errorMessage
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "GitHub 回傳資料：",
+            data
+        );
+
+
+        /* ------------------------------------------
+           確認是不是資料夾
+           ------------------------------------------ */
+
+        if(!Array.isArray(data)){
+
+            throw new Error(
+                "mp3 不是資料夾，或 GitHub 路徑錯誤"
+            );
+
+        }
+
+
+        /* ------------------------------------------
+           篩選 MP3
+           ------------------------------------------ */
+
+        musicFiles = data
+
+            .filter(item =>
+                item.type === "file"
+            )
+
+            .filter(item =>
+                item.name
+                    .toLowerCase()
+                    .endsWith(".mp3")
+            )
+
+
+            /* --------------------------------------
+               排序
+               -------------------------------------- */
+
+            .sort((a,b)=>
+
+                a.name.localeCompare(
+                    b.name,
+                    "zh-Hant",
+                    {
+                        numeric:true,
+                        sensitivity:"base"
+                    }
+                )
+
+            );
+
+
+        /* ------------------------------------------
+           清空下拉選單
+           ------------------------------------------ */
+
+        musicSelect.innerHTML = `
+            <option value="">
+                🎵 選擇音樂
+            </option>
+        `;
+
+
+        /* ------------------------------------------
+           建立下拉選單
+           ------------------------------------------ */
+
+        musicFiles.forEach(
+            (music,index)=>{
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    index;
+
+                option.textContent =
+                    "🎵 " + music.name;
+
+                musicSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        /* ------------------------------------------
+           沒有 MP3
+           ------------------------------------------ */
+
+        if(musicFiles.length === 0){
+
+            fileName.textContent =
+                "mp3 資料夾內沒有 MP3 檔案";
+
+            statusText.textContent =
+                "READY · 找不到 MP3";
+
+            return;
+
+        }
+
+
+        /* ------------------------------------------
+           成功
+           ------------------------------------------ */
+
+        fileName.textContent =
+            "🎵 已找到 " +
+            musicFiles.length +
+            " 首 MP3";
+
+
+        statusText.textContent =
+            "READY · 請從下拉選單選擇音樂";
+
+
+        console.log(
+            "找到 MP3：",
+            musicFiles
+        );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "MP3 讀取失敗：",
+            error
+        );
+
+
+        musicFiles = [];
+
+
+        musicSelect.innerHTML = `
+            <option value="">
+                ⚠️ 無法讀取 MP3
+            </option>
+        `;
+
+
+        fileName.textContent =
+            "無法自動讀取 mp3 資料夾";
+
+
+        statusText.textContent =
+            "ERROR · " +
+            error.message;
+
+    }
+
+}
+
+
+/* ==================================================
+   選擇音樂
+   ================================================== */
+
+musicSelect.addEventListener(
+    "change",
+    function(){
+
+        const index =
+            this.value;
+
+
+        /* 沒有選擇 */
+
+        if(index === ""){
+
+            audio.pause();
+
+            audio.removeAttribute(
+                "src"
+            );
+
+            audio.load();
+
+
+            fileName.textContent =
+                "🎵 請選擇音樂";
+
+
+            statusText.textContent =
+                "READY · 請從下拉選單選擇音樂";
+
+            return;
+
+        }
+
+
+        const music =
+            musicFiles[
+                Number(index)
+            ];
+
+
+        if(!music){
+
+            return;
+
+        }
+
+
+        /* ------------------------------------------
+           使用 GitHub download_url
+           ------------------------------------------ */
+
+        audio.src =
+            music.download_url;
+
+
+        audio.load();
+
+
+        fileName.textContent =
+            "🎵 " +
+            music.name;
+
+
+        statusText.textContent =
+            "READY · 已選擇音樂";
+
+    }
+);
+
+
+/* ==================================================
+   播放
+   ================================================== */
+
+audio.addEventListener(
+    "play",
+    function(){
+
+        const index =
+            musicSelect.value;
+
+
+        if(
+            index !== "" &&
+            musicFiles[index]
+        ){
+
+            statusText.textContent =
+                "▶ PLAYING · " +
+                musicFiles[index].name;
+
+        }
+        else{
+
+            statusText.textContent =
+                "▶ PLAYING";
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   暫停
+   ================================================== */
+
+audio.addEventListener(
+    "pause",
+    function(){
+
+        if(!audio.ended){
+
+            statusText.textContent =
+                "⏸ PAUSED · 已暫停";
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   播放完成
+   ================================================== */
+
+audio.addEventListener(
+    "ended",
+    function(){
+
+        statusText.textContent =
+            "⏹ ENDED · 播放完成";
+
+    }
+);
+
+
+/* ==================================================
+   音樂播放錯誤
+   ================================================== */
+
+audio.addEventListener(
+    "error",
+    function(){
+
+        statusText.textContent =
+            "⚠️ ERROR · MP3 無法播放";
+
+    }
+);
+
+
+/* ==================================================
+   網頁開啟後自動執行
+   ================================================== */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        loadMP3Files();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
