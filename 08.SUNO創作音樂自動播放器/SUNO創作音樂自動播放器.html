@@ -1,0 +1,927 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_SUNO創作音樂播放器</title>
+
+<style>
+
+/* =====================================================
+   基本設定
+===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #263b70 0%,
+            #11182e 45%,
+            #070b18 100%
+        );
+
+    color: white;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+
+/* =====================================================
+   播放器
+===================================================== */
+
+.player {
+
+    width: 90%;
+
+    max-width: 650px;
+
+    padding: 35px;
+
+    border-radius: 25px;
+
+    background:
+        rgba(255,255,255,0.10);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    box-shadow:
+        0 25px 70px
+        rgba(0,0,0,0.5);
+
+    text-align: center;
+
+}
+
+
+/* =====================================================
+   標題
+===================================================== */
+
+h1 {
+
+    margin:
+        0 0 25px 0;
+
+    font-size: 30px;
+
+    letter-spacing: 1px;
+
+}
+
+
+/* =====================================================
+   MP3資料夾狀態
+===================================================== */
+
+.folderInfo {
+
+    margin-bottom: 18px;
+
+    padding: 10px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(0,0,0,0.20);
+
+    font-size: 14px;
+
+    color: #dce6ff;
+
+}
+
+
+/* =====================================================
+   音樂下拉選單
+===================================================== */
+
+#musicSelect {
+
+    width: 100%;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    border: none;
+
+    outline: none;
+
+    font-size: 17px;
+
+    color: #222;
+
+    background: white;
+
+    cursor: pointer;
+
+}
+
+
+/* =====================================================
+   音樂名稱
+===================================================== */
+
+#fileName {
+
+    margin-top: 25px;
+
+    min-height: 30px;
+
+    font-size: 19px;
+
+    font-weight: bold;
+
+    word-break: break-all;
+
+}
+
+
+/* =====================================================
+   狀態
+===================================================== */
+
+#statusText {
+
+    margin-top: 10px;
+
+    min-height: 24px;
+
+    font-size: 14px;
+
+    opacity: 0.85;
+
+}
+
+
+/* =====================================================
+   Audio
+===================================================== */
+
+audio {
+
+    width: 100%;
+
+    margin-top: 25px;
+
+}
+
+
+/* =====================================================
+   載入動畫
+===================================================== */
+
+.loading {
+
+    display: inline-block;
+
+    animation:
+        loading 1.2s infinite;
+
+}
+
+@keyframes loading {
+
+    0% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.3;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="player">
+
+
+    <h1>讓AI解決我的生活大小事器<BR>🎵 SUNO創作音樂播放器</h1>
+
+
+    <!-- =================================================
+         MP3資料夾
+    ================================================== -->
+
+    <div class="folderInfo">
+
+        📁 音樂來源：
+        <strong>MP3資料夾</strong>
+
+    </div>
+
+
+    <!-- =================================================
+         音樂下拉選單
+    ================================================== -->
+
+    <select id="musicSelect">
+
+        <option value="">
+
+            🔄 正在自動搜尋 MP3...
+
+        </option>
+
+    </select>
+
+
+    <!-- =================================================
+         音樂名稱
+    ================================================== -->
+
+    <div id="fileName">
+
+        <span class="loading">
+            正在搜尋 MP3 音樂……
+        </span>
+
+    </div>
+
+
+    <!-- =================================================
+         狀態
+    ================================================== -->
+
+    <div id="statusText">
+
+        LOADING · 正在讀取 MP3資料夾
+
+    </div>
+
+
+    <!-- =================================================
+         播放器
+    ================================================== -->
+
+    <audio
+        id="audio"
+        controls
+        preload="metadata">
+    </audio>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   設定
+===================================================== */
+
+
+/*
+   MP3資料夾名稱
+
+   如果你的資料夾名稱不同，
+   只需要修改這裡。
+*/
+
+const MP3_FOLDER = "MP3資料夾";
+
+
+/* =====================================================
+   取得 HTML 元件
+===================================================== */
+
+const musicSelect =
+    document.getElementById(
+        "musicSelect"
+    );
+
+
+const audio =
+    document.getElementById(
+        "audio"
+    );
+
+
+const fileName =
+    document.getElementById(
+        "fileName"
+    );
+
+
+const statusText =
+    document.getElementById(
+        "statusText"
+    );
+
+
+/* =====================================================
+   音樂清單
+===================================================== */
+
+let musicFiles = [];
+
+
+/* =====================================================
+   判斷目前是不是 GitHub Pages
+===================================================== */
+
+function getGitHubInfo() {
+
+
+    const hostname =
+        window.location.hostname;
+
+
+    /*
+       例如：
+
+       cch98879.github.io
+    */
+
+    if (
+        !hostname.endsWith(
+            ".github.io"
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    /*
+       取得 GitHub 使用者
+
+       cch98879.github.io
+       ↓
+       cch98879
+    */
+
+    const owner =
+        hostname.split(".")[0];
+
+
+    /*
+       取得目前網址路徑
+
+       例如：
+
+       /2026-09-12_class/
+    */
+
+    let path =
+        window.location.pathname;
+
+
+    path =
+        path.replace(
+            /^\/|\/$/g,
+            ""
+        );
+
+
+    /*
+       GitHub Pages 專案網站：
+
+       cch98879.github.io/AI/
+
+       repository =
+       AI
+    */
+
+    let repo;
+
+
+    if (path) {
+
+        repo =
+            path.split("/")[0];
+
+    }
+
+    else {
+
+        /*
+           如果是：
+
+           cch98879.github.io
+
+           repository 通常是：
+           cch98879.github.io
+        */
+
+        repo =
+            owner + ".github.io";
+
+    }
+
+
+    return {
+
+        owner: owner,
+
+        repo: repo
+
+    };
+
+}
+
+
+/* =====================================================
+   自動讀取 MP3資料夾
+===================================================== */
+
+async function loadMP3Files() {
+
+
+    try {
+
+
+        /* ---------------------------------------------
+           顯示載入狀態
+        --------------------------------------------- */
+
+        musicSelect.innerHTML =
+
+            `
+            <option value="">
+                🔄 正在搜尋 MP3...
+            </option>
+            `;
+
+
+        fileName.innerHTML =
+
+            `
+            <span class="loading">
+                正在搜尋 MP3 音樂……
+            </span>
+            `;
+
+
+        statusText.textContent =
+            "LOADING · 正在讀取 MP3資料夾";
+
+
+        /* ---------------------------------------------
+           取得 GitHub 資訊
+        --------------------------------------------- */
+
+        const github =
+            getGitHubInfo();
+
+
+        if (!github) {
+
+            throw new Error(
+                "目前不是 GitHub Pages 網站"
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           GitHub API
+        --------------------------------------------- */
+
+        const apiURL =
+
+            "https://api.github.com/repos/" +
+
+            encodeURIComponent(
+                github.owner
+            ) +
+
+            "/" +
+
+            encodeURIComponent(
+                github.repo
+            ) +
+
+            "/contents/" +
+
+            encodeURIComponent(
+                MP3_FOLDER
+            );
+
+
+        console.log(
+            "讀取 MP3資料夾：",
+            apiURL
+        );
+
+
+        /* ---------------------------------------------
+           取得資料夾內容
+        --------------------------------------------- */
+
+        const response =
+            await fetch(apiURL);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "無法讀取 MP3資料夾"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        /* ---------------------------------------------
+           確認是不是資料夾
+        --------------------------------------------- */
+
+        if (!Array.isArray(data)) {
+
+            throw new Error(
+                "MP3資料夾內容格式錯誤"
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           找出所有 MP3
+        --------------------------------------------- */
+
+        musicFiles = data
+
+            .filter(item =>
+                item.type === "file"
+            )
+
+            .filter(item =>
+                item.name
+                    .toLowerCase()
+                    .endsWith(".mp3")
+            )
+
+            .sort((a,b) =>
+                a.name.localeCompare(
+                    b.name,
+                    "zh-Hant",
+                    {
+                        numeric: true,
+                        sensitivity: "base"
+                    }
+                )
+            );
+
+
+        /* ---------------------------------------------
+           清空下拉選單
+        --------------------------------------------- */
+
+        musicSelect.innerHTML =
+
+            `
+            <option value="">
+                🎵 選擇音樂
+            </option>
+            `;
+
+
+        /* ---------------------------------------------
+           建立下拉選單
+        --------------------------------------------- */
+
+        musicFiles.forEach(
+            (music,index) => {
+
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    index;
+
+
+                option.textContent =
+                    "🎵 " + music.name;
+
+
+                musicSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        /* ---------------------------------------------
+           沒有 MP3
+        --------------------------------------------- */
+
+        if (!musicFiles.length) {
+
+
+            fileName.textContent =
+                "MP3資料夾內沒有 MP3 檔案";
+
+
+            statusText.textContent =
+                "READY · 找不到 MP3 音樂";
+
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           成功
+        --------------------------------------------- */
+
+        fileName.textContent =
+            "🎵 已找到 " +
+            musicFiles.length +
+            " 首 MP3";
+
+
+        statusText.textContent =
+            "READY · 請從下拉選單選擇音樂";
+
+
+        console.log(
+            "找到 MP3：",
+            musicFiles
+        );
+
+
+    }
+
+    catch(error) {
+
+
+        console.error(
+            "MP3讀取失敗：",
+            error
+        );
+
+
+        musicFiles = [];
+
+
+        musicSelect.innerHTML =
+
+            `
+            <option value="">
+                ⚠️ 無法讀取 MP3
+            </option>
+            `;
+
+
+        fileName.textContent =
+            "無法自動讀取 MP3資料夾";
+
+
+        statusText.textContent =
+            "ERROR · 請確認 HTML 是從 GitHub Pages 開啟";
+
+
+    }
+
+}
+
+
+/* =====================================================
+   選擇音樂
+===================================================== */
+
+musicSelect.addEventListener(
+    "change",
+    function() {
+
+
+        const index =
+            this.value;
+
+
+        /* ---------------------------------------------
+           沒有選擇
+        --------------------------------------------- */
+
+        if (index === "") {
+
+            audio.pause();
+
+            audio.removeAttribute(
+                "src"
+            );
+
+            audio.load();
+
+            fileName.textContent =
+                "🎵 請選擇音樂";
+
+            statusText.textContent =
+                "READY · 請從下拉選單選擇音樂";
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           取得音樂
+        --------------------------------------------- */
+
+        const music =
+            musicFiles[
+                Number(index)
+            ];
+
+
+        if (!music) {
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           使用 GitHub Pages 網址播放
+        --------------------------------------------- */
+
+        audio.src =
+            music.download_url;
+
+
+        audio.load();
+
+
+        /* ---------------------------------------------
+           顯示音樂名稱
+        --------------------------------------------- */
+
+        fileName.textContent =
+            "🎵 " + music.name;
+
+
+        statusText.textContent =
+            "READY · 已選擇音樂";
+
+
+        /*
+           不強制自動播放，
+           避免瀏覽器阻擋。
+        */
+
+    }
+);
+
+
+/* =====================================================
+   播放
+===================================================== */
+
+audio.addEventListener(
+    "play",
+    function() {
+
+        const index =
+            musicSelect.value;
+
+
+        if (
+            index !== "" &&
+            musicFiles[index]
+        ) {
+
+            statusText.textContent =
+                "▶ PLAYING · " +
+                musicFiles[index].name;
+
+        }
+
+        else {
+
+            statusText.textContent =
+                "▶ PLAYING";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   暫停
+===================================================== */
+
+audio.addEventListener(
+    "pause",
+    function() {
+
+        if (!audio.ended) {
+
+            statusText.textContent =
+                "⏸ PAUSED · 已暫停";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   播放完成
+===================================================== */
+
+audio.addEventListener(
+    "ended",
+    function() {
+
+        statusText.textContent =
+            "⏹ ENDED · 播放完成";
+
+    }
+);
+
+
+/* =====================================================
+   播放錯誤
+===================================================== */
+
+audio.addEventListener(
+    "error",
+    function() {
+
+        statusText.textContent =
+            "⚠️ ERROR · MP3無法播放";
+
+    }
+);
+
+
+/* =====================================================
+   網頁開啟後自動讀取
+===================================================== */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        loadMP3Files();
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>
+
