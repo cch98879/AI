@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>讓AI解決我的生活大小事_SUNO創作音樂播放器</title>
-    <!-- Tailwind CSS CDN -->
+    <title>讓AI解決我生活大小事_MP3播放同步SRT歌詞</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,7 +13,7 @@
                     colors: {
                         glass: {
                             light: 'rgba(255, 255, 255, 0.1)',
-                            dark: 'rgba(15, 23, 42, 0.6)',
+                            dark: 'rgba(15, 23, 42, 0.65)',
                             border: 'rgba(255, 255, 255, 0.12)',
                         }
                     }
@@ -22,9 +21,7 @@
             }
         }
     </script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -33,17 +30,17 @@
             min-height: 100vh;
         }
         .glass-panel {
-            background: rgba(30, 41, 59, 0.5);
+            background: rgba(30, 41, 59, 0.55);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .glass-pill {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        /* Custom scrollbar for lyrics and playlist */
+        /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -58,70 +55,71 @@
             background: rgba(255, 255, 255, 0.4);
         }
         @keyframes pulse-slow {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.03); opacity: 1; }
         }
         .album-art-pulse {
             animation: pulse-slow 6s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="text-slate-100 flex flex-col items-center justify-center p-4 md:p-8">
+<body class="text-slate-100 flex flex-col items-center justify-center p-4 md:p-6 lg:p-8">
 
     <div class="w-full max-w-5xl mx-auto flex flex-col gap-6">
         
-        <!-- Header -->
+        <!-- Header & Folder Actions -->
         <header class="flex flex-col sm:flex-row items-center justify-between gap-4 glass-panel px-6 py-4 rounded-2xl shadow-2xl">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                     <i class="fa-solid fa-music text-white text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">讓AI解決我的生活大小事_SUNO創作音樂播放器</h1>
-                    <p class="text-xs text-slate-400">相對路徑 "mp3/" 資料夾自動讀取與歌詞同步</p>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">讓AI解決我生活大小事_MP3播放同步SRT歌詞</h1>
+                    <p class="text-xs text-slate-400">支援資料夾讀取與自動 .srt 歌詞同步</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3 flex-wrap justify-center">
-                <!-- Auto-Load Relative 'mp3' Folder Button -->
-                <button id="btn-load-relative" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-sm font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-95 cursor-pointer">
-                    <i class="fa-solid fa-folder-tree"></i>
-                    <span>載入相對 "mp3" 資料夾</span>
-                </button>
-                <!-- Directory Picker / File Picker Fallback -->
-                <button id="btn-select-folder" class="flex items-center gap-2 px-4 py-2 glass-pill hover:bg-white/10 text-slate-200 text-sm font-medium rounded-xl transition cursor-pointer" title="瀏覽本機資料夾">
+                <!-- Directory Picker Button -->
+                <button id="btn-select-folder" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-sm font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-folder-open"></i>
-                    <span>選擇資料夾</span>
+                    <span>選擇 mp3 資料夾</span>
                 </button>
+                <!-- Fallback file input for multi-file selection -->
+                <label class="flex items-center gap-2 px-4 py-2.5 glass-pill hover:bg-white/10 text-slate-200 text-sm font-medium rounded-xl transition cursor-pointer" title="多檔案選取 (MP3 + SRT)">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    <span>選取檔案</span>
+                    <input type="file" id="file-input" multiple accept=".mp3,.srt" class="hidden">
+                </label>
             </div>
         </header>
 
+        <!-- Main Grid Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Left Column: Player & Album Art & Controls (7 cols) -->
+            <!-- Left Column: Player, Controls & Album Art (7 cols) -->
             <div class="lg:col-span-7 flex flex-col gap-6">
                 
-                <!-- Main Player Card -->
                 <div class="glass-panel p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center relative overflow-hidden">
-                    <!-- Background ambient glow -->
+                    <!-- Ambient Glow Effects -->
                     <div class="absolute -top-24 -left-24 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-                    <!-- Visualizer / Album Art -->
+                    <!-- Album Art Display -->
                     <div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-6 rounded-2xl overflow-hidden shadow-2xl album-art-pulse border border-white/10 group">
-                        <img id="album-art" src="https://placehold.co/400x400/1e1b4b/818cf8?text=No+Track" alt="Album Art" class="w-full h-full object-cover">
+                        <img id="album-art" src="https://placehold.co/400x400/1e1b4b/818cf8?text=SonicWave" alt="Album Art" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                             <i class="fa-solid fa-compact-disc text-white text-4xl animate-spin" style="animation-duration: 8s;"></i>
                         </div>
                     </div>
 
-                    <!-- Track Info -->
+                    <!-- Track Metadata -->
                     <div class="text-center w-full mb-6">
-                        <h2 id="track-title" class="text-xl sm:text-2xl font-bold truncate px-4 text-slate-100">未選擇音軌</h2>
-                        <p id="track-artist" class="text-sm text-slate-400 mt-1">請選擇 "mp3" 資料夾或載入音樂檔案</p>
+                        <h2 id="track-title" class="text-xl sm:text-2xl font-bold truncate px-4 text-slate-100">尚未載入音樂</h2>
+                        <p id="track-artist" class="text-sm text-slate-400 mt-1">請點擊上方按鈕選取資料夾或檔案</p>
                     </div>
 
-                    <!-- Progress Bar -->
+                    <!-- Seek Bar -->
                     <div class="w-full flex flex-col gap-2 mb-6">
                         <div class="flex justify-between text-xs text-slate-400 font-medium">
                             <span id="current-time">00:00</span>
@@ -132,31 +130,26 @@
                         </div>
                     </div>
 
-                    <!-- Controls -->
+                    <!-- Playback Controls -->
                     <div class="flex items-center justify-center gap-4 sm:gap-6 w-full mb-6">
-                        <!-- Shuffle -->
                         <button id="btn-shuffle" class="text-slate-400 hover:text-white text-lg transition p-2" title="隨機播放">
                             <i class="fa-solid fa-shuffle"></i>
                         </button>
-                        <!-- Prev -->
                         <button id="btn-prev" class="w-12 h-12 rounded-full glass-pill flex items-center justify-center text-slate-200 hover:text-white hover:bg-white/20 transition shadow-lg active:scale-90">
                             <i class="fa-solid fa-backward-step"></i>
                         </button>
-                        <!-- Play/Pause -->
                         <button id="btn-play" class="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-600/40 hover:scale-105 transition active:scale-95">
                             <i id="play-icon" class="fa-solid fa-play ml-1"></i>
                         </button>
-                        <!-- Next -->
                         <button id="btn-next" class="w-12 h-12 rounded-full glass-pill flex items-center justify-center text-slate-200 hover:text-white hover:bg-white/20 transition shadow-lg active:scale-90">
                             <i class="fa-solid fa-forward-step"></i>
                         </button>
-                        <!-- Repeat -->
-                        <button id="btn-repeat" class="text-slate-400 hover:text-white text-lg transition p-2" title="循環播放">
+                        <button id="btn-repeat" class="text-slate-400 hover:text-white text-lg transition p-2" title="循環模式">
                             <i class="fa-solid fa-repeat"></i>
                         </button>
                     </div>
 
-                    <!-- Volume & Extra Controls -->
+                    <!-- Volume & Status -->
                     <div class="flex items-center justify-between w-full pt-4 border-t border-white/10 px-2">
                         <div class="flex items-center gap-3 w-1/2 sm:w-1/3">
                             <button id="btn-mute" class="text-slate-400 hover:text-white transition">
@@ -178,7 +171,7 @@
             <!-- Right Column: Lyrics & Playlist Tabs (5 cols) -->
             <div class="lg:col-span-5 flex flex-col gap-6">
                 
-                <!-- Tab Switcher -->
+                <!-- Tab Selector -->
                 <div class="flex p-1.5 glass-panel rounded-2xl">
                     <button id="tab-lyrics-btn" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-align-center"></i>
@@ -190,21 +183,20 @@
                     </button>
                 </div>
 
-                <!-- Lyrics View Container -->
+                <!-- Lyrics Panel -->
                 <div id="lyrics-container-panel" class="glass-panel p-6 rounded-3xl shadow-2xl h-[420px] flex flex-col relative overflow-hidden">
                     <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-4 flex items-center justify-between">
                         <span>即時歌詞 (SRT)</span>
                         <i class="fa-solid fa-closed-captioning text-indigo-400"></i>
                     </h3>
                     <div id="lyrics-scroll-area" class="flex-1 overflow-y-auto space-y-6 pr-2 text-center py-12 scroll-smooth">
-                        <p class="text-slate-500 italic">當前音軌無對應的 .srt 歌詞檔案或尚未播放。</p>
+                        <p class="text-slate-500 italic">請載入包含 .srt 歌詞的音軌以顯示同步字幕。</p>
                     </div>
-                    <!-- Gradient fade overlays for lyrics -->
                     <div class="absolute top-12 left-0 right-0 h-10 bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none"></div>
                     <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-900/60 to-transparent pointer-events-none"></div>
                 </div>
 
-                <!-- Playlist View Container (Hidden by default) -->
+                <!-- Playlist Panel -->
                 <div id="playlist-container-panel" class="glass-panel p-6 rounded-3xl shadow-2xl h-[420px] hidden flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase">播放清單</h3>
@@ -213,10 +205,9 @@
                         </div>
                     </div>
                     <div id="playlist-items" class="flex-1 overflow-y-auto space-y-2 pr-1">
-                        <!-- Playlist items injected via JS -->
                         <div class="text-center py-20 text-slate-500 text-sm">
                             <i class="fa-solid fa-folder-music text-3xl mb-2 opacity-40"></i>
-                            <p>尚無音樂檔案。<br>請點擊上方按鈕選擇資料夾。</p>
+                            <p>尚無音樂。<br>點擊上方按鈕選擇本機 mp3 資料夾。</p>
                         </div>
                     </div>
                 </div>
@@ -232,21 +223,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // State variables
-            let playlist = []; // Array of { name, artist, url, srtParsed }
+            let playlist = []; // { id, name, artist, url, srtParsed }
             let currentIndex = 0;
             let isPlaying = false;
             let isShuffle = false;
             let repeatMode = 0; // 0: off, 1: all, 2: one
             let currentSrtIndex = -1;
 
-            // DOM Elements
             const audioElement = document.getElementById('audio-element');
-            const btnLoadRelative = document.getElementById('btn-load-relative');
             const btnSelectFolder = document.getElementById('btn-select-folder');
+            const fileInput = document.getElementById('file-input');
             const trackTitle = document.getElementById('track-title');
             const trackArtist = document.getElementById('track-artist');
-            const albumArt = document.getElementById('album-art');
             const currentTimeEl = document.getElementById('current-time');
             const totalDurationEl = document.getElementById('total-duration');
             const progressBar = document.getElementById('progress-bar');
@@ -260,7 +248,6 @@
             const btnShuffle = document.getElementById('btn-shuffle');
             const btnRepeat = document.getElementById('btn-repeat');
             const srtStatus = document.getElementById('srt-status');
-            const srtIndicator = document.getElementById('srt-indicator');
             const tabLyricsBtn = document.getElementById('tab-lyrics-btn');
             const tabPlaylistBtn = document.getElementById('tab-playlist-btn');
             const lyricsContainerPanel = document.getElementById('lyrics-container-panel');
@@ -270,131 +257,30 @@
             const lyricsScrollArea = document.getElementById('lyrics-scroll-area');
             const playlistSearch = document.getElementById('playlist-search');
 
-            async function loadRelativeMp3Folder() {
-                try {
-                    // Try fetching a manifest.json or scanning predefined/discovered files in relative "mp3/" folder
-                    // First, attempt to fetch a manifest file if present
-                    let manifestFiles = [];
-                    try {
-                        const res = await fetch('mp3/manifest.json');
-                        if (res.ok) {
-                            manifestFiles = await res.json();
-                        }
-                    } catch (e) {
-                        // manifest.json might not exist, we will use auto-discovery or common sample filenames
-                    }
-
-                    if (manifestFiles.length === 0) {
-                        // Fallback: check common track names or use a smart list of songs inside mp3/ folder
-                        // Users can place files like mp3/track1.mp3 and mp3/track1.srt
-                        manifestFiles = [
-                            { name: "song1", title: "Song 1" },
-                            { name: "track1", title: "Track 1" },
-                            { name: "demo", title: "Demo Song" }
-                        ];
-                    }
-
-                    const loadedTracks = [];
-                    for (let i = 0; i < manifestFiles.length; i++) {
-                        const item = manifestFiles[i];
-                        const baseName = typeof item === 'string' ? item : item.name;
-                        const title = item.title || baseName;
-                        
-                        const mp3Url = `mp3/${baseName}.mp3`;
-                        const srtUrl = `mp3/${baseName}.srt`;
-
-                        // Check if MP3 exists
-                        try {
-                            const mp3Check = await fetch(mp3Url, { method: 'HEAD' });
-                            if (mp3Check.ok) {
-                                let srtParsed = [];
-                                try {
-                                    const srtRes = await fetch(srtUrl);
-                                    if (srtRes.ok) {
-                                        const srtText = await srtRes.text();
-                                        srtParsed = parseSRT(srtText);
-                                    }
-                                } catch (err) {
-                                    // No srt found for this track
-                                }
-
-                                loadedTracks.push({
-                                    id: loadedTracks.length,
-                                    name: title,
-                                    artist: "Relative Folder (mp3/)",
-                                    url: mp3Url,
-                                    srtParsed: srtParsed
-                                });
-                            }
-                        } catch (err) {
-                            console.warn(`Could not load ${mp3Url}`);
-                        }
-                    }
-
-                    if (loadedTracks.length > 0) {
-                        playlist = loadedTracks;
-                        currentIndex = 0;
-                        renderPlaylist();
-                        loadTrack(currentIndex, true);
-                        showNotification(`成功載入相對 "mp3" 資料夾，共 ${playlist.length} 首歌曲！`);
-                    } else {
-                        // If relative folder scan found nothing (e.g. running in sandbox without local server files), fallback to picker or demo
-                        loadDefaultFallbackPlaylist();
-                    }
-                } catch (err) {
-                    console.error("Error loading relative folder:", err);
-                    loadDefaultFallbackPlaylist();
-                }
-            }
-
-            function loadDefaultFallbackPlaylist() {
-                const sampleSongs = [
-                    { name: "Sample Track 1 - Neon Horizon", artist: "SonicWave AI", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", srt: "1\n00:00:02,000 --> 00:00:05,000\n歡迎使用 SonicWave 播放器\n\n2\n00:00:05,500 --> 00:00:09,000\n正在從相對 'mp3/' 資料夾讀取\n\n3\n00:00:09,500 --> 00:00:15,000\n享受音樂與自動同步歌詞體驗！" }
-                ];
-
-                playlist = sampleSongs.map((song, idx) => ({
-                    id: idx,
-                    name: song.name,
-                    artist: song.artist,
-                    url: song.url,
-                    srtParsed: parseSRT(song.srt)
-                }));
-                renderPlaylist();
-                if (playlist.length > 0) {
-                    loadTrack(0, false);
-                }
-            }
-
-            btnLoadRelative.addEventListener('click', () => {
-                loadRelativeMp3Folder();
-            });
-
-            // Directory Picker Fallback
             btnSelectFolder.addEventListener('click', async () => {
                 try {
                     if (!window.showDirectoryPicker) {
-                        alert("您的瀏覽器不支援 Directory Picker API。");
+                        alert("您的瀏覽器不支援 Directory Picker API，請改用「選取檔案」按鈕。");
                         return;
                     }
                     const dirHandle = await window.showDirectoryPicker();
-                    await scanDirectory(dirHandle);
+                    await scanDirectoryHandle(dirHandle);
                 } catch (err) {
                     if (err.name !== 'AbortError') {
-                        console.error(err);
+                        console.error("Directory picker error:", err);
                     }
                 }
             });
 
-            async function scanDirectory(dirHandle) {
+            async function scanDirectoryHandle(dirHandle) {
                 const mp3Map = new Map();
                 const srtMap = new Map();
 
                 for await (const entry of dirHandle.values()) {
                     if (entry.kind === 'file') {
                         const file = await entry.getFile();
-                        const fileName = file.name;
-                        const lowerName = fileName.toLowerCase();
-                        const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+                        const lowerName = file.name.toLowerCase();
+                        const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
                         if (lowerName.endsWith('.mp3')) {
                             mp3Map.set(baseName, file);
                         } else if (lowerName.endsWith('.srt')) {
@@ -412,7 +298,7 @@
                 let idx = 0;
                 for (let [baseName, mp3File] of mp3Map.entries()) {
                     let srtParsed = [];
-                    let srtFile = srtMap.get(baseName);
+                    const srtFile = srtMap.get(baseName);
                     if (srtFile) {
                         const srtText = await srtFile.text();
                         srtParsed = parseSRT(srtText);
@@ -421,7 +307,7 @@
                     newPlaylist.push({
                         id: idx++,
                         name: baseName,
-                        artist: "Local Folder",
+                        artist: dirHandle.name || "Local Folder",
                         url: URL.createObjectURL(mp3File),
                         srtParsed: srtParsed
                     });
@@ -431,17 +317,56 @@
                 currentIndex = 0;
                 renderPlaylist();
                 loadTrack(currentIndex, true);
+                showToast(`成功載入 ${playlist.length} 首歌曲！`);
             }
 
-            function showNotification(msg) {
-                const notif = document.createElement('div');
-                notif.className = "fixed bottom-6 right-6 bg-indigo-600 text-white px-4 py-2 rounded-xl shadow-2xl z-50 text-xs animate-bounce";
-                notif.textContent = msg;
-                document.body.appendChild(notif);
-                setTimeout(() => notif.remove(), 3000);
-            }
+            fileInput.addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
 
-            // SRT Parser function
+                const mp3Map = new Map();
+                const srtMap = new Map();
+
+                files.forEach(file => {
+                    const lowerName = file.name.toLowerCase();
+                    const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+                    if (lowerName.endsWith('.mp3')) {
+                        mp3Map.set(baseName, file);
+                    } else if (lowerName.endsWith('.srt')) {
+                        srtMap.set(baseName, file);
+                    }
+                });
+
+                const newPlaylist = [];
+                let idx = 0;
+                for (let [baseName, mp3File] of mp3Map.entries()) {
+                    let srtParsed = [];
+                    const srtFile = srtMap.get(baseName);
+                    if (srtFile) {
+                        const srtText = await srtFile.text();
+                        srtParsed = parseSRT(srtText);
+                    }
+
+                    newPlaylist.push({
+                        id: idx++,
+                        name: baseName,
+                        artist: "Uploaded Files",
+                        url: URL.createObjectURL(mp3File),
+                        srtParsed: srtParsed
+                    });
+                }
+
+                if (newPlaylist.length > 0) {
+                    playlist = newPlaylist;
+                    currentIndex = 0;
+                    renderPlaylist();
+                    loadTrack(currentIndex, true);
+                    showToast(`成功載入 ${playlist.length} 首歌！`);
+                } else {
+                    alert("未偵測到有效的 .mp3 檔案。");
+                }
+            });
+
             function parseSRT(srtString) {
                 if (!srtString) return [];
                 const cleaned = srtString.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -464,7 +389,6 @@
                 return subtitles;
             }
 
-            // Load Track into Audio Element
             function loadTrack(index, autoplay = false) {
                 if (playlist.length === 0) return;
                 currentIndex = (index + playlist.length) % playlist.length;
@@ -493,7 +417,7 @@
                     isPlaying = true;
                     playIcon.className = "fa-solid fa-pause";
                 }).catch(err => {
-                    console.error("Playback error:", err);
+                    console.error("Playback prevented:", err);
                 });
             }
 
@@ -606,10 +530,10 @@
 
             function updateSrtStatus(srtParsed) {
                 if (srtParsed && srtParsed.length > 0) {
-                    srtStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="srt-indicator"></span>已同步 .srt 歌詞 (${srtParsed.length} 行)`;
+                    srtStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>已同步 .srt (${srtParsed.length} 行)`;
                     srtStatus.className = "text-xs px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/20 flex items-center gap-1.5";
                 } else {
-                    srtStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500" id="srt-indicator"></span>無歌詞`;
+                    srtStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500"></span>無歌詞`;
                     srtStatus.className = "text-xs px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-400 border border-white/5 flex items-center gap-1.5";
                 }
             }
@@ -617,7 +541,7 @@
             function renderLyrics(srtParsed) {
                 lyricsScrollArea.innerHTML = "";
                 if (!srtParsed || srtParsed.length === 0) {
-                    lyricsScrollArea.innerHTML = `<p class="text-slate-500 italic py-24">當前音軌無對應的 .srt 歌詞檔案。</p>`;
+                    lyricsScrollArea.innerHTML = `<p class="text-slate-500 italic py-24">此音軌無對應的 .srt 歌詞。</p>`;
                     return;
                 }
 
@@ -739,8 +663,13 @@
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
 
-            // Auto-load relative folder on start
-            loadRelativeMp3Folder();
+            function showToast(msg) {
+                const toast = document.createElement('div');
+                toast.className = "fixed bottom-6 right-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow-2xl z-50 text-xs animate-bounce";
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3500);
+            }
         });
     </script>
 </body>
