@@ -1,655 +1,747 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>讓AI解決我的生活大小事_SUNO創作音樂分享</title>
-
-<style>
-
-*{
-    box-sizing:border-box;
-}
-
-body{
-    margin:0;
-    min-height:100vh;
-    font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;
-    background:
-        radial-gradient(circle at top,#263b70 0%,#11182e 45%,#070b18 100%);
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.player{
-    width:90%;
-    max-width:650px;
-    padding:35px;
-    border-radius:25px;
-
-    background:rgba(255,255,255,0.10);
-
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-
-    border:1px solid rgba(255,255,255,0.18);
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,0.5);
-
-    text-align:center;
-}
-
-h1{
-    margin:0 0 25px 0;
-    font-size:30px;
-    letter-spacing:1px;
-}
-
-.folderInfo{
-    margin-bottom:18px;
-    padding:10px;
-    border-radius:10px;
-
-    background:rgba(0,0,0,0.20);
-
-    font-size:14px;
-    color:#dce6ff;
-}
-
-#musicSelect{
-
-    width:100%;
-
-    padding:15px;
-
-    border-radius:12px;
-
-    border:none;
-
-    outline:none;
-
-    font-size:17px;
-
-    color:#222;
-
-    background:white;
-
-    cursor:pointer;
-}
-
-#fileName{
-
-    margin-top:25px;
-
-    min-height:30px;
-
-    font-size:19px;
-
-    font-weight:bold;
-
-    word-break:break-all;
-}
-
-#statusText{
-
-    margin-top:10px;
-
-    min-height:24px;
-
-    font-size:14px;
-
-    opacity:0.85;
-}
-
-audio{
-
-    width:100%;
-
-    margin-top:25px;
-}
-
-.loading{
-
-    display:inline-block;
-
-    animation:loading 1.2s infinite;
-}
-
-@keyframes loading{
-
-    0%{
-        opacity:.3;
-    }
-
-    50%{
-        opacity:1;
-    }
-
-    100%{
-        opacity:.3;
-    }
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="player">
-
-    <h1>讓AI解決我的生活大小事🎵 SUNO創作音樂分享</h1>
-
-    <div class="folderInfo">
-
-        📁 音樂來源：
-        <strong>mp3</strong>
-
-    </div>
-
-    <select id="musicSelect">
-
-        <option value="">
-            🔄 正在自動搜尋 MP3...
-        </option>
-
-    </select>
-
-    <div id="fileName">
-
-        <span class="loading">
-            正在搜尋 MP3 音樂……
-        </span>
-
-    </div>
-
-    <div id="statusText">
-
-        LOADING · 正在讀取 mp3 資料夾
-
-    </div>
-
-    <audio
-        id="audio"
-        controls
-        preload="metadata">
-    </audio>
-
-</div>
-
-
-<script>
-
-/* ==================================================
-   GitHub 設定
-   ================================================== */
-
-/*
-   你的 GitHub 帳號
-*/
-const GITHUB_USER = "cch98879";
-
-
-/*
-   你的 GitHub 儲存庫
-*/
-const GITHUB_REPO = "AI";
-
-
-/*
-   MP3 資料夾
-*/
-const MP3_FOLDER = "mp3";
-
-
-/* ==================================================
-   取得網頁元件
-   ================================================== */
-
-const musicSelect =
-    document.getElementById("musicSelect");
-
-const audio =
-    document.getElementById("audio");
-
-const fileName =
-    document.getElementById("fileName");
-
-const statusText =
-    document.getElementById("statusText");
-
-
-let musicFiles = [];
-
-
-/* ==================================================
-   自動讀取 MP3
-   ================================================== */
-
-async function loadMP3Files(){
-
-    try{
-
-        musicSelect.innerHTML = `
-            <option value="">
-                🔄 正在搜尋 MP3...
-            </option>
-        `;
-
-        fileName.innerHTML = `
-            <span class="loading">
-                正在搜尋 MP3 音樂……
-            </span>
-        `;
-
-        statusText.textContent =
-            "LOADING · 正在讀取 mp3 資料夾";
-
-
-        /* ------------------------------------------
-           GitHub API
-           ------------------------------------------ */
-
-        const apiURL =
-            "https://api.github.com/repos/" +
-            encodeURIComponent(GITHUB_USER) +
-            "/" +
-            encodeURIComponent(GITHUB_REPO) +
-            "/contents/" +
-            encodeURIComponent(MP3_FOLDER);
-
-
-        console.log(
-            "正在讀取：",
-            apiURL
-        );
-
-
-        /* ------------------------------------------
-           連線 GitHub
-           ------------------------------------------ */
-
-        const response =
-            await fetch(apiURL,{
-
-                headers:{
-                    "Accept":
-                    "application/vnd.github+json"
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>讓AI解決我的生活大小事_SUNO創作音樂播放器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        glass: {
+                            light: 'rgba(255, 255, 255, 0.1)',
+                            dark: 'rgba(15, 23, 42, 0.6)',
+                            border: 'rgba(255, 255, 255, 0.12)',
+                        }
+                    }
                 }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #020617);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-pill {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Custom scrollbar for lyrics and playlist */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        .album-art-pulse {
+            animation: pulse-slow 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col items-center justify-center p-4 md:p-8">
 
+    <div class="w-full max-w-5xl mx-auto flex flex-col gap-6">
+        
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 glass-panel px-6 py-4 rounded-2xl shadow-2xl">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-music text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">讓AI解決我的生活大小事_SUNO創作音樂播放器</h1>
+                    <p class="text-xs text-slate-400">相對路徑 "mp3/" 資料夾自動讀取與歌詞同步</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <!-- Auto-Load Relative 'mp3' Folder Button -->
+                <button id="btn-load-relative" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-sm font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-95 cursor-pointer">
+                    <i class="fa-solid fa-folder-tree"></i>
+                    <span>載入相對 "mp3" 資料夾</span>
+                </button>
+                <!-- Directory Picker / File Picker Fallback -->
+                <button id="btn-select-folder" class="flex items-center gap-2 px-4 py-2 glass-pill hover:bg-white/10 text-slate-200 text-sm font-medium rounded-xl transition cursor-pointer" title="瀏覽本機資料夾">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>選擇資料夾</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Player & Album Art & Controls (7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- Main Player Card -->
+                <div class="glass-panel p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center relative overflow-hidden">
+                    <!-- Background ambient glow -->
+                    <div class="absolute -top-24 -left-24 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-pink-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <!-- Visualizer / Album Art -->
+                    <div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-6 rounded-2xl overflow-hidden shadow-2xl album-art-pulse border border-white/10 group">
+                        <img id="album-art" src="https://placehold.co/400x400/1e1b4b/818cf8?text=No+Track" alt="Album Art" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <i class="fa-solid fa-compact-disc text-white text-4xl animate-spin" style="animation-duration: 8s;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Track Info -->
+                    <div class="text-center w-full mb-6">
+                        <h2 id="track-title" class="text-xl sm:text-2xl font-bold truncate px-4 text-slate-100">未選擇音軌</h2>
+                        <p id="track-artist" class="text-sm text-slate-400 mt-1">請選擇 "mp3" 資料夾或載入音樂檔案</p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full flex flex-col gap-2 mb-6">
+                        <div class="flex justify-between text-xs text-slate-400 font-medium">
+                            <span id="current-time">00:00</span>
+                            <span id="total-duration">00:00</span>
+                        </div>
+                        <div class="relative group cursor-pointer py-1">
+                            <input type="range" id="progress-bar" value="0" max="100" step="0.1" class="w-full h-2 bg-slate-700/60 rounded-lg appearance-none cursor-pointer accent-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex items-center justify-center gap-4 sm:gap-6 w-full mb-6">
+                        <!-- Shuffle -->
+                        <button id="btn-shuffle" class="text-slate-400 hover:text-white text-lg transition p-2" title="隨機播放">
+                            <i class="fa-solid fa-shuffle"></i>
+                        </button>
+                        <!-- Prev -->
+                        <button id="btn-prev" class="w-12 h-12 rounded-full glass-pill flex items-center justify-center text-slate-200 hover:text-white hover:bg-white/20 transition shadow-lg active:scale-90">
+                            <i class="fa-solid fa-backward-step"></i>
+                        </button>
+                        <!-- Play/Pause -->
+                        <button id="btn-play" class="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-600 to-pink-600 flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-600/40 hover:scale-105 transition active:scale-95">
+                            <i id="play-icon" class="fa-solid fa-play ml-1"></i>
+                        </button>
+                        <!-- Next -->
+                        <button id="btn-next" class="w-12 h-12 rounded-full glass-pill flex items-center justify-center text-slate-200 hover:text-white hover:bg-white/20 transition shadow-lg active:scale-90">
+                            <i class="fa-solid fa-forward-step"></i>
+                        </button>
+                        <!-- Repeat -->
+                        <button id="btn-repeat" class="text-slate-400 hover:text-white text-lg transition p-2" title="循環播放">
+                            <i class="fa-solid fa-repeat"></i>
+                        </button>
+                    </div>
+
+                    <!-- Volume & Extra Controls -->
+                    <div class="flex items-center justify-between w-full pt-4 border-t border-white/10 px-2">
+                        <div class="flex items-center gap-3 w-1/2 sm:w-1/3">
+                            <button id="btn-mute" class="text-slate-400 hover:text-white transition">
+                                <i id="volume-icon" class="fa-solid fa-volume-high"></i>
+                            </button>
+                            <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="1" class="w-full h-1.5 bg-slate-700/60 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="srt-status" class="text-xs px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-400 border border-white/5 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-slate-500" id="srt-indicator"></span>
+                                無歌詞
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Lyrics & Playlist Tabs (5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- Tab Switcher -->
+                <div class="flex p-1.5 glass-panel rounded-2xl">
+                    <button id="tab-lyrics-btn" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-align-center"></i>
+                        <span>同步歌詞</span>
+                    </button>
+                    <button id="tab-playlist-btn" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>播放清單 (<span id="playlist-count">0</span>)</span>
+                    </button>
+                </div>
+
+                <!-- Lyrics View Container -->
+                <div id="lyrics-container-panel" class="glass-panel p-6 rounded-3xl shadow-2xl h-[420px] flex flex-col relative overflow-hidden">
+                    <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-4 flex items-center justify-between">
+                        <span>即時歌詞 (SRT)</span>
+                        <i class="fa-solid fa-closed-captioning text-indigo-400"></i>
+                    </h3>
+                    <div id="lyrics-scroll-area" class="flex-1 overflow-y-auto space-y-6 pr-2 text-center py-12 scroll-smooth">
+                        <p class="text-slate-500 italic">當前音軌無對應的 .srt 歌詞檔案或尚未播放。</p>
+                    </div>
+                    <!-- Gradient fade overlays for lyrics -->
+                    <div class="absolute top-12 left-0 right-0 h-10 bg-gradient-to-b from-slate-900/60 to-transparent pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-900/60 to-transparent pointer-events-none"></div>
+                </div>
+
+                <!-- Playlist View Container (Hidden by default) -->
+                <div id="playlist-container-panel" class="glass-panel p-6 rounded-3xl shadow-2xl h-[420px] hidden flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase">播放清單</h3>
+                        <div class="relative w-40">
+                            <input type="text" id="playlist-search" placeholder="搜尋歌曲..." class="w-full bg-slate-800/60 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div id="playlist-items" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                        <!-- Playlist items injected via JS -->
+                        <div class="text-center py-20 text-slate-500 text-sm">
+                            <i class="fa-solid fa-folder-music text-3xl mb-2 opacity-40"></i>
+                            <p>尚無音樂檔案。<br>請點擊上方按鈕選擇資料夾。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Hidden audio element -->
+    <audio id="audio-element"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State variables
+            let playlist = []; // Array of { name, artist, url, srtParsed }
+            let currentIndex = 0;
+            let isPlaying = false;
+            let isShuffle = false;
+            let repeatMode = 0; // 0: off, 1: all, 2: one
+            let currentSrtIndex = -1;
+
+            // DOM Elements
+            const audioElement = document.getElementById('audio-element');
+            const btnLoadRelative = document.getElementById('btn-load-relative');
+            const btnSelectFolder = document.getElementById('btn-select-folder');
+            const trackTitle = document.getElementById('track-title');
+            const trackArtist = document.getElementById('track-artist');
+            const albumArt = document.getElementById('album-art');
+            const currentTimeEl = document.getElementById('current-time');
+            const totalDurationEl = document.getElementById('total-duration');
+            const progressBar = document.getElementById('progress-bar');
+            const volumeBar = document.getElementById('volume-bar');
+            const volumeIcon = document.getElementById('volume-icon');
+            const btnMute = document.getElementById('btn-mute');
+            const btnPlay = document.getElementById('btn-play');
+            const playIcon = document.getElementById('play-icon');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnShuffle = document.getElementById('btn-shuffle');
+            const btnRepeat = document.getElementById('btn-repeat');
+            const srtStatus = document.getElementById('srt-status');
+            const srtIndicator = document.getElementById('srt-indicator');
+            const tabLyricsBtn = document.getElementById('tab-lyrics-btn');
+            const tabPlaylistBtn = document.getElementById('tab-playlist-btn');
+            const lyricsContainerPanel = document.getElementById('lyrics-container-panel');
+            const playlistContainerPanel = document.getElementById('playlist-container-panel');
+            const playlistItems = document.getElementById('playlist-items');
+            const playlistCount = document.getElementById('playlist-count');
+            const lyricsScrollArea = document.getElementById('lyrics-scroll-area');
+            const playlistSearch = document.getElementById('playlist-search');
+
+            async function loadRelativeMp3Folder() {
+                try {
+                    // Try fetching a manifest.json or scanning predefined/discovered files in relative "mp3/" folder
+                    // First, attempt to fetch a manifest file if present
+                    let manifestFiles = [];
+                    try {
+                        const res = await fetch('mp3/manifest.json');
+                        if (res.ok) {
+                            manifestFiles = await res.json();
+                        }
+                    } catch (e) {
+                        // manifest.json might not exist, we will use auto-discovery or common sample filenames
+                    }
+
+                    if (manifestFiles.length === 0) {
+                        // Fallback: check common track names or use a smart list of songs inside mp3/ folder
+                        // Users can place files like mp3/track1.mp3 and mp3/track1.srt
+                        manifestFiles = [
+                            { name: "song1", title: "Song 1" },
+                            { name: "track1", title: "Track 1" },
+                            { name: "demo", title: "Demo Song" }
+                        ];
+                    }
+
+                    const loadedTracks = [];
+                    for (let i = 0; i < manifestFiles.length; i++) {
+                        const item = manifestFiles[i];
+                        const baseName = typeof item === 'string' ? item : item.name;
+                        const title = item.title || baseName;
+                        
+                        const mp3Url = `mp3/${baseName}.mp3`;
+                        const srtUrl = `mp3/${baseName}.srt`;
+
+                        // Check if MP3 exists
+                        try {
+                            const mp3Check = await fetch(mp3Url, { method: 'HEAD' });
+                            if (mp3Check.ok) {
+                                let srtParsed = [];
+                                try {
+                                    const srtRes = await fetch(srtUrl);
+                                    if (srtRes.ok) {
+                                        const srtText = await srtRes.text();
+                                        srtParsed = parseSRT(srtText);
+                                    }
+                                } catch (err) {
+                                    // No srt found for this track
+                                }
+
+                                loadedTracks.push({
+                                    id: loadedTracks.length,
+                                    name: title,
+                                    artist: "Relative Folder (mp3/)",
+                                    url: mp3Url,
+                                    srtParsed: srtParsed
+                                });
+                            }
+                        } catch (err) {
+                            console.warn(`Could not load ${mp3Url}`);
+                        }
+                    }
+
+                    if (loadedTracks.length > 0) {
+                        playlist = loadedTracks;
+                        currentIndex = 0;
+                        renderPlaylist();
+                        loadTrack(currentIndex, true);
+                        showNotification(`成功載入相對 "mp3" 資料夾，共 ${playlist.length} 首歌曲！`);
+                    } else {
+                        // If relative folder scan found nothing (e.g. running in sandbox without local server files), fallback to picker or demo
+                        loadDefaultFallbackPlaylist();
+                    }
+                } catch (err) {
+                    console.error("Error loading relative folder:", err);
+                    loadDefaultFallbackPlaylist();
+                }
+            }
+
+            function loadDefaultFallbackPlaylist() {
+                const sampleSongs = [
+                    { name: "Sample Track 1 - Neon Horizon", artist: "SonicWave AI", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", srt: "1\n00:00:02,000 --> 00:00:05,000\n歡迎使用 SonicWave 播放器\n\n2\n00:00:05,500 --> 00:00:09,000\n正在從相對 'mp3/' 資料夾讀取\n\n3\n00:00:09,500 --> 00:00:15,000\n享受音樂與自動同步歌詞體驗！" }
+                ];
+
+                playlist = sampleSongs.map((song, idx) => ({
+                    id: idx,
+                    name: song.name,
+                    artist: song.artist,
+                    url: song.url,
+                    srtParsed: parseSRT(song.srt)
+                }));
+                renderPlaylist();
+                if (playlist.length > 0) {
+                    loadTrack(0, false);
+                }
+            }
+
+            btnLoadRelative.addEventListener('click', () => {
+                loadRelativeMp3Folder();
             });
 
+            // Directory Picker Fallback
+            btnSelectFolder.addEventListener('click', async () => {
+                try {
+                    if (!window.showDirectoryPicker) {
+                        alert("您的瀏覽器不支援 Directory Picker API。");
+                        return;
+                    }
+                    const dirHandle = await window.showDirectoryPicker();
+                    await scanDirectory(dirHandle);
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error(err);
+                    }
+                }
+            });
 
-        /* ------------------------------------------
-           判斷 GitHub 回應
-           ------------------------------------------ */
+            async function scanDirectory(dirHandle) {
+                const mp3Map = new Map();
+                const srtMap = new Map();
 
-        if(!response.ok){
-
-            let errorMessage =
-                "GitHub API 錯誤：" +
-                response.status;
-
-            try{
-
-                const errorData =
-                    await response.json();
-
-                if(errorData.message){
-
-                    errorMessage +=
-                        " - " +
-                        errorData.message;
-
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'file') {
+                        const file = await entry.getFile();
+                        const fileName = file.name;
+                        const lowerName = fileName.toLowerCase();
+                        const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+                        if (lowerName.endsWith('.mp3')) {
+                            mp3Map.set(baseName, file);
+                        } else if (lowerName.endsWith('.srt')) {
+                            srtMap.set(baseName, file);
+                        }
+                    }
                 }
 
-            }catch(e){}
+                if (mp3Map.size === 0) {
+                    alert("在所選資料夾中找不到任何 .mp3 檔案！");
+                    return;
+                }
 
-            throw new Error(
-                errorMessage
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "GitHub 回傳資料：",
-            data
-        );
-
-
-        /* ------------------------------------------
-           確認是不是資料夾
-           ------------------------------------------ */
-
-        if(!Array.isArray(data)){
-
-            throw new Error(
-                "mp3 不是資料夾，或 GitHub 路徑錯誤"
-            );
-
-        }
-
-
-        /* ------------------------------------------
-           篩選 MP3
-           ------------------------------------------ */
-
-        musicFiles = data
-
-            .filter(item =>
-                item.type === "file"
-            )
-
-            .filter(item =>
-                item.name
-                    .toLowerCase()
-                    .endsWith(".mp3")
-            )
-
-
-            /* --------------------------------------
-               排序
-               -------------------------------------- */
-
-            .sort((a,b)=>
-
-                a.name.localeCompare(
-                    b.name,
-                    "zh-Hant",
-                    {
-                        numeric:true,
-                        sensitivity:"base"
+                const newPlaylist = [];
+                let idx = 0;
+                for (let [baseName, mp3File] of mp3Map.entries()) {
+                    let srtParsed = [];
+                    let srtFile = srtMap.get(baseName);
+                    if (srtFile) {
+                        const srtText = await srtFile.text();
+                        srtParsed = parseSRT(srtText);
                     }
-                )
 
-            );
+                    newPlaylist.push({
+                        id: idx++,
+                        name: baseName,
+                        artist: "Local Folder",
+                        url: URL.createObjectURL(mp3File),
+                        srtParsed: srtParsed
+                    });
+                }
 
-
-        /* ------------------------------------------
-           清空下拉選單
-           ------------------------------------------ */
-
-        musicSelect.innerHTML = `
-            <option value="">
-                🎵 選擇音樂
-            </option>
-        `;
-
-
-        /* ------------------------------------------
-           建立下拉選單
-           ------------------------------------------ */
-
-        musicFiles.forEach(
-            (music,index)=>{
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-                option.value =
-                    index;
-
-                option.textContent =
-                    "🎵 " + music.name;
-
-                musicSelect.appendChild(
-                    option
-                );
-
+                playlist = newPlaylist;
+                currentIndex = 0;
+                renderPlaylist();
+                loadTrack(currentIndex, true);
             }
-        );
 
-
-        /* ------------------------------------------
-           沒有 MP3
-           ------------------------------------------ */
-
-        if(musicFiles.length === 0){
-
-            fileName.textContent =
-                "mp3 資料夾內沒有 MP3 檔案";
-
-            statusText.textContent =
-                "READY · 找不到 MP3";
-
-            return;
-
-        }
-
-
-        /* ------------------------------------------
-           成功
-           ------------------------------------------ */
-
-        fileName.textContent =
-            "🎵 已找到 " +
-            musicFiles.length +
-            " 首 MP3";
-
-
-        statusText.textContent =
-            "READY · 請從下拉選單選擇音樂";
-
-
-        console.log(
-            "找到 MP3：",
-            musicFiles
-        );
-
-    }
-
-    catch(error){
-
-        console.error(
-            "MP3 讀取失敗：",
-            error
-        );
-
-
-        musicFiles = [];
-
-
-        musicSelect.innerHTML = `
-            <option value="">
-                ⚠️ 無法讀取 MP3
-            </option>
-        `;
-
-
-        fileName.textContent =
-            "無法自動讀取 mp3 資料夾";
-
-
-        statusText.textContent =
-            "ERROR · " +
-            error.message;
-
-    }
-
-}
-
-
-/* ==================================================
-   選擇音樂
-   ================================================== */
-
-musicSelect.addEventListener(
-    "change",
-    function(){
-
-        const index =
-            this.value;
-
-
-        /* 沒有選擇 */
-
-        if(index === ""){
-
-            audio.pause();
-
-            audio.removeAttribute(
-                "src"
-            );
-
-            audio.load();
-
-
-            fileName.textContent =
-                "🎵 請選擇音樂";
-
-
-            statusText.textContent =
-                "READY · 請從下拉選單選擇音樂";
-
-            return;
-
-        }
-
-
-        const music =
-            musicFiles[
-                Number(index)
-            ];
-
-
-        if(!music){
-
-            return;
-
-        }
-
-
-        /* ------------------------------------------
-           使用 GitHub download_url
-           ------------------------------------------ */
-
-        audio.src =
-            music.download_url;
-
-
-        audio.load();
-
-
-        fileName.textContent =
-            "🎵 " +
-            music.name;
-
-
-        statusText.textContent =
-            "READY · 已選擇音樂";
-
-    }
-);
-
-
-/* ==================================================
-   播放
-   ================================================== */
-
-audio.addEventListener(
-    "play",
-    function(){
-
-        const index =
-            musicSelect.value;
-
-
-        if(
-            index !== "" &&
-            musicFiles[index]
-        ){
-
-            statusText.textContent =
-                "▶ PLAYING · " +
-                musicFiles[index].name;
-
-        }
-        else{
-
-            statusText.textContent =
-                "▶ PLAYING";
-
-        }
-
-    }
-);
-
-
-/* ==================================================
-   暫停
-   ================================================== */
-
-audio.addEventListener(
-    "pause",
-    function(){
-
-        if(!audio.ended){
-
-            statusText.textContent =
-                "⏸ PAUSED · 已暫停";
-
-        }
-
-    }
-);
-
-
-/* ==================================================
-   播放完成
-   ================================================== */
-
-audio.addEventListener(
-    "ended",
-    function(){
-
-        statusText.textContent =
-            "⏹ ENDED · 播放完成";
-
-    }
-);
-
-
-/* ==================================================
-   音樂播放錯誤
-   ================================================== */
-
-audio.addEventListener(
-    "error",
-    function(){
-
-        statusText.textContent =
-            "⚠️ ERROR · MP3 無法播放";
-
-    }
-);
-
-
-/* ==================================================
-   網頁開啟後自動執行
-   ================================================== */
-
-window.addEventListener(
-    "DOMContentLoaded",
-    function(){
-
-        loadMP3Files();
-
-    }
-);
-
-</script>
-
+            function showNotification(msg) {
+                const notif = document.createElement('div');
+                notif.className = "fixed bottom-6 right-6 bg-indigo-600 text-white px-4 py-2 rounded-xl shadow-2xl z-50 text-xs animate-bounce";
+                notif.textContent = msg;
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 3000);
+            }
+
+            // SRT Parser function
+            function parseSRT(srtString) {
+                if (!srtString) return [];
+                const cleaned = srtString.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                const blocks = cleaned.split(/\n\s*\n/);
+                const subtitles = [];
+
+                for (let block of blocks) {
+                    const lines = block.trim().split('\n');
+                    if (lines.length >= 3) {
+                        const timeLine = lines[1];
+                        const textLines = lines.slice(2).join('<br>');
+                        const match = timeLine.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+                        if (match) {
+                            const startSec = parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseInt(match[3]) + parseInt(match[4]) / 1000;
+                            const endSec = parseInt(match[5]) * 3600 + parseInt(match[6]) * 60 + parseInt(match[7]) + parseInt(match[8]) / 1000;
+                            subtitles.push({ start: startSec, end: endSec, text: textLines });
+                        }
+                    }
+                }
+                return subtitles;
+            }
+
+            // Load Track into Audio Element
+            function loadTrack(index, autoplay = false) {
+                if (playlist.length === 0) return;
+                currentIndex = (index + playlist.length) % playlist.length;
+                const track = playlist[currentIndex];
+
+                audioElement.src = track.url;
+                trackTitle.textContent = track.name;
+                trackArtist.textContent = track.artist;
+                progressBar.value = 0;
+                currentTimeEl.textContent = "00:00";
+                totalDurationEl.textContent = "00:00";
+
+                updateSrtStatus(track.srtParsed);
+                renderLyrics(track.srtParsed);
+                highlightPlaylistActive();
+
+                if (autoplay) {
+                    playAudio();
+                } else {
+                    pauseAudio();
+                }
+            }
+
+            function playAudio() {
+                audioElement.play().then(() => {
+                    isPlaying = true;
+                    playIcon.className = "fa-solid fa-pause";
+                }).catch(err => {
+                    console.error("Playback error:", err);
+                });
+            }
+
+            function pauseAudio() {
+                audioElement.pause();
+                isPlaying = false;
+                playIcon.className = "fa-solid fa-play ml-1";
+            }
+
+            btnPlay.addEventListener('click', () => {
+                if (playlist.length === 0) return;
+                if (isPlaying) {
+                    pauseAudio();
+                } else {
+                    playAudio();
+                }
+            });
+
+            btnNext.addEventListener('click', () => {
+                if (isShuffle) {
+                    currentIndex = Math.floor(Math.random() * playlist.length);
+                } else {
+                    currentIndex = (currentIndex + 1) % playlist.length;
+                }
+                loadTrack(currentIndex, true);
+            });
+
+            btnPrev.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+                loadTrack(currentIndex, true);
+            });
+
+            audioElement.addEventListener('timeupdate', () => {
+                if (isNaN(audioElement.duration)) return;
+                const progressPercent = (audioElement.currentTime / audioElement.duration) * 100;
+                progressBar.value = progressPercent;
+                currentTimeEl.textContent = formatTime(audioElement.currentTime);
+                totalDurationEl.textContent = formatTime(audioElement.duration);
+
+                updateActiveLyric(audioElement.currentTime);
+            });
+
+            audioElement.addEventListener('loadedmetadata', () => {
+                totalDurationEl.textContent = formatTime(audioElement.duration);
+            });
+
+            audioElement.addEventListener('ended', () => {
+                if (repeatMode === 2) {
+                    audioElement.currentTime = 0;
+                    playAudio();
+                } else if (repeatMode === 1 || currentIndex < playlist.length - 1) {
+                    btnNext.click();
+                } else {
+                    pauseAudio();
+                }
+            });
+
+            progressBar.addEventListener('input', (e) => {
+                if (isNaN(audioElement.duration)) return;
+                const seekTime = (e.target.value / 100) * audioElement.duration;
+                audioElement.currentTime = seekTime;
+            });
+
+            volumeBar.addEventListener('input', (e) => {
+                audioElement.volume = e.target.value;
+                updateVolumeIcon(audioElement.volume);
+            });
+
+            btnMute.addEventListener('click', () => {
+                if (audioElement.volume > 0) {
+                    audioElement.dataset.lastVol = audioElement.volume;
+                    audioElement.volume = 0;
+                    volumeBar.value = 0;
+                } else {
+                    audioElement.volume = audioElement.dataset.lastVol || 1;
+                    volumeBar.value = audioElement.volume;
+                }
+                updateVolumeIcon(audioElement.volume);
+            });
+
+            function updateVolumeIcon(vol) {
+                if (vol === 0) {
+                    volumeIcon.className = "fa-solid fa-volume-xmark";
+                } else if (vol < 0.5) {
+                    volumeIcon.className = "fa-solid fa-volume-low";
+                } else {
+                    volumeIcon.className = "fa-solid fa-volume-high";
+                }
+            }
+
+            btnShuffle.addEventListener('click', () => {
+                isShuffle = !isShuffle;
+                btnShuffle.classList.toggle('text-indigo-400', isShuffle);
+                btnShuffle.classList.toggle('text-slate-400', !isShuffle);
+            });
+
+            btnRepeat.addEventListener('click', () => {
+                repeatMode = (repeatMode + 1) % 3;
+                if (repeatMode === 0) {
+                    btnRepeat.className = "text-slate-400 hover:text-white text-lg transition p-2";
+                    btnRepeat.innerHTML = '<i class="fa-solid fa-repeat"></i>';
+                } else if (repeatMode === 1) {
+                    btnRepeat.className = "text-indigo-400 hover:text-white text-lg transition p-2";
+                    btnRepeat.innerHTML = '<i class="fa-solid fa-repeat"></i>';
+                } else {
+                    btnRepeat.className = "text-pink-400 hover:text-white text-lg transition p-2";
+                    btnRepeat.innerHTML = '<i class="fa-solid fa-repeat-1"></i>';
+                }
+            });
+
+            function updateSrtStatus(srtParsed) {
+                if (srtParsed && srtParsed.length > 0) {
+                    srtStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="srt-indicator"></span>已同步 .srt 歌詞 (${srtParsed.length} 行)`;
+                    srtStatus.className = "text-xs px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/20 flex items-center gap-1.5";
+                } else {
+                    srtStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-500" id="srt-indicator"></span>無歌詞`;
+                    srtStatus.className = "text-xs px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-400 border border-white/5 flex items-center gap-1.5";
+                }
+            }
+
+            function renderLyrics(srtParsed) {
+                lyricsScrollArea.innerHTML = "";
+                if (!srtParsed || srtParsed.length === 0) {
+                    lyricsScrollArea.innerHTML = `<p class="text-slate-500 italic py-24">當前音軌無對應的 .srt 歌詞檔案。</p>`;
+                    return;
+                }
+
+                srtParsed.forEach((item, index) => {
+                    const p = document.createElement('p');
+                    p.id = `lyric-line-${index}`;
+                    p.className = "text-slate-400 text-sm md:text-base font-medium transition-all duration-300 py-2 cursor-pointer hover:text-slate-200";
+                    p.innerHTML = item.text;
+                    p.addEventListener('click', () => {
+                        audioElement.currentTime = item.start;
+                    });
+                    lyricsScrollArea.appendChild(p);
+                });
+            }
+
+            function updateActiveLyric(currentTime) {
+                const track = playlist[currentIndex];
+                if (!track || !track.srtParsed || track.srtParsed.length === 0) return;
+
+                const srt = track.srtParsed;
+                let activeIdx = -1;
+
+                for (let i = 0; i < srt.length; i++) {
+                    if (currentTime >= srt[i].start && currentTime <= srt[i].end) {
+                        activeIdx = i;
+                        break;
+                    }
+                }
+
+                if (activeIdx !== currentSrtIndex) {
+                    currentSrtIndex = activeIdx;
+                    for (let i = 0; i < srt.length; i++) {
+                        const lineEl = document.getElementById(`lyric-line-${i}`);
+                        if (!lineEl) continue;
+                        if (i === currentSrtIndex) {
+                            lineEl.className = "text-indigo-300 font-bold text-lg md:text-xl scale-105 transition-all duration-300 py-2 drop-shadow-[0_0_10px_rgba(129,140,248,0.5)]";
+                        } else {
+                            lineEl.className = "text-slate-500 text-sm md:text-base font-medium transition-all duration-300 py-2 opacity-60";
+                        }
+                    }
+
+                    if (currentSrtIndex !== -1) {
+                        const activeEl = document.getElementById(`lyric-line-${currentSrtIndex}`);
+                        if (activeEl) {
+                            activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }
+            }
+
+            function renderPlaylist(filter = "") {
+                playlistItems.innerHTML = "";
+                playlistCount.textContent = playlist.length;
+
+                const filtered = playlist.filter(t => t.name.toLowerCase().includes(filter.toLowerCase()));
+
+                if (filtered.length === 0) {
+                    playlistItems.innerHTML = `<div class="text-center py-16 text-slate-500 text-sm"><p>找不到符合的歌曲</p></div>`;
+                    return;
+                }
+
+                filtered.forEach(track => {
+                    const item = document.createElement('div');
+                    const isCurrent = track.id === currentIndex;
+                    item.className = `flex items-center justify-between p-3 rounded-xl transition cursor-pointer border ${isCurrent ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-200' : 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300'}`;
+                    
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3 truncate">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">
+                                ${isCurrent ? '<i class="fa-solid fa-volume-high"></i>' : (track.id + 1)}
+                            </div>
+                            <div class="truncate">
+                                <p class="text-xs font-semibold truncate">${track.name}</p>
+                                <p class="text-[10px] text-slate-400">${track.srtParsed.length > 0 ? '具備 .srt 歌詞' : '純音樂'}</p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-slate-400 pl-2">
+                            <i class="fa-solid fa-play text-[10px]"></i>
+                        </div>
+                    `;
+
+                    item.addEventListener('click', () => {
+                        loadTrack(track.id, true);
+                    });
+
+                    playlistItems.appendChild(item);
+                });
+            }
+
+            function highlightPlaylistActive() {
+                renderPlaylist(playlistSearch.value);
+            }
+
+            playlistSearch.addEventListener('input', (e) => {
+                renderPlaylist(e.target.value);
+            });
+
+            tabLyricsBtn.addEventListener('click', () => {
+                tabLyricsBtn.className = "flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md transition flex items-center justify-center gap-2";
+                tabPlaylistBtn.className = "flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-2";
+                lyricsContainerPanel.classList.remove('hidden');
+                lyricsContainerPanel.classList.add('flex');
+                playlistContainerPanel.classList.remove('flex');
+                playlistContainerPanel.classList.add('hidden');
+            });
+
+            tabPlaylistBtn.addEventListener('click', () => {
+                tabPlaylistBtn.className = "flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md transition flex items-center justify-center gap-2";
+                tabLyricsBtn.className = "flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-2";
+                playlistContainerPanel.classList.remove('hidden');
+                playlistContainerPanel.classList.add('flex');
+                lyricsContainerPanel.classList.remove('flex');
+                lyricsContainerPanel.classList.add('hidden');
+            });
+
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // Auto-load relative folder on start
+            loadRelativeMp3Folder();
+        });
+    </script>
 </body>
 </html>
