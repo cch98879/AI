@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
+<html lang="zh-Hant"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -304,56 +303,30 @@
 
         <div class="form-row">
             <label for="webAdmin">網站管理員</label>
-            <input
-                type="text"
-                id="webAdmin"
-                value="李信賢"
-                placeholder="請輸入網頁管理員"
-            >
+            <input type="text" id="webAdmin" value="李信賢" placeholder="請輸入網頁管理員" disabled="">
         </div>
 
         <div class="form-row">
             <label for="githubUser">GitHub帳號</label>
-            <input
-                type="text"
-                id="githubUser"
-                value="cch98879"
-                placeholder="請輸入 GitHub 帳號"
-            >
+            <input type="text" id="githubUser" value="cch98879" placeholder="請輸入 GitHub 帳號" disabled="">
         </div>
 
         <div class="form-row">
             <label for="githubRepo">儲存庫名稱</label>
-            <input
-                type="text"
-                id="githubRepo"
-                value="AI"
-                placeholder="請輸入儲存庫名稱"
-            >
+            <input type="text" id="githubRepo" value="AI" placeholder="請輸入儲存庫名稱" disabled="">
         </div>
 
         <div class="button-area">
 
-            <button
-                type="button"
-                class="btn-load"
-                onclick="startLoad()">
+            <button type="button" class="btn-load" onclick="startLoad()">
                 🔍 載入GitHUB儲存庫
             </button>
 
-            <button
-                type="button"
-                class="btn-back"
-                onclick="goBack()">
+            <button type="button" class="btn-back" onclick="goBack()">
                 ⬅ 返回前一頁
             </button>
 
-            <button
-                type="button"
-                class="btn-download"
-                onclick="downloadHTML()">
-                📥 下載此網頁index.html
-            </button>
+            <button type="button" class="btn-download" onclick="downloadHTML()" disabled="">📥 已下載 index.html</button>
 
         </div>
 
@@ -368,7 +341,7 @@
 
 
         <strong>📦 GitHUB儲存庫：</strong>
-        <span id="repoInfo">尚未載入</span>
+        <span id="repoInfo">cch98879 / AI</span>
         <br>
 
         <strong>🌿 Branch：</strong>
@@ -376,7 +349,7 @@
         <br>
 
         <strong>🌐 GitHub Pages：</strong>
-        <span id="pagesInfo">尚未載入</span>
+        <span id="pagesInfo">https://cch98879.github.io/AI/</span>
 
     </div>
 
@@ -384,20 +357,14 @@
     <!-- ==================== 路徑 ==================== -->
     <div class="path-bar">
 	🌐 <a href="https://github.com/"><font color="blue"><u>從GitHUB儲存庫_上傳檔案或刪除檔案</u></font></a>
-	<BR>
+	<br>
         📂 目前位置：
         <span id="currentPath">/</span>
     </div>
 
 
     <!-- ==================== 檔案列表 ==================== -->
-    <div id="fileList" class="file-list">
-
-        <div class="message">
-            請先輸入 GitHub 帳號與儲存庫名稱，再按「載入儲存庫」
-        </div>
-
-    </div>
+    <div id="fileList" class="file-list"><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">01.上傳或刪除GitHUB檔案_步驟</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">02.上課日期</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">03.上課講義</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">04.常用工具</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">05.課程教材</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">06.生成HTML遊戲</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">07.生成HTML工具</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">📁</span><span class="file-name folder-name">08.SUNO創作音樂自動播放器</span></div><div class="file-actions"></div></div><div class="file-item"><div class="file-left"><span class="file-icon">🌐</span><span class="file-name">115秋季班學員資訊.html</span></div><div class="file-actions"><a class="open-link" href="https://cch98879.github.io/AI/115秋季班學員資訊.html" target="_blank" rel="noopener noreferrer">🔗 開啟</a><button type="button" class="btn-copy">📋 複製超連結</button></div></div><div class="file-item"><div class="file-left"><span class="file-icon">🌐</span><span class="file-name">教學課程資料_騎出安全好心情.html</span></div><div class="file-actions"><a class="open-link" href="https://cch98879.github.io/AI/教學課程資料_騎出安全好心情.html" target="_blank" rel="noopener noreferrer">🔗 開啟</a><button type="button" class="btn-copy">📋 複製超連結</button></div></div><div class="file-item"><div class="file-left"><span class="file-icon">🌐</span><span class="file-name">index.html</span></div><div class="file-actions"><a class="open-link" href="https://cch98879.github.io/AI/index.html" target="_blank" rel="noopener noreferrer">🔗 開啟</a><button type="button" class="btn-copy">📋 複製超連結</button></div></div></div>
 
 </div>
 
@@ -1510,5 +1477,5 @@ document.addEventListener(
 
 </script>
 
-</body>
-</html>
+
+</body></html>
