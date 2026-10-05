@@ -115,62 +115,6 @@ h1 {
 }
 
 
-/* =========================
-   GitHub 設定
-   ========================= */
-
-.github-config {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.github-config label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    color: #cbd5e1;
-    font-size: 14px;
-}
-
-.github-config input {
-    height: 52px;
-    border-radius: 12px;
-    border: 1px solid #475569;
-    background: #18233f;
-    color: white;
-    padding: 0 15px;
-    font-size: 17px;
-    outline: none;
-}
-
-.github-config input:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 15px rgba(96,165,250,0.4);
-}
-
-.download-html {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-}
-
-.github-config input:disabled,
-.download-html:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
-@media(max-width:800px) {
-    .github-config {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .download-html {
-        grid-column: 1 / -1;
-        width: 100%;
-    }
-}
-
 select {
 
     height: 52px;
@@ -512,16 +456,6 @@ audio {
 
 @media(max-width:500px) {
 
-    .github-config {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .github-config input,
-    .github-config button {
-        width: 100%;
-    }
-
     .player {
 
         padding: 20px;
@@ -574,6 +508,87 @@ audio {
 
 }
 
+
+
+/* =========================
+   GitHub 設定
+========================= */
+.github-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: end;
+}
+
+.github-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.github-field label {
+    font-size: 14px;
+    color: #cbd5e1;
+    font-weight: bold;
+}
+
+.github-field input {
+    height: 52px;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #475569;
+    background: #18233f;
+    color: white;
+    padding: 0 15px;
+    font-size: 17px;
+    outline: none;
+}
+
+.github-field input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 15px rgba(96,165,250,0.4);
+}
+
+.github-field input:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.download-html {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.download-html:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media(max-width:800px) {
+    .github-settings {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .download-html {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+}
+
+@media(max-width:500px) {
+    .github-settings {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .github-field,
+    .download-html {
+        width: 100%;
+    }
+}
+
 </style>
 
 </head>
@@ -587,40 +602,38 @@ audio {
 
     <h1>🎵 讓AI解決我的生活大小事_我的音樂創作</h1>
 
-
     <!-- =====================
          GitHub 設定
     ====================== -->
+    <div class="github-settings">
 
-    <div class="github-config">
-
-        <label>
-        我的 GitHub 帳號    
+        <div class="github-field">
+            <label for="githubUser">我的 GitHub 帳號</label>
             <input
                 type="text"
-                id="githubUserInput"
+                id="githubUser"
                 value="cch98879"
                 autocomplete="off">
-        </label>
+        </div>
 
-        <label>
-            我的 GitHub 儲存庫名稱
+        <div class="github-field">
+            <label for="githubRepo">我的 GitHub 儲存庫名稱</label>
             <input
                 type="text"
-                id="githubRepoInput"
+                id="githubRepo"
                 value="AI"
                 autocomplete="off">
-        </label>
-		
-        <label>
-		儲存庫內建立 mp3 資料夾
+        </div>
+
         <button
             id="downloadHTML"
             class="download-html">
-            ⬇️ 下載 我的音樂創作.html
+            ⬇️ 下載 mp3.html
         </button>
-        </label>
+
     </div>
+
+
 
     <!-- =====================
          選擇歌曲
@@ -761,45 +774,60 @@ audio {
    GitHub 設定
 ===================================================== */
 
-const githubUserInput =
-    document.getElementById("githubUserInput");
+let GITHUB_USER = "cch98879";
+let GITHUB_REPO = "AI";
+const MP3_FOLDER = "mp3";
 
+const githubUserInput =
+    document.getElementById("githubUser");
 
 const githubRepoInput =
-    document.getElementById("githubRepoInput");
+    document.getElementById("githubRepo");
 
+const downloadHTML =
+    document.getElementById("downloadHTML");
 
-/* 下載後的 mp3.html 會自動將設定鎖定 */
-const CONFIG_LOCKED = false;
+function updateGitHubConfig() {
 
+    const user =
+        githubUserInput.value.trim();
 
-const GITHUB_USER =
-    githubUserInput.value.trim() || "cch98879";
+    const repo =
+        githubRepoInput.value.trim();
 
+    if (user) {
+        GITHUB_USER = user;
+    }
 
-const GITHUB_REPO =
-    githubRepoInput.value.trim() || "AI";
+    if (repo) {
+        GITHUB_REPO = repo;
+    }
+}
 
+function getAPIURL() {
 
-const MP3_FOLDER =
-    "mp3";
+    return (
+        "https://api.github.com/repos/"
+        + encodeURIComponent(GITHUB_USER)
+        + "/"
+        + encodeURIComponent(GITHUB_REPO)
+        + "/contents/"
+        + MP3_FOLDER
+    );
+}
 
+function getMP3BaseURL() {
 
-const API_URL =
-    "https://api.github.com/repos/"
-    + GITHUB_USER
-    + "/"
-    + GITHUB_REPO
-    + "/contents/"
-    + MP3_FOLDER;
-
-
-const MP3_BASE_URL =
-    "https://cch98879.github.io/"
-    + GITHUB_REPO
-    + "/"
-    + MP3_FOLDER
-    + "/";
+    return (
+        "https://"
+        + GITHUB_USER
+        + ".github.io/"
+        + GITHUB_REPO
+        + "/"
+        + MP3_FOLDER
+        + "/"
+    );
+}
 
 
 /* =====================================================
@@ -810,6 +838,8 @@ const songSelect =
     document.getElementById(
         "songSelect"
     );
+
+updateGitHubConfig();
 
 
 const playButton =
@@ -833,12 +863,6 @@ const downloadSRT =
 const refreshButton =
     document.getElementById(
         "refreshButton"
-    );
-
-
-const downloadHTML =
-    document.getElementById(
-        "downloadHTML"
     );
 
 
@@ -912,109 +936,7 @@ let lyrics = [];
 
 window.addEventListener(
     "load",
-    function() {
-
-        if (CONFIG_LOCKED) {
-            githubUserInput.disabled = true;
-            githubRepoInput.disabled = true;
-            downloadHTML.disabled = true;
-            downloadHTML.textContent = "🔒 我的音樂創作.html 已鎖定";
-        }
-
-        loadSongs();
-    }
-);
-
-
-/* =====================================================
-   下載 我的音樂創作.html
-   下載後會把 GitHub 帳號、儲存庫及本按鈕鎖定
-===================================================== */
-
-downloadHTML.addEventListener(
-    "click",
-    function() {
-
-        const user = githubUserInput.value.trim();
-        const repo = githubRepoInput.value.trim();
-
-        if (!user || !repo) {
-            alert("請先輸入 GitHub 帳號及儲存庫名稱！");
-            return;
-        }
-
-        /*
-         * 以目前網頁內容建立一份新的 HTML。
-         * 將使用者輸入的 GitHub 設定寫入下載檔，
-         * 並把兩個欄位及「下載 我的音樂創作.html」按鈕鎖定。
-         */
-        const clone = document.documentElement.cloneNode(true);
-
-        const userInput = clone.querySelector("#githubUserInput");
-        const repoInput = clone.querySelector("#githubRepoInput");
-        const htmlButton = clone.querySelector("#downloadHTML");
-
-        if (userInput) {
-            userInput.value = user;
-            userInput.setAttribute("value", user);
-            userInput.disabled = true;
-            userInput.setAttribute("disabled", "disabled");
-        }
-
-        if (repoInput) {
-            repoInput.value = repo;
-            repoInput.setAttribute("value", repo);
-            repoInput.disabled = true;
-            repoInput.setAttribute("disabled", "disabled");
-        }
-
-        if (htmlButton) {
-            htmlButton.disabled = true;
-            htmlButton.setAttribute("disabled", "disabled");
-            htmlButton.textContent = "🔒 我的音樂創作.html 已鎖定";
-        }
-
-        /* 把下載檔中的 GitHub 常數改成目前輸入值 */
-        const scripts = clone.querySelectorAll("script");
-        scripts.forEach(script => {
-            if (script.textContent.includes("const CONFIG_LOCKED")) {
-                script.textContent = script.textContent
-                    .replace(
-                        'const CONFIG_LOCKED =\\n    false;',
-                        'const CONFIG_LOCKED =\\n    true;'
-                    )
-                    .replace(
-                        'const GITHUB_USER =\\n    githubUserInput.value.trim() || "cch98879";',
-                        'const GITHUB_USER =\\n    "' + user.replace(/\\/g, "\\\\").replace(/"/g, '\\\\\"') + '";'
-                    )
-                    .replace(
-                        'const GITHUB_REPO =\\n    githubRepoInput.value.trim() || "AI";',
-                        'const GITHUB_REPO =\\n    "' + repo.replace(/\\/g, "\\\\").replace(/"/g, '\\\\\"') + '";'
-                    );
-            }
-        });
-
-        const html = "<!DOCTYPE html>\\n" +
-            clone.outerHTML;
-
-        const blob = new Blob(
-            [html],
-            { type: "text/html;charset=utf-8" }
-        );
-
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-
-        link.href = url;
-        link.download = "我的音樂創作.html";
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(url);
-
-        statusText.textContent =
-            "✅ 我的音樂創作.html 已下載；下載檔中的 GitHub 設定已鎖定";
-    }
+    loadSongs
 );
 
 
@@ -1040,7 +962,7 @@ async function loadSongs() {
 
         const response =
             await fetch(
-                API_URL
+                getAPIURL()
             );
 
 
@@ -1209,6 +1131,137 @@ async function loadSongs() {
 
 
 /* =====================================================
+   GitHub 設定變更
+===================================================== */
+
+githubUserInput.addEventListener(
+    "input",
+    updateGitHubConfig
+);
+
+githubRepoInput.addEventListener(
+    "input",
+    updateGitHubConfig
+);
+
+
+/* =====================================================
+   下載 mp3.html
+   注意：使用真正的換行，不把 "\\n" 寫進 HTML
+===================================================== */
+
+downloadHTML.addEventListener(
+    "click",
+    function() {
+
+        updateGitHubConfig();
+
+        if (!GITHUB_USER || !GITHUB_REPO) {
+            alert("請輸入 GitHub 帳號與儲存庫名稱！");
+            return;
+        }
+
+        /*
+         * 複製目前完整網頁。
+         * 使用 cloneNode() 後直接設定欄位值與 disabled，
+         * 讓下載後的 mp3.html 一開啟就是鎖定狀態。
+         */
+        const clonedDocument =
+            document.documentElement.cloneNode(true);
+
+        const clonedUser =
+            clonedDocument.querySelector("#githubUser");
+
+        const clonedRepo =
+            clonedDocument.querySelector("#githubRepo");
+
+        const clonedDownload =
+            clonedDocument.querySelector("#downloadHTML");
+
+        if (clonedUser) {
+            clonedUser.value = GITHUB_USER;
+            clonedUser.setAttribute("value", GITHUB_USER);
+            clonedUser.disabled = true;
+            clonedUser.setAttribute("disabled", "disabled");
+        }
+
+        if (clonedRepo) {
+            clonedRepo.value = GITHUB_REPO;
+            clonedRepo.setAttribute("value", GITHUB_REPO);
+            clonedRepo.disabled = true;
+            clonedRepo.setAttribute("disabled", "disabled");
+        }
+
+        if (clonedDownload) {
+            clonedDownload.disabled = true;
+            clonedDownload.setAttribute("disabled", "disabled");
+        }
+
+        /*
+         * 同步下載檔中的 JavaScript 初始值。
+         * 這樣即使原始 HTML 曾經修改過預設值，
+         * 下載後仍會使用目前輸入的 GitHub 設定。
+         */
+        const scripts =
+            clonedDocument.querySelectorAll("script");
+
+        scripts.forEach(function(script) {
+
+            if (!script.textContent.includes(
+                'let GITHUB_USER = "cch98879";'
+            )) {
+                return;
+            }
+
+            script.textContent =
+                script.textContent.replace(
+                    /let GITHUB_USER = "[^"]*";/,
+                    'let GITHUB_USER = ' +
+                    JSON.stringify(GITHUB_USER) +
+                    ';'
+                ).replace(
+                    /let GITHUB_REPO = "[^"]*";/,
+                    'let GITHUB_REPO = ' +
+                    JSON.stringify(GITHUB_REPO) +
+                    ';'
+                );
+        });
+
+        /*
+         * outerHTML 本身會產生真正的換行，
+         * 不使用 literal "\\n" 字串，因此不會在檔案開頭
+         * 或 HTML 內容看到 \\n         */
+        const html =
+            "<!DOCTYPE html>\n" +
+            clonedDocument.outerHTML;
+
+        const blob =
+            new Blob(
+                [html],
+                { type: "text/html;charset=utf-8" }
+            );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href = url;
+        link.download = "mp3.html";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+
+        statusText.textContent =
+            "✅ mp3.html 下載完成";
+    }
+);
+
+
+/* =====================================================
    選擇歌曲
 ===================================================== */
 
@@ -1270,7 +1323,7 @@ function getMP3URL() {
 
 
     return (
-        MP3_BASE_URL +
+        getMP3BaseURL() +
         encodeURIComponent(
             fileName
         )
@@ -1305,7 +1358,7 @@ function getSRTURL() {
 
 
     return (
-        MP3_BASE_URL +
+        getMP3BaseURL() +
         encodeURIComponent(
             songName + ".srt"
         )
