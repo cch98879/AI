@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI讓生活更有趣｜彰化社區大學</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;background:radial-gradient(circle at 20% 10%,rgba(120,160,255,.18),transparent 30%),radial-gradient(circle at 80% 20%,rgba(255,190,120,.16),transparent 30%),linear-gradient(135deg,#f4f7ff,#eef5ff,#fff8f0);color:#263238;line-height:1.8}
+.hero{min-height:520px;display:flex;justify-content:center;align-items:center;text-align:center;padding:70px 20px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(30,60,114,.96),rgba(61,96,150,.92),rgba(91,125,170,.88));color:white}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.06)}.hero:before{width:500px;height:500px;top:-220px;left:-150px}.hero:after{width:400px;height:400px;bottom:-200px;right:-100px}
+.hero-content{max-width:900px;position:relative;z-index:2}.school{display:inline-block;padding:8px 20px;border:1px solid rgba(255,255,255,.5);border-radius:50px;font-size:1rem;letter-spacing:2px;margin-bottom:20px;background:rgba(255,255,255,.08)}
+.hero h1{font-size:clamp(2.5rem,7vw,5rem);margin:10px 0;letter-spacing:4px;text-shadow:0 8px 25px rgba(0,0,0,.25)}.hero h2{font-size:clamp(1.1rem,3vw,1.6rem);font-weight:400;margin:15px 0 30px;opacity:.95}.hero-tag{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:10px}.hero-tag span{padding:8px 16px;border-radius:30px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-size:.95rem}
+.container{width:min(1150px,92%);margin:auto}section{padding:70px 0}.section-title{text-align:center;margin-bottom:45px}.section-title .small{color:#5879a8;font-weight:bold;letter-spacing:3px;font-size:.9rem}.section-title h2{font-size:2.2rem;margin:8px 0;color:#263f68}.section-title p{max-width:700px;margin:auto;color:#68727d}
+.highlight-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.highlight{background:rgba(255,255,255,.8);padding:28px 20px;border-radius:20px;text-align:center;box-shadow:0 8px 30px rgba(45,65,100,.08);border:1px solid rgba(255,255,255,.8);transition:.3s}.highlight:hover{transform:translateY(-7px);box-shadow:0 15px 35px rgba(45,65,100,.14)}.highlight .icon{font-size:2.6rem;margin-bottom:10px}.highlight h3{margin:8px 0;color:#345d91}.highlight p{margin:0;color:#68727d;font-size:.95rem}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}.info-card{background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px rgba(45,65,100,.08)}.info-card h3{color:#345d91;margin-top:0;font-size:1.3rem}.info-card h3 span{margin-right:8px}.info-card p{margin-bottom:0;color:#555}
+.course-section{background:rgba(255,255,255,.45)}.course-list{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}.week-card{background:rgba(255,255,255,.92);border-radius:20px;padding:25px;display:flex;gap:18px;box-shadow:0 7px 25px rgba(45,65,100,.07);border-left:5px solid #6e8fbd;transition:.3s}.week-card:hover{transform:translateY(-5px);box-shadow:0 14px 35px rgba(45,65,100,.12)}
+.week-number{flex:0 0 60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#5879a8,#7998c2);color:white;display:flex;justify-content:center;align-items:center;text-align:center;font-weight:bold;line-height:1.2;box-shadow:0 5px 15px rgba(55,80,120,.18)}
+.week-content h3{margin:0 0 8px;color:#294a76;font-size:1.2rem}.week-content p{margin:0;color:#606a75;font-size:.95rem}.special-week{border-left-color:#c49a54;background:linear-gradient(135deg,#fffaf0,#fff)}.special-week .week-number{background:linear-gradient(135deg,#b8893f,#d2ad69)}.final-week{border-left-color:#7b61a8;background:linear-gradient(135deg,#faf7ff,#fff)}.final-week .week-number{background:linear-gradient(135deg,#74559e,#9a7ac0)}
+.quote-box{max-width:900px;margin:auto;padding:45px;background:linear-gradient(135deg,#fff,#f7faff);border-radius:25px;text-align:center;box-shadow:0 10px 40px rgba(45,65,100,.1);position:relative}.quote-box:before{content:"“";position:absolute;top:-25px;left:25px;font-size:7rem;color:#d8e2f2;font-family:Georgia,serif}.quote-box p{font-size:1.25rem;color:#43546b;margin:0}
+.dual-box{display:grid;grid-template-columns:1fr 1fr;gap:25px}.skill-box{padding:35px;border-radius:25px;color:white;box-shadow:0 12px 35px rgba(45,65,100,.12)}.skill-box h3{font-size:1.5rem;margin-top:0}.skill-box ul{padding-left:20px;margin-bottom:0}.skill-box li{margin-bottom:8px}.sel{background:linear-gradient(135deg,#6c8db8,#8ca8cc)}.literacy{background:linear-gradient(135deg,#7b9b8c,#98b5a6)}
+.teaching{max-width:900px;margin:auto;padding:35px;background:white;border-radius:25px;text-align:center;box-shadow:0 10px 40px rgba(45,65,100,.08)}.teaching strong{color:#345d91}
+.cta{text-align:center;padding:90px 20px;background:linear-gradient(135deg,#263f68,#5879a8);color:white}.cta h2{font-size:clamp(2rem,5vw,3rem);margin:0 0 20px}.cta p{font-size:1.15rem;max-width:700px;margin:auto;opacity:.95}.cta .slogan{margin-top:30px;font-size:1.4rem;font-weight:bold;letter-spacing:2px}footer{text-align:center;padding:25px;background:#1e304e;color:rgba(255,255,255,.7);font-size:.9rem}
+@media(max-width:900px){.highlight-grid{grid-template-columns:repeat(2,1fr)}.course-list{grid-template-columns:1fr}}@media(max-width:650px){section{padding:50px 0}.hero{min-height:470px}.highlight-grid,.info-grid,.dual-box{grid-template-columns:1fr}.week-card{padding:20px}.week-number{flex-basis:52px;height:52px}.quote-box{padding:35px 25px}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-content"><div class="school">彰化社區大學</div><h1>AI讓生活更有趣</h1><h2>18週，從「我不會AI」到「AI真的可以幫我！」</h2><div class="hero-tag"><span>🤖 AI生活應用</span><span>💡 資訊素養</span><span>❤️ 社會情緒學習</span><span>🌈 跨世代學習</span></div></div></header>
+
+<section><div class="container"><div class="section-title"><div class="small">COURSE HIGHLIGHTS</div><h2>這不只是學AI</h2><p>而是一趟讓生活更方便、更有趣、更有溫度的18週學習旅程。</p></div><div class="highlight-grid">
+<div class="highlight"><div class="icon">🤖</div><h3>AI生活應用</h3><p>把AI真正用在生活大小事，學了就能用。</p></div>
+<div class="highlight"><div class="icon">🧠</div><h3>資訊素養</h3><p>學會查證真假資訊，安全、安心使用AI。</p></div>
+<div class="highlight"><div class="icon">❤️</div><h3>社會情緒學習</h3><p>培養同理、尊重、合作與自信。</p></div>
+<div class="highlight"><div class="icon">🌈</div><h3>跨世代交流</h3><p>20～80歲都能學，一起學習、一起分享。</p></div>
+</div></div></section>
+
+<section><div class="container"><div class="section-title"><div class="small">OUR IDEA</div><h2>課程理念</h2></div><div class="quote-box"><p>讓AI成為生活好幫手，從實際需求出發學會AI應用、資訊判讀與安全使用，培養解決問題、自信學習與關懷他人的能力。</p></div></div></section>
+
+<section><div class="container"><div class="section-title"><div class="small">COURSE INFORMATION</div><h2>課程資訊</h2></div><div class="info-grid">
+<div class="info-card"><h3>🎯 課程目標</h3><p>因應AI快速融入生活，帶領學員認識生成式AI的基本原理與資訊素養，學習提問、文字、圖片、影音及生活工具等實作技能；培養尊重、同理、合作與負責任使用AI的態度，將所學應用於家庭、工作與社區，提升生活品質並促進世代交流。</p></div>
+<div class="info-card"><h3>👥 學員資格</h3><p>適合20～80歲對AI有興趣的初學者，不需具備程式設計能力。具備基本手機或電腦操作能力即可，願意嘗試、分享與互相學習最重要。</p></div>
+<div class="info-card"><h3>🎓 授課方式</h3><p>講師示範與實際操作、個別指導與反覆練習、團體互動及小組活動、案例討論與心得分享、影片及圖像教學，並安排學員作品分享與成果展。</p></div>
+<div class="info-card"><h3>🚀 發展計畫</h3><p>持續依AI新工具與學員生活需求更新課程，逐步整合健康、旅遊、家庭、學習及社區議題，建立跨世代AI生活學習社群。</p></div>
+</div></div></section>
+
+<section><div class="container"><div class="section-title"><div class="small">LEARNING CORE</div><h2>不只學工具，更學會與AI相處</h2></div><div class="dual-box">
+<div class="skill-box sel"><h3>❤️ 社會情緒學習 SEL</h3><ul><li>認識自己的學習需求與情緒</li><li>培養AI學習的信心與成就感</li><li>學習同理、尊重與有效溝通</li><li>透過小組合作建立人際連結</li><li>將科技使用與人的溫度結合</li></ul></div>
+<div class="skill-box literacy"><h3>🧠 資訊素養</h3><ul><li>認識AI生成內容與假訊息</li><li>學習查證資訊來源</li><li>建立個資與帳號安全觀念</li><li>認識著作權與AI使用倫理</li><li>培養「查證再分享」的習慣</li></ul></div>
+</div></div></section>
+
+<section class="course-section"><div class="container"><div class="section-title"><div class="small">18 WEEKS</div><h2>18週精彩課程</h2><p>從第一次認識AI，到最後完成自己的AI作品。</p></div><div class="course-list">
+<div class="week-card"><div class="week-number">第<br>1週</div><div class="week-content"><h3>AI初次見面：原來AI離我這麼近</h3><p>認識生成式AI與生活中的AI應用，透過簡單有趣的互動，第一次與AI對話。從「我想請AI幫什麼？」開始，建立學習信心。</p></div></div><div class="week-card"><div class="week-number">第<br>2週</div><div class="week-content"><h3>會說話的AI：把問題問得更漂亮</h3><p>學習AI提問技巧，從模糊問題變成清楚指令。透過生活情境練習，讓AI協助規劃、整理、比較與解決問題。</p></div></div><div class="week-card"><div class="week-number">第<br>3週</div><div class="week-content"><h3>AI生活小幫手：我的大小事它都能幫</h3><p>實作行程規劃、購物比較、旅遊安排、菜單設計、祝福文字等生活應用，體驗AI如何節省時間、增加便利。</p></div></div><div class="week-card"><div class="week-number">第<br>4週</div><div class="week-content"><h3>AI幫我寫：從一句話變成精彩內容</h3><p>學習利用AI撰寫通知、卡片、邀請、心得、社群貼文及生活文字。強調個人想法仍是主角，AI只是協助表達的工具。</p></div></div><div class="week-card"><div class="week-number">第<br>5週</div><div class="week-content"><h3>AI變畫家：把想像變成看得見的作品</h3><p>學習AI生圖與圖像描述技巧，將人物、故事、回憶與想像轉化為圖片，完成自己的AI創意作品。</p></div></div><div class="week-card"><div class="week-number">第<br>6週</div><div class="week-content"><h3>資訊不迷惘：AI時代的真假判讀力</h3><p>認識假訊息、AI生成內容、圖片誤導與資訊來源可信度。學習交叉查證、辨識來源及「查證再分享」，培養負責任的資訊素養。</p></div></div><div class="week-card"><div class="week-number">第<br>7週</div><div class="week-content"><h3>AI變身影片師：讓照片動起來</h3><p>認識AI影音工具，將圖片、文字與聲音轉化為短影片。從腳本、素材到成品，完成一支屬於自己的AI小影片。</p></div></div><div class="week-card"><div class="week-number">第<br>8週</div><div class="week-content"><h3>AI錄音變筆記：我的學習不漏接</h3><p>實作錄音轉文字、重點整理、摘要與行動清單，將課堂、會議或生活對話快速整理成有用資訊，提升學習與生活效率。</p></div></div><div class="week-card"><div class="week-number">第<br>10週</div><div class="week-content"><h3>AI幫我學：打造專屬學習教練</h3><p>運用AI協助閱讀、摘要、解釋艱深內容、設計學習計畫與練習題，讓每個人都能依自己的速度學習。</p></div></div><div class="week-card"><div class="week-number">第<br>11週</div><div class="week-content"><h3>AI幫我玩：照片、音樂與創意大變身</h3><p>結合圖片、音樂與文字進行創作，體驗AI跨媒體應用。從「我想表達什麼」出發，完成具有個人特色的創意作品。</p></div></div><div class="week-card"><div class="week-number">第<br>12週</div><div class="week-content"><h3>AI幫我顧生活：家庭大小事一次搞定</h3><p>以家庭生活為情境，實作食譜、採買、家庭活動、旅行規劃及生活提醒等應用，培養運用AI解決問題的能力。</p></div></div><div class="week-card"><div class="week-number">第<br>13週</div><div class="week-content"><h3>AI與我：科技也要有溫度</h3><p>從社會情緒學習出發，討論同理心、尊重、溝通與AI的關係，學習如何讓科技協助人與人交流，而不是取代人與人的溫度。</p></div></div><div class="week-card"><div class="week-number">第<br>14週</div><div class="week-content"><h3>AI安全使用：方便之外更要懂保護</h3><p>認識個資、帳號、著作權、影像與AI使用倫理，建立安全使用AI的習慣，學會哪些資料可以給AI、哪些資料不能隨意提供。</p></div></div><div class="week-card"><div class="week-number">第<br>15週</div><div class="week-content"><h3>AI跨世代：我教你，你教我</h3><p>透過小組合作與經驗分享，讓不同年齡學員互相教學，將生活經驗與AI工具結合，體驗「一起學、一起教、一起成長」。</p></div></div><div class="week-card"><div class="week-number">第<br>16週</div><div class="week-content"><h3>我的AI生活專案：從想法到作品</h3><p>學員選擇自己的生活主題，運用18週所學完成個人AI作品，例如旅遊企劃、家庭回憶、生活指南、圖像故事或影音作品。</p></div></div><div class="week-card"><div class="week-number">第<br>17週</div><div class="week-content"><h3>作品最後衝刺：讓我的成果更精彩</h3><p>完成作品優化、文字修正、圖片設計及簡報準備，練習上台介紹自己的作品，透過同儕回饋提升表達與分享能力.</p></div></div>
+<div class="week-card special-week"><div class="week-number">第<br>9週</div><div class="week-content"><h3>公民素養週</h3><p>由彰化社區大學安排</p></div></div>
+<div class="week-card final-week"><div class="week-number">第<br>18週</div><div class="week-content"><h3>AI生活成果展：我的精彩AI作品</h3><p>展示學員18週學習成果，分享AI如何改變自己的生活。透過作品發表、心得交流與互相鼓勵，為學習旅程留下精彩的成果與回憶。</p></div></div>
+</div></div></section>
+
+<section><div class="container"><div class="section-title"><div class="small">TEACHING DESIGN</div><h2>一堂課，真正帶你做出來</h2></div><div class="teaching"><p><strong>第6週｜AI時代的真假判讀力</strong><br><br>情境引導 → 真假資訊案例 → AI協助查證 → 小組判讀 → 分享心得 → 建立「查證再分享」習慣。</p></div></div></section>
+
+<section class="cta"><h2>18週後，你會發現……</h2><p>AI不只是科技，而是一個可以陪你學習、創作、思考與解決生活問題的好幫手。</p><div class="slogan">「一起學習、一起分享，讓AI讓生活更有趣！」</div></section>
+<footer>彰化社區大學 ｜ AI讓生活更有趣</footer>
+</body>
+</html>
