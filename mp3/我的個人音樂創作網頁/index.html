@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0135)https://cch98879.github.io/AI/mp3/%E6%88%91%E7%9A%84%E5%80%8B%E4%BA%BA%E9%9F%B3%E6%A8%82%E5%89%B5%E4%BD%9C%E7%B6%B2%E9%A0%81/index.html -->
+<html lang="zh-Hant"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>讓AI解決我的生活大小事｜我的音樂創作</title>
 
@@ -398,22 +397,18 @@ body.standalone-song #downloadPageRow {
             <label for="songSelect">
                 選擇音樂（自動列出 mp3 資料夾中的歌曲）
             </label>
-            <select id="songSelect">
-                <option value="">讀取歌曲清單中……</option>
-            </select>
+            <select id="songSelect"><option value="">請選擇歌曲</option><option value="不想上課">不想上課</option><option value="五月的風，媽媽的愛1">五月的風，媽媽的愛1</option><option value="五月的風，媽媽的愛2">五月的風，媽媽的愛2</option><option value="五月的風，媽媽的愛3">五月的風，媽媽的愛3</option><option value="五月的風，媽媽的愛4">五月的風，媽媽的愛4</option><option value="日出幸福早餐店">日出幸福早餐店</option><option value="月光下的祝福">月光下的祝福</option><option value="冬至這一天_1">冬至這一天_1</option><option value="冬至這一天_2">冬至這一天_2</option><option value="阮的希望所在(台語)">阮的希望所在(台語)</option><option value="信賢的歌">信賢的歌</option><option value="孩子們，加油">孩子們，加油</option><option value="班歌：讓AI解決我的生活大小事">班歌：讓AI解決我的生活大小事</option><option value="媽媽的手">媽媽的手</option><option value="媽媽的白髮，是愛的花">媽媽的白髮，是愛的花</option><option value="彰化社大">彰化社大</option><option value="彰化社大春季班">彰化社大春季班</option><option value="彰化社區大學">彰化社區大學</option><option value="端午粽葉飄香1">端午粽葉飄香1</option><option value="端午粽葉飄香2">端午粽葉飄香2</option><option value="端午粽葉飄香3">端午粽葉飄香3</option><option value="端午粽葉飄香4">端午粽葉飄香4</option><option value="學習的路上">學習的路上</option><option value="讓AI解決我的生活大小事">讓AI解決我的生活大小事</option><option value="TEAM TAIWAN_1">TEAM TAIWAN_1</option><option value="TEAM TAIWAN_2">TEAM TAIWAN_2</option></select>
         </div>
 
         <div class="song-row">
             <div class="field">
                 <label for="songNameInput">歌曲名稱（不含副檔名）</label>
-                <input id="songNameInput"
-                       type="text"
-                       placeholder="例如：我的歌曲">
+                <input id="songNameInput" type="text" placeholder="例如：我的歌曲">
             </div>
             <button id="loadButton" type="button">載入歌曲</button>
         </div>
 
-        <div class="button-row" id="downloadPageRow" hidden>
+        <div class="button-row" id="downloadPageRow" hidden="">
             <button id="downloadPage" type="button">⬇ 下載網頁</button>
         </div>
 
@@ -429,9 +424,7 @@ body.standalone-song #downloadPageRow {
 
         <div id="songTitle" class="song-title">請選擇一首歌曲</div>
 
-        <div id="status" class="status" role="status" aria-live="polite">
-            準備讀取歌曲清單……
-        </div>
+        <div id="status" class="status" role="status" aria-live="polite">歌曲清單載入完成，共 26 首</div>
 
         <section class="lyrics-panel" aria-label="KTV 同步歌詞">
             <div id="lyrics">
@@ -442,12 +435,11 @@ body.standalone-song #downloadPageRow {
         </section>
 
         <div class="wave-box">
-            <canvas id="waveCanvas"></canvas>
+            <canvas id="waveCanvas" width="1348" height="150"></canvas>
             <div class="wave-line"></div>
         </div>
 
-        <audio id="audio" controls preload="metadata"
-               crossorigin="anonymous"></audio>
+        <audio id="audio" controls="" preload="metadata" crossorigin="anonymous"></audio>
 
 
 
@@ -806,11 +798,10 @@ async function loadSong(song) {
 
         image.src = jpgURL;
 
-        await loadSRT(srtURL, requestID);
+// 背景載入字幕，不阻擋音樂播放
+loadSRT(srtURL, requestID);
 
-        if (requestID !== playRequestID) return;
-
-        setStatus("歌曲已載入，可以開始播放");
+setStatus("歌曲已載入，字幕正在背景載入");
 
     } catch (error) {
         setStatus(error.message);
@@ -910,7 +901,7 @@ function drawWave() {
     ctx.shadowBlur = 0;
 }
 
-/* 播放歌曲 */
+/* 播放歌曲：優先啟動音樂，不等待字幕與圖片 */
 playButton.addEventListener("click", async () => {
     const song = songNameInput.value.trim();
 
@@ -919,14 +910,56 @@ playButton.addEventListener("click", async () => {
         return;
     }
 
-    if (song !== currentSong || !audio.src) {
-        await loadSong(song);
-    }
-
     try {
-        await createAudioAnalyzer();
-        await audio.play();
+        // 只有切換歌曲時才重新設定音樂來源
+        if (song !== currentSong || !audio.src) {
+            currentSong = song;
+            songTitle.textContent = song;
+            updateDownloadPageButton();
+
+            const mp3URL = getFileURL(song, "mp3");
+            const srtURL = getFileURL(song, "srt");
+            const jpgURL = getFileURL(song, "jpg");
+            const requestID = ++playRequestID;
+
+            audio.pause();
+            audio.src = mp3URL;
+            audio.load();
+
+            // 字幕在背景載入，不等待結果
+            loadSRT(srtURL, requestID);
+
+            // 背景圖片非必要，不阻擋播放
+            const image = new Image();
+
+            image.onload = () => {
+                if (requestID !== playRequestID) return;
+
+                lyricsPanel.style.setProperty(
+                    "--lyrics-image",
+                    'url("' + jpgURL + '")'
+                );
+            };
+
+            image.onerror = () => {
+                if (requestID !== playRequestID) return;
+                lyricsPanel.style.setProperty("--lyrics-image", "none");
+            };
+
+            image.src = jpgURL;
+        }
+
+        // 先要求瀏覽器開始播放
+        const playPromise = audio.play();
+
+        // 音波分析器另外啟動
+        createAudioAnalyzer().catch(error => {
+            console.warn("音波效果啟動失敗：", error);
+        });
+
+        await playPromise;
         setStatus("正在播放：" + currentSong);
+
     } catch (error) {
         setStatus("無法播放，請確認 MP3 檔案是否存在");
         console.error("播放失敗：", error);
@@ -1076,5 +1109,5 @@ if (document.body.classList.contains("standalone-song")) {
 drawWave();
 </script>
 
-</body>
-</html>
+
+</body></html>
