@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一片蛋餅翻轉人生滋味｜彰化社區大學 18週微型創業與生活療癒學程</title>
+  <!-- Google Fonts: Noto Sans TC & Playfair / Inter for typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800&family=Noto+Serif+TC:wght@600;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            amberBrand: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              200: '#fde68a',
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+              800: '#92400e',
+              900: '#78350f',
+            },
+            warmGray: {
+              50: '#faf8f5',
+              100: '#f4f0e8',
+              200: '#e8e2d5',
+              700: '#4a443c',
+              800: '#342e27',
+              900: '#211d18',
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'Inter', 'sans-serif'],
+            serif: ['"Noto Serif TC"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Smooth Scroll & Custom Scrollbar */
+    html {
+      scroll-behavior: smooth;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #fdfaf4;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e2d2b5;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #c6ab83;
+    }
+    
+    /* Print Friendly Optimization */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: white !important;
+        color: #111 !important;
+        font-size: 11pt;
+      }
+      .card-shadow {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+    
+    .glass-nav {
+      background: rgba(254, 252, 248, 0.92);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="bg-[#FAF7F2] text-warmGray-800 font-sans antialiased selection:bg-amberBrand-200 selection:text-amberBrand-900 min-h-screen flex flex-col">
+
+  <!-- 頂部導覽列 -->
+  <header class="sticky top-0 z-40 glass-nav border-b border-amberBrand-100 shadow-sm transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="w-10 h-10 rounded-xl bg-amber-400 text-warmGray-900 flex items-center justify-center font-bold text-lg shadow-sm border border-amber-300">
+          <i class="fa-solid fa-utensils"></i>
+        </span>
+        <div>
+          <span class="text-xs uppercase font-semibold text-amberBrand-700 tracking-wider block">彰化社區大學 18週學程</span>
+          <h1 class="text-base sm:text-lg font-bold text-warmGray-900 leading-tight">一片蛋餅翻轉人生滋味</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3 no-print">
+        <button id="copySummaryBtn" onclick="copyCourseText()" class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs sm:text-sm font-medium text-amberBrand-900 bg-amberBrand-100 hover:bg-amberBrand-200 border border-amberBrand-300 rounded-lg transition-all duration-200 shadow-sm">
+          <i class="fa-regular fa-copy"></i>
+          <span>複製文字稿</span>
+        </button>
+        <button onclick="window.print()" class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-amberBrand-600 hover:bg-amberBrand-700 rounded-lg transition-all duration-200 shadow-sm">
+          <i class="fa-solid fa-print"></i>
+          <span class="hidden sm:inline">列印簡章</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主視覺 Hero Section -->
+  <section class="relative overflow-hidden pt-12 pb-16 lg:pt-16 lg:pb-24 border-b border-amberBrand-200/60 bg-gradient-to-b from-amber-50/80 via-[#FAF7F2] to-[#FAF7F2]">
+    <div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="max-w-3xl mx-auto text-center space-y-5">
+        
+        <!-- 標籤群 -->
+        <div class="flex flex-wrap items-center justify-center gap-2">
+          <span class="px-3 py-1 text-xs font-semibold bg-amber-500 text-white rounded-full shadow-sm">
+            <i class="fa-solid fa-clock mr-1"></i>18 週完整課程
+          </span>
+          <span class="px-3 py-1 text-xs font-semibold bg-emerald-600 text-white rounded-full shadow-sm">
+            <i class="fa-solid fa-users mr-1"></i>20 ~ 80 歲青銀共學
+          </span>
+          <span class="px-3 py-1 text-xs font-semibold bg-amber-100 text-amberBrand-800 border border-amberBrand-300 rounded-full">
+            <i class="fa-solid fa-heart mr-1"></i>社會情緒學習 (SEL)
+          </span>
+          <span class="px-3 py-1 text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-300 rounded-full">
+            <i class="fa-solid fa-mobile-screen-button mr-1"></i>數位資訊素養
+          </span>
+        </div>
+
+        <!-- 主標題 -->
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-warmGray-900 tracking-tight font-serif leading-tight">
+          一片蛋餅翻轉人生滋味
+        </h2>
+
+        <!-- 副標題引言 -->
+        <p class="text-base sm:text-lg text-warmGray-700 font-normal leading-relaxed max-w-2xl mx-auto">
+          從滋滋作響的脆皮粉漿，到手機端暖心的微型故事行銷。<br class="hidden sm:inline">
+          這不只是一門小吃料理課，而是一場用手作香氣療癒心靈、開啟熟齡翻轉與青年圓夢的共好旅程。
+        </p>
+
+        <!-- 亮點數據快速預覽 -->
+        <div class="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto text-left">
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-amber-100 shadow-sm flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-gray-500 font-medium">開課地點</div>
+              <div class="text-xs sm:text-sm font-bold text-warmGray-900">彰化社區大學</div>
+            </div>
+          </div>
+
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-amber-100 shadow-sm flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-gray-500 font-medium">課程時數</div>
+              <div class="text-xs sm:text-sm font-bold text-warmGray-900">每週 1 堂 / 共18週</div>
+            </div>
+          </div>
+
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-amber-100 shadow-sm flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-gray-500 font-medium">學習難度</div>
+              <div class="text-xs sm:text-sm font-bold text-warmGray-900">零廚藝入門友善</div>
+            </div>
+          </div>
+
+          <div class="bg-white/80 p-3.5 rounded-2xl border border-amber-100 shadow-sm flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-award"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-gray-500 font-medium">期末亮點</div>
+              <div class="text-xs sm:text-sm font-bold text-warmGray-900">社區市集成果展</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 主要內容區 -->
+  <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-12">
+
+    <!-- 區塊一：核心課程架構卡片區 (理念、目標、限制、方式、發展、教學設計) -->
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-2xl font-bold text-warmGray-900 font-serif flex items-center">
+            <span class="w-2.5 h-6 bg-amber-500 rounded-full mr-3"></span>
+            課程核心亮點與指標
+          </h3>
+          <p class="text-sm text-warmGray-700 mt-1">融合SEL情緒覺察、數位資訊力與早午餐小吃微創業實戰</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- 卡片 1: 課程理念 -->
+        <div class="bg-white rounded-2xl p-6 border border-amber-100/90 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            <h4 class="text-lg font-bold text-warmGray-900">課程理念</h4>
+            <p class="text-warmGray-700 text-sm leading-relaxed">
+              以手作蛋餅融合情緒覺察與數位行銷，陪伴青銀共學掌握微型創業技能，在脆皮香氣中療癒自我、翻轉生活自信。
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-amber-50 flex items-center text-xs text-amber-800 font-medium">
+            <i class="fa-solid fa-seedling mr-1.5 text-amber-600"></i> 心靈療癒與微創業共融
+          </div>
+        </div>
+
+        <!-- 卡片 2: 課程目標 -->
+        <div class="bg-white rounded-2xl p-6 border border-amber-100/90 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+            <h4 class="text-lg font-bold text-warmGray-900">課程目標</h4>
+            <p class="text-warmGray-700 text-sm leading-relaxed">
+              為助跨世代學員微型創業與圓夢，本課結合煎檯料理與數位行銷理論，鍛鍊餅皮調漿、火候掌控及手機排版技能；培養專注耐心的職人品格，並藉由在地食材採購與共好擺攤，深厚個人與社區之情感連結。
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-amber-50 flex flex-wrap gap-1 text-[11px] text-warmGray-700">
+            <span class="bg-amber-50 px-2 py-0.5 rounded text-amber-800">知識技能</span>
+            <span class="bg-emerald-50 px-2 py-0.5 rounded text-emerald-800">品格素養</span>
+            <span class="bg-sky-50 px-2 py-0.5 rounded text-sky-800">社區共好</span>
+          </div>
+        </div>
+
+        <!-- 卡片 3: 條件限制 -->
+        <div class="bg-white rounded-2xl p-6 border border-amber-100/90 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+            <h4 class="text-lg font-bold text-warmGray-900">學員條件限制</h4>
+            <p class="text-warmGray-700 text-sm leading-relaxed">
+              本課程為初階入門，凡 20 至 80 歲對早點手作、微型創業或生活療癒感興趣者皆可參加。無需廚藝或科技背景，僅需自備具上網與拍照功能之智慧型手機，以及一顆樂於交流、願動手嘗試的開放心態。
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-amber-50 flex items-center text-xs text-emerald-700 font-medium">
+            <i class="fa-solid fa-check-circle mr-1.5"></i> 初階入門・自備智慧型手機
+          </div>
+        </div>
+
+        <!-- 卡片 4: 授課方式 -->
+        <div class="bg-white rounded-2xl p-6 border border-amber-100/90 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+            <h4 class="text-lg font-bold text-warmGray-900">多元授課方式</h4>
+            <p class="text-warmGray-700 text-sm leading-relaxed">
+              採講師示範與實際操作、團體互動及小組活動、個別指導與反覆練習、主題探討或簡報介紹，輔以案例討論與心得分享、學員競賽及獎勵表揚，讓學員在互助共融的溫暖氛圍中實作精進。
+            </p>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-1.5">
+            <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full">講師示範實作</span>
+            <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full">團體互動</span>
+            <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full">競賽與表揚</span>
+          </div>
+        </div>
+
+        <!-- 卡片 5: 發展計畫 -->
+        <div class="bg-white rounded-2xl p-6 border border-amber-100/90 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h4 class="text-lg font-bold text-warmGray-900">未來發展計畫</h4>
+            <p class="text-warmGray-700 text-sm leading-relaxed">
+              未來將深化開展進階「早午餐品牌實戰」與「在地農產市集進駐」，結合數位社群經營，推動學員社區微型創業。
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-amber-50 text-xs text-warmGray-700 flex items-center">
+            <i class="fa-solid fa-shop mr-1.5 text-amber-600"></i> 市集攤車與社群品牌雙軌延伸
+          </div>
+        </div>
+
+        <!-- 卡片 6: 第7週精選教學設計焦點 -->
+        <div class="bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-semibold">
+              <i class="fa-solid fa-star text-amber-200"></i>
+              <span>精選教學設計範例</span>
+            </div>
+            <h4 class="text-lg font-bold text-white">第 7 週：職人美學攝影日</h4>
+            <p class="text-white/90 text-sm leading-relaxed font-normal">
+              流程：由情緒自覺「找初心」導入，講師示範配方調漿，學員分組手作並回饋心得，最後練習手機拍出溫暖宣傳照。
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-white/20 text-xs text-amber-100 flex items-center justify-between">
+            <span>融合自覺 + 手作 + 數位行銷</span>
+            <i class="fa-solid fa-camera"></i>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 區塊二：18週精彩課程大綱 (支援搜尋與分類過濾) -->
+    <section id="curriculumSection" class="bg-white rounded-3xl p-6 sm:p-8 border border-amber-100 shadow-sm">
+      
+      <!-- 表格上方標題與搜尋篩選區 -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between pb-6 border-b border-warmGray-100 gap-4">
+        <div>
+          <h3 class="text-2xl font-bold text-warmGray-900 font-serif flex items-center">
+            <i class="fa-solid fa-book-open-reader text-amber-600 mr-2.5"></i>
+            18 週循序漸進課程大綱
+          </h3>
+          <p class="text-xs sm:text-sm text-warmGray-700 mt-1">
+            包含第 9 週「公民素養週」與第 18 週「香氣流轉・蛋餅傳情」成果展
+          </p>
+        </div>
+
+        <!-- 搜尋與快速按鈕 -->
+        <div class="flex flex-wrap items-center gap-2 no-print">
+          <div class="relative w-full sm:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input 
+              type="text" 
+              id="courseSearchInput" 
+              placeholder="搜尋週次、主題或內容..." 
+              oninput="filterCourses()"
+              class="w-full pl-8 pr-4 py-1.5 text-xs sm:text-sm rounded-xl border border-warmGray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-warmGray-50/50"
+            />
+          </div>
+          <div class="flex items-center space-x-1">
+            <button onclick="setFilter('all')" id="btnFilterAll" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-500 text-white transition-colors">全部(18)</button>
+            <button onclick="setFilter('sel')" id="btnFilterSEL" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-warmGray-100 hover:bg-warmGray-200 text-warmGray-700 transition-colors">情緒SEL</button>
+            <button onclick="setFilter('digital')" id="btnFilterDigital" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-warmGray-100 hover:bg-warmGray-200 text-warmGray-700 transition-colors">數位素養</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 響應式表格容器 -->
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full text-left border-collapse" id="curriculumTable">
+          <thead>
+            <tr class="border-b border-amber-200/80 bg-amber-50/60 text-warmGray-800 text-xs uppercase tracking-wider">
+              <th scope="col" class="py-3.5 px-4 font-bold w-20 text-center">週次</th>
+              <th scope="col" class="py-3.5 px-4 font-bold sm:w-56">主題 (50字內)</th>
+              <th scope="col" class="py-3.5 px-4 font-bold">課程內容 (150字內)</th>
+              <th scope="col" class="py-3.5 px-3 font-bold w-28 text-center no-print">核心維度</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-warmGray-100 text-sm text-warmGray-700" id="curriculumBody">
+            <!-- JavaScript 渲染內容 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 搜尋查無資料提示 -->
+      <div id="noResultsAlert" class="hidden py-12 text-center text-gray-500">
+        <i class="fa-regular fa-face-meh text-3xl mb-2 text-gray-400"></i>
+        <p>查無符合關鍵字的課程內容，請嘗試其他關鍵字。</p>
+      </div>
+    </section>
+
+    <!-- 區塊三：為什麼這門課讓人無法抗拒？（3大吸引亮點） -->
+    <section class="bg-gradient-to-r from-amber-100/50 via-warmGray-50 to-amber-50/50 rounded-3xl p-6 sm:p-10 border border-amber-200/70">
+      <div class="max-w-3xl mx-auto text-center space-y-3 mb-8">
+        <span class="text-xs uppercase font-bold text-amber-700 tracking-wider bg-amber-200/60 px-3 py-1 rounded-full">為什麼一定要選這門課？</span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-warmGray-900 font-serif">不只是做蛋餅，更翻轉生活態度</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white/90 p-5 rounded-2xl border border-amber-100 shadow-sm text-center space-y-2">
+          <div class="w-12 h-12 bg-amber-500 text-white rounded-2xl mx-auto flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-solid fa-mug-hot"></i>
+          </div>
+          <h4 class="font-bold text-warmGray-900 text-base">情感療癒・減壓自覺</h4>
+          <p class="text-xs text-warmGray-700 leading-relaxed">
+            透過揉麵、調漿、聽油煎滋滋聲，放慢步調找回內在平靜；在青銀互助讚美中撫平生活焦慮。
+          </p>
+        </div>
+
+        <div class="bg-white/90 p-5 rounded-2xl border border-amber-100 shadow-sm text-center space-y-2">
+          <div class="w-12 h-12 bg-amber-500 text-white rounded-2xl mx-auto flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-solid fa-store"></i>
+          </div>
+          <h4 class="font-bold text-warmGray-900 text-base">小成本・微創業真本事</h4>
+          <p class="text-xs text-warmGray-700 leading-relaxed">
+            從粉漿比例到擺攤器具清單、動線控時與成本定價，直接擁有開一間早午餐小舖的紮實能力。
+          </p>
+        </div>
+
+        <div class="bg-white/90 p-5 rounded-2xl border border-amber-100 shadow-sm text-center space-y-2">
+          <div class="w-12 h-12 bg-amber-500 text-white rounded-2xl mx-auto flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-solid fa-hashtag"></i>
+          </div>
+          <h4 class="font-bold text-warmGray-900 text-base">青銀攜手・手機玩轉行銷</h4>
+          <p class="text-xs text-warmGray-700 leading-relaxed">
+            零基礎上手 Canva 菜單設計與 Google 商家打卡地標，長輩不怕科技脫節，青年發揮創意專長。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊四：招生資訊卡片 & 報名提醒 -->
+    <section class="bg-warmGray-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-amber-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        <div class="lg:col-span-8 space-y-4">
+          <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full border border-amber-500/30">
+            名額有限・熱烈招生中
+          </span>
+          <h3 class="text-2xl sm:text-3xl font-extrabold font-serif">
+            讓蛋餅的香氣，成為溫暖你我人生的起點
+          </h3>
+          <p class="text-warmGray-200 text-sm leading-relaxed max-w-xl">
+            無論你想開創斜槓人生、圓一個早餐攤夢想，或是想走出家門結交溫暖志同道合的好友，彰化社區大學誠摯邀請您加入我們！
+          </p>
+          <div class="pt-2 flex flex-wrap gap-4 text-xs text-warmGray-300">
+            <span class="flex items-center"><i class="fa-solid fa-map-pin text-amber-400 mr-2"></i>上課地點：彰化社區大學實作教室</span>
+            <span class="flex items-center"><i class="fa-solid fa-id-card text-amber-400 mr-2"></i>對象：20 ~ 80歲皆可報名</span>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col space-y-3 no-print">
+          <button onclick="showContactModal()" class="w-full py-3.5 px-6 bg-amber-500 hover:bg-amber-400 text-warmGray-950 font-bold rounded-2xl text-center transition-all duration-200 shadow-lg shadow-amber-500/30 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-phone-volume"></i>
+            <span>洽詢報名方式</span>
+          </button>
+          <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-full py-3 px-6 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-2xl text-center transition-colors">
+            返回頂部查看完整簡章
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 頁腳 -->
+  <footer class="bg-warmGray-100 border-t border-warmGray-200/80 py-8 text-warmGray-700 text-xs text-center mt-12">
+    <div class="max-w-6xl mx-auto px-4 space-y-2">
+      <p class="font-semibold text-warmGray-800">彰化社區大學 課程企劃案｜一片蛋餅翻轉人生滋味 (18週)</p>
+      <p>融合：社會情緒學習 (SEL) × 數位資訊素養 × 巷弄微型創業實務</p>
+      <p class="text-warmGray-700 text-[11px] pt-2">© 彰化社區大學 課程企劃發想教學使用</p>
+    </div>
+  </footer>
+
+  <!-- 浮動訊息彈窗 (Toast) -->
+  <div id="toastMessage" class="fixed bottom-6 right-6 z-50 bg-warmGray-900 text-white px-4 py-3 rounded-xl shadow-2xl text-sm transform transition-all duration-300 translate-y-20 opacity-0 flex items-center space-x-2 border border-amber-500/30">
+    <i class="fa-solid fa-circle-check text-amber-400"></i>
+    <span id="toastText">訊息通知</span>
+  </div>
+
+  <!-- 報名資訊彈窗 Modal -->
+  <div id="contactModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-amber-100 relative">
+      <button onclick="closeContactModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+        &times;
+      </button>
+      <div class="space-y-4">
+        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center text-xl">
+          <i class="fa-solid fa-school"></i>
+        </div>
+        <h4 class="text-xl font-bold text-warmGray-900 font-serif">彰化社區大學 報名資訊</h4>
+        <div class="text-sm text-warmGray-700 space-y-2 bg-warmGray-50 p-4 rounded-xl border border-warmGray-200">
+          <p><strong>招生電話：</strong>(04) 732-2200（代表號）</p>
+          <p><strong>校本部地址：</strong>彰化縣彰化市卦山路 13 號</p>
+          <p><strong>服務時間：</strong>週一至週五 14:00 - 21:00</p>
+          <p><strong>報名證件：</strong>身分證明文件、智慧型手機、一顆熱忱的心</p>
+        </div>
+        <p class="text-xs text-gray-500">
+          請於社區大學春秋季招生期間攜帶相關文件至現場辦理，或至社大官方選課網站線上預約。
+        </p>
+        <button onclick="closeContactModal()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition-colors">
+          我知道了
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript 交互邏輯與資料庫 -->
+  <script>
+    // 18 週完整課程資料清單
+    const weeklyCurriculum = [
+      {
+        week: 1,
+        title: "破冰相見歡：尋找屬於你的蛋餅記憶",
+        content: "破冰互動讓青銀學員相識，分享各自記憶中的早點味道。介紹微型創業的真實樣貌，引導建立心理韌性與共學同理心，開啟一場味覺與心靈的探索旅程。",
+        category: "sel",
+        badge: "情緒SEL"
+      },
+      {
+        week: 2,
+        title: "經典粉漿的秘密：傳統古早味調漿實作",
+        content: "傳授傳統古早味粉漿的黃金比例與粉水調配技巧。引導學員在攪拌粉漿中學會沉靜專注、觀察手感細節，並練習用手機備忘錄隨手記錄配方與實作心得。",
+        category: "digital",
+        badge: "數位記事"
+      },
+      {
+        week: 3,
+        title: "掌心上的火候：煎檯安全與手感修煉",
+        content: "詳解瓦斯火候與油溫掌控要訣，避免熱油噴濺的安心操作法。透過面對高溫的呼吸調適克服對煎檯的恐懼，落實職人安全守則與細心工作習慣。",
+        category: "sel",
+        badge: "情緒調節"
+      },
+      {
+        week: 4,
+        title: "咔滋的魅力：手工桿皮與脆皮技巧研習",
+        content: "學習現桿麵糰筋度揉捏與千層酥脆煎法。在反覆揉麵中練習排解日常焦慮與壓力，並運用短影音平台（YouTube/Reels）搜尋學習國內外餅皮創意做法。",
+        category: "digital",
+        badge: "資訊搜尋"
+      },
+      {
+        week: 5,
+        title: "食物的情緒密碼：早晨的第一份暖心調味",
+        content: "探討顧客早晨的情緒心理，示範經典醬油膏、特製蒜蓉醬與辣椒醬調製。透過情境演練，體會一道好醬料如何為食客帶來安慰與一整天的好心情。",
+        category: "sel",
+        badge: "同理心"
+      },
+      {
+        week: 6,
+        title: "招牌由你定義：九層塔、玉米與經典餡料",
+        content: "實作多款經典人氣內餡的處理與水分控制。小組分工合作激發創意思考，培養相互包容與溝通默契，齊心端出第一盤團隊招牌蛋餅。",
+        category: "skill",
+        badge: "團隊協作"
+      },
+      {
+        week: 7,
+        title: "職人美學：手機拍出垂涎欲滴的蛋餅美照",
+        content: "學習自然光線取景、擺盤美感與手機微距攝影構圖。結合自我肯定練習，鼓勵長輩與青年互相協助，在鏡頭下為自己的手作成果留下自信與榮譽感。",
+        category: "digital",
+        badge: "數位攝影"
+      },
+      {
+        week: 8,
+        title: "成本與定價心法：告別廉價勞動的微創業學",
+        content: "傳授食材耗損、瓦斯電費與時間成本簡易計算。引導建立健康正向的金錢觀念，學習用手機試算表（Google Sheets）建立清晰的物料清單與定價結構。",
+        category: "digital",
+        badge: "數位試算"
+      },
+      {
+        week: 9,
+        title: "公民素養週",
+        content: "由彰化社區大學安排",
+        category: "special",
+        badge: "全校公同"
+      },
+      {
+        week: 10,
+        title: "在地風土入餅：彰化農產的驚喜跨界",
+        content: "走訪在地小農食材（如社頭芭樂、溪湖韭菜、在地鮮菇），構思特色風味蛋餅。學習在政府產銷履歷與食安平台查核食材源頭，強化在地社區連結與食安素養。",
+        category: "digital",
+        badge: "在地食安"
+      },
+      {
+        week: 11,
+        title: "顧客心理學：從點餐那一刻建立暖心連結",
+        content: "透過角色扮演模擬排隊久候、送錯餐點等常見客訴情境。練習非暴力溝通與情緒轉化技巧，掌握以同理心化解顧客焦慮的「高情商接待法」。",
+        category: "sel",
+        badge: "情緒溝通"
+      },
+      {
+        week: 12,
+        title: "數位招牌亮相：免花大錢的 Canva 菜單設計",
+        content: "零基礎學習使用手機版 Canva 設計精美小吃菜單與價目表。實踐數位平權理念，由青年學員輔助年長夥伴，打造清晰吸睛、排版舒適的門面招牌。",
+        category: "digital",
+        badge: "數位設計"
+      },
+      {
+        week: 13,
+        title: "攤車的排隊魔法：社群集客與在地打卡點",
+        content: "示範如何建立 Google 我的商家（商家檔案）與在地打卡地標。教導辨識網路評價真偽、理性面對負面評論，運用正向心態經營良好的網路口碑。",
+        category: "digital",
+        badge: "資訊素養"
+      },
+      {
+        week: 14,
+        title: "煎檯上的流水線：出餐效率與動線規劃",
+        content: "拆解點餐、煎製、捲餅、切塊至打包的標準流暢動線。模擬尖峰時段的出餐節奏，訓練學員在高壓快節奏下維持平穩專注的情緒與團隊默契。",
+        category: "sel",
+        badge: "抗壓韌性"
+      },
+      {
+        week: 15,
+        title: "行銷文案力：寫出有溫度的手作故事",
+        content: "引導回溯學員做料理的初衷與生活感觸，撰寫動人的社群微短文。學習辨識假訊息與誇大廣告法規，建立具公信力且真誠耐讀的品牌故事。",
+        category: "digital",
+        badge: "文案素養"
+      },
+      {
+        week: 16,
+        title: "成果展暖身賽：班級金牌蛋餅盲測爭霸",
+        content: "班內分組模擬營業試賣，舉辦無負擔的盲測互評交流。以「讚美三步驟」練習建設性給予同儕回饋，共同優化出餐口味與服務流程。",
+        category: "sel",
+        badge: "同儕回饋"
+      },
+      {
+        week: 17,
+        title: "開店大吉準備日：攤位設備、衛生與最後總檢",
+        content: "全面盤點營業攤位器具動線、衛生安全自主檢核表與數位收銀流程。團隊共同凝聚信心、調整臨場心態，為結業成果展做最萬全的迎客準備。",
+        category: "skill",
+        badge: "創業整備"
+      },
+      {
+        week: 18,
+        title: "「香氣流轉・蛋餅傳情」結業成果展",
+        content: "於社大公共場域搭建實體微型攤位，邀請親友與社區民眾現場品嚐。展示每位學員的自信手藝與溫馨文案，歡慶結業並頒發職人結業肯定獎項。",
+        category: "special",
+        badge: "成果慶典"
+      }
+    ];
+
+    let currentFilter = 'all';
+
+    // 渲染課綱表格
+    function renderCurriculum(items) {
+      const tbody = document.getElementById('curriculumBody');
+      const noResults = document.getElementById('noResultsAlert');
+      tbody.innerHTML = '';
+
+      if (items.length === 0) {
+        noResults.classList.remove('hidden');
+        return;
+      }
+      noResults.classList.add('hidden');
+
+      items.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        // 特殊週次樣式高亮（第9週公民素養週、第18週成果展）
+        let specialBg = "hover:bg-amber-50/40 transition-colors";
+        let badgeColor = "bg-amber-100 text-amber-900 border-amber-200";
+
+        if (item.week === 9) {
+          specialBg = "bg-blue-50/60 font-semibold text-blue-950 hover:bg-blue-50";
+          badgeColor = "bg-blue-200 text-blue-900 border-blue-300";
+        } else if (item.week === 18) {
+          specialBg = "bg-amber-100/70 font-semibold text-amber-950 hover:bg-amber-100";
+          badgeColor = "bg-amber-500 text-white border-amber-600";
+        }
+
+        tr.className = specialBg;
+        tr.innerHTML = `
+          <td class="py-4 px-4 text-center font-bold">
+            <span class="inline-block w-8 h-8 rounded-full ${item.week === 9 || item.week === 18 ? 'bg-amber-600 text-white' : 'bg-warmGray-100 text-warmGray-700'} leading-8 text-xs font-semibold">
+              ${item.week}
+            </span>
+          </td>
+          <td class="py-4 px-4 font-bold text-warmGray-900">
+            <div class="flex items-center">
+              ${item.week === 18 ? '<i class="fa-solid fa-trophy text-amber-600 mr-2"></i>' : ''}
+              ${item.week === 9 ? '<i class="fa-solid fa-landmark text-blue-600 mr-2"></i>' : ''}
+              <span>${item.title}</span>
+            </div>
+          </td>
+          <td class="py-4 px-4 text-xs sm:text-sm text-warmGray-700 leading-relaxed">
+            ${item.content}
+          </td>
+          <td class="py-4 px-3 text-center no-print">
+            <span class="inline-block text-[11px] px-2 py-0.5 rounded-full border ${badgeColor}">
+              ${item.badge}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 搜尋與篩選器
+    function filterCourses() {
+      const keyword = document.getElementById('courseSearchInput').value.trim().toLowerCase();
+      
+      const filtered = weeklyCurriculum.filter(item => {
+        const matchesCategory = 
+          currentFilter === 'all' || 
+          (currentFilter === 'sel' && item.category === 'sel') || 
+          (currentFilter === 'digital' && item.category === 'digital');
+
+        const matchesKeyword = 
+          item.title.toLowerCase().includes(keyword) || 
+          item.content.toLowerCase().includes(keyword) ||
+          String(item.week).includes(keyword);
+
+        return matchesCategory && matchesKeyword;
+      });
+
+      renderCurriculum(filtered);
+    }
+
+    function setFilter(type) {
+      currentFilter = type;
+      
+      // 更新按鈕樣式
+      const buttons = {
+        all: document.getElementById('btnFilterAll'),
+        sel: document.getElementById('btnFilterSEL'),
+        digital: document.getElementById('btnFilterDigital')
+      };
+
+      Object.keys(buttons).forEach(key => {
+        if (key === type) {
+          buttons[key].className = "px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-500 text-white transition-colors";
+        } else {
+          buttons[key].className = "px-2.5 py-1 text-xs font-medium rounded-lg bg-warmGray-100 hover:bg-warmGray-200 text-warmGray-700 transition-colors";
+        }
+      });
+
+      filterCourses();
+    }
+
+    // 複製文字稿功能
+    function copyCourseText() {
+      const textToCopy = `【彰化社區大學 課程資料】
+課程名稱：一片蛋餅翻轉人生滋味
+課程理念：以手作蛋餅融合情緒覺察與數位行銷，陪伴青銀共學掌握微型創業技能，在脆皮香氣中療癒自我、翻轉生活自信。
+課程目標：為助跨世代學員微型創業與圓夢，本課結合煎檯料理與數位行銷理論，鍛鍊餅皮調漿、火候掌控及手機排版技能；培養專注耐心的職人品格，並藉由在地食材採購與共好擺攤，深厚個人與社區之情感連結。
+條件限制：本課程為初階入門，凡20至80歲對早點手作、微型微創業或生活療癒感興趣者皆可參加。無需廚藝或科技背景，僅需自備具上網與拍照功能之智慧型手機，以及一顆樂於交流、願動手嘗試的開放心態。
+授課方式：採講師示範與實際操作、團體互動及小組活動、個別指導與反覆練習、主題探討或簡報介紹，輔以案例討論與心得分享、學員競賽及獎勵表揚，讓學員在互助共融的溫暖氛圍中實作精進。
+發展計畫：未來將深化開展進階「早午餐品牌實戰」與「在地農產市集進駐」，結合數位社群經營，推動學員社區微型創業。
+教學設計：第7週流程：由情緒自覺「找初心」導入，講師示範配方調漿，學員分組手作並回饋心得，最後練習手機拍出溫暖宣傳照。
+開課單位：彰化社區大學（18週完整課程，含第9週公民素養週及第18週成果展）`;
+
+      const dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = textToCopy;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+
+      showToast("課程完整文字稿已複製到剪貼簿！");
+    }
+
+    // 浮動通知提示 (Toast)
+    function showToast(msg) {
+      const toast = document.getElementById('toastMessage');
+      const toastText = document.getElementById('toastText');
+      toastText.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // Modal 開關
+    function showContactModal() {
+      const modal = document.getElementById('contactModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeContactModal() {
+      const modal = document.getElementById('contactModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // 初始化頁面
+    window.onload = function() {
+      renderCurriculum(weeklyCurriculum);
+    };
+  </script>
+</body>
+</html>
