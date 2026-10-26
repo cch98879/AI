@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>讓AI解決我的生活大小事_LINE貼圖切割器</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at top,#313b55,#111522 65%);
+
+    color:#fff;
+    min-height:100vh;
+}
+
+/* ================= 頁首 ================= */
+
+header{
+    padding:20px;
+    text-align:center;
+
+    background:rgba(0,0,0,.25);
+
+    border-bottom:
+        1px solid rgba(255,255,255,.1);
+}
+
+header h1{
+    margin:0;
+    font-size:28px;
+}
+
+header p{
+    margin:7px 0 0;
+    opacity:.7;
+}
+
+/* ================= 主容器 ================= */
+
+.container{
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
+
+    display:grid;
+    grid-template-columns:330px 1fr;
+
+    gap:20px;
+}
+
+/* ================= 控制面板 ================= */
+
+.panel{
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    backdrop-filter:
+        blur(15px);
+}
+
+.panel h2{
+    font-size:18px;
+    margin:0 0 15px;
+}
+
+.group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+
+    margin-bottom:7px;
+
+    font-size:14px;
+
+    color:#ddd;
+}
+
+input[type="file"]{
+    width:100%;
+}
+
+input[type="text"],
+select{
+
+    width:100%;
+
+    padding:11px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#202638;
+
+    color:white;
+}
+
+input[type="range"]{
+    width:100%;
+}
+
+.value{
+    float:right;
+
+    font-size:12px;
+
+    color:#aaa;
+}
+
+button{
+
+    border:0;
+
+    border-radius:10px;
+
+    padding:11px 14px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    background:#30384e;
+
+    color:white;
+
+    transition:.2s;
+}
+
+button:hover{
+
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.15);
+}
+
+button.primary{
+    background:#00b894;
+}
+
+button.danger{
+    background:#d63031;
+}
+
+button.preset{
+
+    width:100%;
+
+    margin-bottom:7px;
+
+    text-align:left;
+}
+
+.button-row{
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+}
+
+/* ================= 工作區 ================= */
+
+.editor-area{
+    min-width:0;
+}
+
+.workspace{
+
+    background:#080b12;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    min-height:600px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    overflow:hidden;
+}
+
+/* ================= Canvas ================= */
+
+.canvas-wrap{
+
+    position:relative;
+
+    max-width:100%;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+#memeCanvas{
+
+    display:block;
+
+    max-width:100%;
+
+    max-height:80vh;
+
+    width:auto;
+
+    height:auto;
+
+    border-radius:10px;
+
+    background:#222;
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,.5);
+
+    touch-action:none;
+
+    cursor:
+        default;
+}
+
+/* ================= 操作提示 ================= */
+
+.status{
+
+    margin-top:15px;
+
+    color:#aaa;
+
+    text-align:center;
+
+    font-size:13px;
+
+    line-height:1.6;
+}
+
+/* ================= 圖片選擇 ================= */
+
+.sticker-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:7px;
+}
+
+.sticker{
+
+    aspect-ratio:1;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    border:
+        2px solid transparent;
+
+    background:#222;
+}
+
+.preview-item.selected{ border:2px solid #00b894; box-shadow:0 0 0 2px rgba(0,184,148,.25); }
+.preview-item{ cursor:pointer; }
+.preview-item .select-label{font-size:12px;color:#9ff3d5;text-align:center;padding:4px;}
+
+.preview-item.selected{border:2px solid #00b894;box-shadow:0 0 0 2px rgba(0,184,148,.25);}
+.preview-item{cursor:pointer;}
+.preview-item .select-label{font-size:12px;color:#9ff3d5;text-align:center;padding:4px;}
+
+.sticker:hover{
+
+    border-color:#00cec9;
+}
+
+.sticker img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+}
+
+/* ================= 裁切按鈕 ================= */
+
+.crop-buttons{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:7px;
+}
+
+.crop-buttons button.active{
+
+    background:#00b894;
+}
+
+/* ================= 說明 ================= */
+
+.info{
+
+    background:
+        rgba(255,255,255,.06);
+
+    border-radius:10px;
+
+    padding:10px;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    color:#bbb;
+}
+
+/* ================= 分隔線 ================= */
+
+hr{
+
+    border:0;
+
+    border-top:
+        1px solid rgba(255,255,255,.1);
+
+    margin:
+        20px 0;
+}
+
+/* ================= LINE貼圖預覽 ================= */
+
+.preview-grid{
+
+    width:100%;
+
+    max-width:760px;
+
+    margin-top:20px;
+
+    display:grid;
+
+    gap:10px;
+}
+
+.preview-grid.grid8{
+    grid-template-columns:repeat(4,1fr);
+}
+
+.preview-grid.grid16{
+    grid-template-columns:repeat(4,1fr);
+}
+
+.preview-item{
+
+    background:#111;
+
+    border-radius:8px;
+
+    padding:5px;
+
+    border:
+        1px solid rgba(255,255,255,.1);
+
+    overflow:hidden;
+}
+
+.preview-item canvas{
+
+    display:block;
+
+    width:100%;
+
+    height:auto;
+}
+
+/* ================= 手機 ================= */
+
+@media(max-width:850px){
+
+    .container{
+
+        grid-template-columns:1fr;
+
+        padding:10px;
+    }
+
+    .workspace{
+
+        min-height:auto;
+
+        padding:10px;
+    }
+
+    header h1{
+
+        font-size:23px;
+    }
+
+    #memeCanvas{
+
+        max-height:none;
+
+        width:100%;
+
+        height:auto;
+    }
+
+}
+
+/* ================= 小手機 ================= */
+
+@media(max-width:480px){
+
+    .container{
+
+        padding:7px;
+    }
+
+    .panel{
+
+        padding:14px;
+    }
+
+    .button-row button{
+
+        flex:1;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>讓AI解決我的生活大小事_LINE貼圖切割器</h1>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =========================================================
+     左側控制區
+========================================================= -->
+
+<div class="panel">
+
+
+<h2>🖼️ 上傳圖片</h2>
+
+
+<!-- 上傳圖片 -->
+
+<div class="group">
+
+<input
+    type="file"
+    id="imageUpload"
+    accept="image/*">
+
+</div>
+
+
+
+
+
+<!-- =========================================================
+     LINE貼圖裁切
+========================================================= -->
+
+<h2>
+✂️ 圖片切割數量
+</h2>
+
+
+<div class="group">
+
+<div class="crop-buttons">
+
+<button
+    id="crop8"
+    class="active"
+    onclick="setGrid(8)">
+    8格
+</button>
+
+<button
+    id="crop16"
+    onclick="setGrid(16)">
+    16格
+</button>
+
+</div>
+
+</div>
+
+<hr>
+
+
+<!-- =========================================================
+     操作按鈕
+========================================================= -->
+
+<div class="button-row">
+
+
+<button
+    class="primary"
+
+    onclick="downloadAll()">
+
+✂️ 下載切割後的圖片
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+<!-- =========================================================
+     右側編輯區
+========================================================= -->
+
+<div class="editor-area">
+
+
+<div class="workspace">
+
+
+<div class="canvas-wrap">
+
+<canvas
+    id="memeCanvas">
+</canvas>
+
+</div>
+
+
+<div class="status">
+
+上傳圖片後，可自選下方任一張切割圖片，來匯出 main.png 與 tab.png。
+
+</div>
+
+
+<div
+    id="previewGrid"
+    class="preview-grid grid8">
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   基本設定
+========================================================= */
+
+const canvas =
+    document.getElementById(
+        "memeCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+let image =
+    new Image();
+
+
+let currentGrid = 8;
+let selectedCrop = { sx: 0, sy: 0, sw: 0, sh: 0, index: 1 };
+
+
+/* =========================================================
+   初始圖片
+========================================================= */
+
+image.crossOrigin = "anonymous";
+
+image.src =
+    "";
+
+
+image.onload = function(){
+
+    fitCanvasToImage();
+
+    draw();
+
+};
+
+
+/* =========================================================
+   Canvas依照圖片比例自動調整
+========================================================= */
+
+function fitCanvasToImage(){
+
+    if(
+        !image.naturalWidth ||
+        !image.naturalHeight
+    ){
+        return;
+    }
+
+
+    /*
+        最大畫布尺寸。
+
+        注意：
+
+        這只是限制「Canvas實際解析度」，
+        不是強制圖片變成這個比例。
+    */
+
+    const MAX_WIDTH = 1200;
+
+    const MAX_HEIGHT = 1200;
+
+
+    let width =
+        image.naturalWidth;
+
+    let height =
+        image.naturalHeight;
+
+
+    /*
+        如果圖片太大，
+        等比例縮小。
+
+        如果圖片沒有超過限制，
+        保持原始尺寸。
+    */
+
+    const scale =
+        Math.min(
+            1,
+            MAX_WIDTH / width,
+            MAX_HEIGHT / height
+        );
+
+
+    canvas.width =
+        Math.round(
+            width * scale
+        );
+
+    canvas.height =
+        Math.round(
+            height * scale
+        );
+
+}
+
+
+/* =========================================================
+   上傳圖片
+========================================================= */
+
+document
+.getElementById("imageUpload")
+.addEventListener(
+    "change",
+    function(e){
+
+        const file =
+            e.target.files[0];
+
+        if(!file){
+            return;
+        }
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(event){
+
+                const newImage =
+                    new Image();
+
+
+                newImage.onload =
+                    function(){
+
+                        image =
+                            newImage;
+
+
+                        /*
+                            新圖片載入後，
+                            重新依比例設定 Canvas
+                        */
+
+                        fitCanvasToImage();
+
+
+                        /*
+                            新圖片時，
+                            文字重新放回預設位置
+                        */
+
+                        topPX = 0.5;
+                        topPY = 0.12;
+
+                        bottomPX = 0.5;
+                        bottomPY = 0.88;
+
+
+                        draw();
+
+                    };
+
+
+                newImage.src =
+                    event.target.result;
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================================================
+   載入預設圖片
+========================================================= */
+
+function loadPresetImage(url){
+
+    const newImage =
+        new Image();
+
+
+    newImage.crossOrigin =
+        "anonymous";
+
+
+    newImage.onload =
+        function(){
+
+            image =
+                newImage;
+
+
+            fitCanvasToImage();
+
+
+            topPX = 0.5;
+            topPY = 0.12;
+
+            bottomPX = 0.5;
+            bottomPY = 0.88;
+
+
+            draw();
+
+        };
+
+
+    newImage.src =
+        url;
+
+}
+
+
+/* =========================================================
+   畫面
+========================================================= */
+
+function draw(){
+
+    if(
+        !image ||
+        !image.complete ||
+        !image.naturalWidth
+    ){
+        return;
+    }
+
+
+    /*
+        確保 Canvas與圖片比例一致
+    */
+
+    fitCanvasToImage();
+
+
+    /*
+        清除
+    */
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        ------------------------------------------------
+        重點：
+        不使用 cover
+        不使用固定 900×600
+
+        直接按照圖片原始比例繪製。
+        ------------------------------------------------
+    */
+
+    ctx.drawImage(
+        image,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        淡淡的黑色漸層
+    */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            canvas.height
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(0,0,0,.18)"
+    );
+
+    gradient.addColorStop(
+        .5,
+        "rgba(0,0,0,0)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(0,0,0,.18)"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+}
+
+
+/* =========================================================
+   設定裁切格數
+========================================================= */
+
+function setGrid(num){
+
+    currentGrid =
+        num;
+
+
+    document
+    .querySelectorAll(
+        ".crop-buttons button"
+    )
+    .forEach(
+        function(btn){
+
+            btn.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    document
+    .getElementById(
+        "crop" + num
+    )
+    .classList.add(
+        "active"
+    );
+
+
+    const grid =
+        document
+        .getElementById(
+            "previewGrid"
+        );
+
+
+    grid.className =
+        "preview-grid grid" +
+        num;
+
+
+    generatePreview();
+
+}
+
+
+/* =========================================================
+   產生 LINE貼圖裁切預覽
+========================================================= */
+
+function generatePreview(){
+    const grid = document.getElementById("previewGrid");
+    grid.innerHTML = "";
+    if (!image || !image.naturalWidth) return;
+
+    const cols = 4;
+    const rows = currentGrid === 8 ? 2 : 4;
+    const cw = image.naturalWidth / cols;
+    const ch = image.naturalHeight / rows;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const index = row * cols + col + 1;
+            const sx = col * cw, sy = row * ch;
+            const item = document.createElement("div");
+            item.className = "preview-item";
+            item.dataset.index = index;
+
+            const mini = document.createElement("canvas");
+            mini.width = 320; mini.height = 320;
+            mini.style.width = "100%";
+            const mctx = mini.getContext("2d");
+            drawContain(mctx, image, sx, sy, cw, ch, 0, 0, 320, 320);
+
+            const label = document.createElement("div");
+            label.className = "select-label";
+            label.textContent = String(index).padStart(2, "0")+".png";
+            item.append(mini, label);
+            item.addEventListener("click", () => {
+                selectedCrop = { sx, sy, sw: cw, sh: ch, index };
+                document.querySelectorAll(".preview-item").forEach(el => el.classList.remove("selected"));
+                item.classList.add("selected");
+            });
+            grid.appendChild(item);
+        }
+    }
+    const first = grid.querySelector(".preview-item");
+    if (first) first.click();
+}
+
+function drawContain(ctx, source, sx, sy, sw, sh, dx, dy, dw, dh) {
+    ctx.clearRect(dx, dy, dw, dh);
+    const scale = Math.min(dw / sw, dh / sh);
+    const w = sw * scale, h = sh * scale;
+    ctx.drawImage(source, sx, sy, sw, sh,
+        dx + (dw - w) / 2, dy + (dh - h) / 2, w, h);
+}
+
+function exportCropPNG(filename, width, height) {
+    if (!image || !image.naturalWidth || !selectedCrop.sw) {
+        alert("請先上傳圖片並選取切割圖片。");
+        return;
+    }
+    const out = document.createElement("canvas");
+    out.width = width; out.height = height;
+    drawContain(out.getContext("2d"), image,
+        selectedCrop.sx, selectedCrop.sy, selectedCrop.sw, selectedCrop.sh,
+        0, 0, width, height);
+    const link = document.createElement("a");
+    link.download = filename;
+    link.href = out.toDataURL("image/png");
+    link.click();
+}
+
+function downloadSelectedAssets() {
+    if (!image || !image.naturalWidth) {
+        alert("請先上傳圖片。");
+        return;
+    }
+    // 只匯出 main.png 與 tab.png，不再匯出選取的切割圖片。
+    exportCropPNG("main.png", 240, 240);
+    setTimeout(() => exportCropPNG("tab.png", 96, 74), 300);
+}
+
+/* =========================================================
+   下載所有 LINE貼圖
+========================================================= */
+
+async function downloadAll() {
+    if (!image || !image.naturalWidth) {
+        alert("請先上傳圖片。");
+        return;
+    }
+
+    if (typeof JSZip === "undefined") {
+        alert("ZIP 套件載入失敗，請確認網路連線後重新整理網頁。");
+        return;
+    }
+
+    const zip = new JSZip();
+    const cols = 4;
+    const rows = currentGrid === 8 ? 2 : 4;
+
+    const cw = image.naturalWidth / cols;
+    const ch = image.naturalHeight / rows;
+
+    let index = 1;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const out = document.createElement("canvas");
+            out.width = 320;
+            out.height = 320;
+
+            const outCtx = out.getContext("2d");
+
+            drawContain(
+                outCtx,
+                image,
+                col * cw,
+                row * ch,
+                cw,
+                ch,
+                0,
+                0,
+                320,
+                320
+            );
+
+            const blob = await new Promise(resolve => {
+                out.toBlob(resolve, "image/png");
+            });
+
+            if (!blob) {
+                alert("第 " + index + " 張圖片產生失敗，請重新操作。");
+                return;
+            }
+
+            // 更改檔名格式為 01.png, 02.png...
+            const filename = String(index).padStart(2, "0") + ".png";
+
+            zip.file(filename, blob);
+            index++;
+        }
+    }
+
+    // 同時加入 main.png (240x240) 與 tab.png (96x74) 進入 ZIP
+    const helperCanvas = document.createElement("canvas");
+    const helperCtx = helperCanvas.getContext("2d");
+
+    // 1. main.png (使用當前選中的裁切範圍或預設第一個範圍)
+    const targetCrop = selectedCrop.sw ? selectedCrop : { sx: 0, sy: 0, sw: cw, sh: ch };
+    
+    helperCanvas.width = 240;
+    helperCanvas.height = 240;
+    drawContain(helperCtx, image, targetCrop.sx, targetCrop.sy, targetCrop.sw, targetCrop.sh, 0, 0, 240, 240);
+    const mainBlob = await new Promise(resolve => helperCanvas.toBlob(resolve, "image/png"));
+    zip.file("main.png", mainBlob);
+
+    // 2. tab.png
+    helperCanvas.width = 96;
+    helperCanvas.height = 74;
+    drawContain(helperCtx, image, targetCrop.sx, targetCrop.sy, targetCrop.sw, targetCrop.sh, 0, 0, 96, 74);
+    const tabBlob = await new Promise(resolve => helperCanvas.toBlob(resolve, "image/png"));
+    zip.file("tab.png", tabBlob);
+
+    const zipBlob = await zip.generateAsync({
+        type: "blob"
+    });
+
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "LINE貼圖_" + currentGrid + "格.zip";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+    alert("匯出ZIP壓縮檔完成！包含圖片.png、main.png、tab.png");
+}
+
+
+/* =========================================================
+   初始化
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        draw();
+
+    }
+);
+
+
+</script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
