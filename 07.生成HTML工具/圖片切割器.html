@@ -2161,169 +2161,121 @@ function downloadMeme(){
    下載所有 LINE貼圖
 ========================================================= */
 
-function downloadAll(){
 
-    /*
-        1格就是直接下載完整迷因
-    */
+/* =========================================================
+   下載所有 LINE 貼圖
+   改良版：逐張下載，避免連續觸發過快
+========================================================= */
 
-    if(
-        currentGrid ===
-        1
-    ){
+async function downloadAll() {
 
-        downloadMeme();
-
+    if (!image || !image.naturalWidth || !image.naturalHeight) {
+        alert("請先上傳圖片！");
         return;
-
     }
 
+    // 1 格：直接下載完整圖片
+    if (currentGrid === 1) {
+        downloadMeme();
+        return;
+    }
 
-    const n =
-        Math.sqrt(
-            currentGrid
-        );
+    const n = Math.sqrt(currentGrid);
 
+    const sourceWidth = image.naturalWidth;
+    const sourceHeight = image.naturalHeight;
 
-    const sourceWidth =
-        image.naturalWidth;
-
-    const sourceHeight =
-        image.naturalHeight;
-
-
-    const cropWidth =
-        sourceWidth / n;
-
-    const cropHeight =
-        sourceHeight / n;
-
+    const cropWidth = sourceWidth / n;
+    const cropHeight = sourceHeight / n;
 
     let index = 1;
+    const total = currentGrid;
 
+    for (let row = 0; row < n; row++) {
 
-    for(
-        let row = 0;
-        row < n;
-        row++
-    ){
+        for (let col = 0; col < n; col++) {
 
-        for(
-            let col = 0;
-            col < n;
-            col++
-        ){
-
-            /*
-                保留原始裁切比例
-            */
-
-            const outputWidth =
-                Math.min(
-                    1200,
-                    Math.round(
-                        cropWidth
-                    )
-                );
-
-
-            const outputHeight =
-                Math.round(
-                    outputWidth *
-                    cropHeight /
-                    cropWidth
-                );
-
-
-            const out =
-                document
-                .createElement(
-                    "canvas"
-                );
-
-
-            out.width =
-                outputWidth;
-
-            out.height =
-                outputHeight;
-
-
-            const octx =
-                out.getContext(
-                    "2d"
-                );
-
-
-            const sx =
-                col *
-                cropWidth;
-
-            const sy =
-                row *
-                cropHeight;
-
-
-            /*
-                裁切圖片
-            */
-
-            octx.drawImage(
-
-                image,
-
-                sx,
-                sy,
-
-                cropWidth,
-                cropHeight,
-
-                0,
-                0,
-
-                outputWidth,
-                outputHeight
-
+            const outputWidth = Math.min(
+                1200,
+                Math.round(cropWidth)
             );
 
+            const outputHeight = Math.max(
+                1,
+                Math.round(
+                    outputWidth * cropHeight / cropWidth
+                )
+            );
 
-            /*
-                LINE貼圖裁切時，
-                保留每一格的原始圖片，
-                不進行拉伸。
-            */
+            const out = document.createElement("canvas");
 
+            out.width = outputWidth;
+            out.height = outputHeight;
 
-            const link =
-                document
-                .createElement(
-                    "a"
-                );
+            const octx = out.getContext("2d");
 
+            if (!octx) {
+                alert("無法建立圖片畫布！");
+                return;
+            }
 
+            const sx = col * cropWidth;
+            const sy = row * cropHeight;
+
+            octx.drawImage(
+                image,
+                sx,
+                sy,
+                cropWidth,
+                cropHeight,
+                0,
+                0,
+                outputWidth,
+                outputHeight
+            );
+
+            // 將 Canvas 轉成 PNG Blob
+            const blob = await new Promise(resolve => {
+                out.toBlob(resolve, "image/png");
+            });
+
+            if (!blob) {
+                alert(`第 ${index} 張圖片產生失敗！`);
+                return;
+            }
+
+            // 建立下載連結
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
             link.download =
                 "切割圖片_" +
-                String(index)
-                .padStart(2,"0") +
+                String(index).padStart(2, "0") +
                 ".png";
 
-
-            link.href =
-                out.toDataURL(
-                    "image/png"
-                );
-
-
+            document.body.appendChild(link);
             link.click();
+            link.remove();
 
+            // 延遲釋放圖片網址，避免下載尚未開始就被回收
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 60000);
+
+            // 更新下載進度
+            console.log(`已觸發第 ${index}/${total} 張下載`);
 
             index++;
 
+            // 每張間隔 800 毫秒
+            await new Promise(resolve => setTimeout(resolve, 800));
         }
-
     }
 
+    alert(`已完成 ${total} 張圖片的下載請求！`);
 }
+
 
 
 /* =========================================================
