@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓AI解決我的生活大小事-LINE貼圖切割神器</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;padding:24px;
+  font-family:"Noto Sans CJK TC","Microsoft JhengHei",Arial,sans-serif;
+  color:#f4f7ff;background:radial-gradient(circle at top,#303c59,#111522 68%);
+}
+header{text-align:center;margin:8px auto 24px}
+h1{font-size:clamp(22px,4vw,30px);margin:0 0 8px}
+header p{margin:0;color:#b9c4d8}
+.container{max-width:1200px;margin:auto;display:grid;grid-template-columns:300px 1fr;gap:20px}
+.panel,.workspace{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);
+  border-radius:18px;padding:20px;backdrop-filter:blur(12px)
+}
+h2{font-size:18px;margin:0 0 16px}
+.group{margin-bottom:22px}
+label{display:block;margin-bottom:10px;color:#dce5f5;font-weight:600}
+input[type=file]{width:100%;padding:12px;background:#202a40;border-radius:10px;color:#fff}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.options button,.download{
+  border:0;border-radius:10px;padding:13px 10px;color:#fff;background:#303c56;
+  font-size:15px;font-weight:700;cursor:pointer;transition:.2s
+}
+.options button:hover,.download:hover{filter:brightness(1.18);transform:translateY(-1px)}
+.options button.active,.download{background:#00a985}
+.options button span{display:block;font-size:12px;font-weight:400;opacity:.8;margin-top:4px}
+.download{width:100%;margin-top:18px}
+.download:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.note{font-size:12px;line-height:1.7;color:#b9c4d8;margin-top:16px}
+.workspace{min-height:440px}
+.status{text-align:center;color:#b9c4d8;padding:12px}
+.preview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.preview-item{
+  min-width:0;position:relative;overflow:hidden;border-radius:10px;
+  border:1px solid rgba(255,255,255,.18);
+  background-color:#e9edf3;
+  background-image:linear-gradient(45deg,#cfd5df 25%,transparent 25%),
+    linear-gradient(-45deg,#cfd5df 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#cfd5df 75%),
+    linear-gradient(-45deg,transparent 75%,#cfd5df 75%);
+  background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0;
+}
+.preview-item canvas{display:block;width:100%;aspect-ratio:1;object-fit:contain}
+.preview-item small{
+  position:absolute;left:5px;top:5px;background:rgba(0,0,0,.65);
+  color:#fff;border-radius:5px;padding:2px 6px;font-size:11px
+}
+@media(max-width:800px){body{padding:12px}.container{grid-template-columns:1fr}.workspace{padding:12px}}
+@media(max-width:480px){.preview-grid{gap:7px}.panel{padding:15px}}
+
+
+/* main、tab 選取按鈕 */
+.select-actions {
+  position:absolute;
+  bottom:5px;
+  left:5px;
+  right:5px;
+  display:flex;
+  gap:4px;
+}
+
+.select-actions button {
+  flex:1;
+  min-width:0;
+  border:0;
+  border-radius:5px;
+  padding:6px 2px;
+  font-size:11px;
+  font-weight:bold;
+  color:white;
+  background:#303c56;
+  cursor:pointer;
+}
+
+.select-actions button.selected-main {
+  background:#e39b20;
+}
+
+.select-actions button.selected-tab {
+  background:#168bd2;
+}
+
+.download-zip {
+  width:100%;
+  margin-top:10px;
+  border:0;
+  border-radius:10px;
+  padding:13px 10px;
+  color:white;
+  background:#5369cf;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.download-zip:hover {
+  filter:brightness(1.15);
+}
+
+.download-zip:disabled {
+  opacity:.4;
+  cursor:not-allowed;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>讓AI解決我的生活大小事-LINE貼圖切割神器</h1>
+  <p>設計：李信賢</p>
+</header>
+
+<main class="container">
+  <section class="panel">
+    <h2>🖼️ 圖片上傳</h2>
+    <div class="group">
+      <label for="imageUpload">選擇圖片</label>
+      <input id="imageUpload" type="file" accept="image/png,image/jpeg,image/webp,image/*">
+    </div>
+
+    <h2>✂️ 圖片切割數量</h2>
+    <div class="options">
+      <button type="button" data-count="1" class="active">1 格<span>1 欄 × 1 列</span></button>
+      <button type="button" data-count="8">8 格<span>4 欄 × 2 列</span></button>
+      <button type="button" data-count="16">16 格<span>4 欄 × 4 列</span></button>
+      <button type="button" data-count="24">24 格<span>4 欄 × 6 列</span></button>
+    </div>
+
+    <button id="downloadBtn" class="download" type="button" disabled>⬇️ 下載切割圖片（PNG）<BR>適合手機版</button>
+<div class="note">
+  每格圖片皆為正方形，輸出 PNG 透明背景。<br>
+  顏色 #00FF00 會自動轉為透明背景。
+</div>
+
+<button id="downloadZipBtn" class="download-zip"
+        type="button" disabled>
+  📦 下載切割圖片（ZIP壓縮檔）<BR>適合電腦版<BR>從右側圖片設為main.png<BR>及tab.png
+</button>
+<div class="note">
+  每格圖片皆為正方形，輸出 PNG 透明背景。<br>
+  顏色 #00FF00 會自動轉為透明背景。<br>
+  含main.png及tab.png圖檔。
+</div>
+
+  </section>
+
+  <section class="workspace">
+    <h2>圖片預覽</h2>
+    <div id="status" class="status">請先上傳圖片</div>
+    <div id="previewGrid" class="preview-grid"></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+const downloadZipBtn = document.getElementById('downloadZipBtn'); //引入 ZIP 壓縮套件
+
+let selectedMainIndex = null; //引入 ZIP 壓縮套件
+let selectedTabIndex = null; //引入 ZIP 壓縮套件
+
+
+
+
+const upload = document.getElementById('imageUpload');
+const previewGrid = document.getElementById('previewGrid');
+const statusEl = document.getElementById('status');
+const downloadBtn = document.getElementById('downloadBtn');
+
+let sourceImage = null;
+let selectedCount = 1;
+let outputCanvases = [];
+
+const layouts = {
+  1: { cols: 1, rows: 1 },
+  8: { cols: 4, rows: 2 },
+  16: { cols: 4, rows: 4 },
+  24: { cols: 4, rows: 6 }
+};
+
+document.querySelectorAll('.options button').forEach(button => {
+  button.addEventListener('click', () => {
+    selectedCount = Number(button.dataset.count);
+    document.querySelectorAll('.options button').forEach(b => b.classList.remove('active'));
+    button.classList.add('active');
+    if (sourceImage) createSlices();
+  });
+});
+
+upload.addEventListener('change', event => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+
+  img.onload = () => {
+    sourceImage = img;
+    URL.revokeObjectURL(url);
+    createSlices();
+  };
+
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    statusEl.textContent = '圖片讀取失敗，請重新選擇圖片。';
+  };
+
+  img.src = url;
+});
+
+// 先將原圖中央裁成符合欄列比例的範圍，
+// 再平均切割，確保每一格都是正方形且不會拉伸變形。
+function getSquareCropArea(img, cols, rows) {
+  const targetRatio = cols / rows;
+  const imageRatio = img.naturalWidth / img.naturalHeight;
+
+  let sx = 0, sy = 0;
+  let sw = img.naturalWidth, sh = img.naturalHeight;
+
+  if (imageRatio > targetRatio) {
+    sw = sh * targetRatio;
+    sx = (img.naturalWidth - sw) / 2;
+  } else {
+    sh = sw / targetRatio;
+    sy = (img.naturalHeight - sh) / 2;
+  }
+  return { sx, sy, sw, sh, tile: Math.floor(Math.min(sw / cols, sh / rows)) };
+}
+
+// 將指定綠色 #00FF00 轉成透明背景
+// 自動去除純綠色及接近綠色，轉為透明背景
+
+// 綠幕去背：去除純綠色、接近綠色及邊緣綠色溢色
+function removeTargetColor(ctx, width, height) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+
+    // 綠色相對於紅、藍色的優勢
+    const greenDiff = g - Math.max(r, b);
+
+    // 1. 完全去除純綠色及明顯綠幕背景
+    if (g > 180 && greenDiff > 35) {
+      data[i + 3] = 0;
+      continue;
+    }
+
+    // 2. 去除邊緣殘留的綠色
+    if (greenDiff > 12) {
+      const strength = Math.min(1, (greenDiff - 12) / 70);
+
+      // 降低綠色通道，消除綠色溢色
+      data[i + 1] = Math.max(
+        r,
+        b,
+        Math.round(g - greenDiff * strength)
+      );
+
+      // 輕微降低邊緣透明度
+      if (greenDiff > 30) {
+        data[i + 3] = Math.round(
+          data[i + 3] * (1 - strength * 0.45)
+        );
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+
+function createSlices() {
+  if (!sourceImage) return;
+
+  const { cols, rows } = layouts[selectedCount];
+  const area = getSquareCropArea(sourceImage, cols, rows);
+  const tile = Math.max(1, area.tile);
+
+outputCanvases = [];
+
+selectedMainIndex = null; //引入 ZIP 壓縮套件
+selectedTabIndex = null; //引入 ZIP 壓縮套件
+
+downloadZipBtn.disabled = true; //引入 ZIP 壓縮套件
+
+previewGrid.innerHTML = '';
+  
+  
+  
+  
+  
+  previewGrid.style.gridTemplateColumns = `repeat(${Math.min(cols, 4)}, minmax(0, 1fr))`;
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const canvas = document.createElement('canvas');
+      canvas.width = tile;
+      canvas.height = tile;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+      const sx = area.sx + col * (area.sw / cols);
+      const sy = area.sy + row * (area.sh / rows);
+      ctx.drawImage(
+        sourceImage,
+        sx, sy, area.sw / cols, area.sh / rows,
+        0, 0, tile, tile
+      );
+
+      removeTargetColor(ctx, tile, tile);
+      outputCanvases.push(canvas);
+
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      const number = document.createElement('small');
+      number.textContent = String(outputCanvases.length).padStart(2, '0');
+item.appendChild(canvas);
+item.appendChild(number);
+
+// 建立 main、tab 選取按鈕
+const actions = document.createElement('div');
+actions.className = 'select-actions';
+
+const mainBtn = document.createElement('button');
+mainBtn.textContent = '設為 main.png';
+
+const tabBtn = document.createElement('button');
+tabBtn.textContent = '設為 tab.png';
+
+mainBtn.addEventListener('click', () => {
+  selectedMainIndex = outputCanvases.indexOf(canvas);
+  updateSelection();
+});
+
+tabBtn.addEventListener('click', () => {
+  selectedTabIndex = outputCanvases.indexOf(canvas);
+  updateSelection();
+});
+
+actions.appendChild(mainBtn);
+actions.appendChild(tabBtn);
+item.appendChild(actions);
+
+previewGrid.appendChild(item);
+    }
+  }
+
+  statusEl.textContent = `已完成 ${selectedCount} 格切割｜每格 ${tile} × ${tile} px｜透明背景`;
+  downloadBtn.disabled = false;
+}
+
+downloadBtn.addEventListener('click', async () => {
+  if (!outputCanvases.length) return;
+
+  downloadBtn.disabled = true;
+  const originalText = downloadBtn.textContent;
+  downloadBtn.textContent = '正在準備下載…';
+
+  for (let i = 0; i < outputCanvases.length; i++) {
+    const canvas = outputCanvases[i];
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) continue;
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `切割圖片_${String(i + 1).padStart(2, '0')}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+
+  downloadBtn.textContent = originalText;
+  downloadBtn.disabled = false;
+});
+
+
+// 更新圖片選取狀態
+function updateSelection() {
+  const items = previewGrid.querySelectorAll('.preview-item');
+
+  items.forEach((item, index) => {
+    const buttons = item.querySelectorAll('.select-actions button');
+
+    buttons[0].classList.toggle(
+      'selected-main',
+      index === selectedMainIndex
+    );
+
+    buttons[1].classList.toggle(
+      'selected-tab',
+      index === selectedTabIndex
+    );
+  });
+
+  downloadZipBtn.disabled =
+    selectedMainIndex === null ||
+    selectedTabIndex === null;
+
+  statusEl.textContent =
+    `已完成 ${selectedCount} 格切割｜` +
+    `main：${selectedMainIndex === null ? '尚未選擇' : '第 ' + (selectedMainIndex + 1) + ' 格'}｜` +
+    `tab：${selectedTabIndex === null ? '尚未選擇' : '第 ' + (selectedTabIndex + 1) + ' 格'}`;
+}
+
+
+// 產生指定尺寸圖片，保持原圖比例並置中
+function resizeImage(source, width, height) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+
+  const scale = Math.min(
+    width / source.width,
+    height / source.height
+  );
+
+  const drawWidth = source.width * scale;
+  const drawHeight = source.height * scale;
+
+  const x = (width - drawWidth) / 2;
+  const y = (height - drawHeight) / 2;
+
+  ctx.drawImage(source, x, y, drawWidth, drawHeight);
+
+  return new Promise(resolve => {
+    canvas.toBlob(resolve, 'image/png');
+  });
+}
+
+
+// ZIP 壓縮下載
+downloadZipBtn.addEventListener('click', async () => {
+  if (
+    selectedMainIndex === null ||
+    selectedTabIndex === null ||
+    !window.JSZip
+  ) {
+    return;
+  }
+
+  downloadZipBtn.disabled = true;
+  downloadZipBtn.textContent = '正在製作 ZIP 壓縮檔…';
+
+  try {
+    const zip = new JSZip();
+
+    // 加入所有切割圖片
+    for (let i = 0; i < outputCanvases.length; i++) {
+      const blob = await new Promise(resolve => {
+        outputCanvases[i].toBlob(resolve, 'image/png');
+      });
+
+      if (!blob) throw new Error('切割圖片轉檔失敗');
+
+      zip.file(
+        `切割圖片_${String(i + 1).padStart(2, '0')}.png`,
+        blob
+      );
+    }
+
+    // 產生 main.png：240 × 240
+    const mainBlob = await resizeImage(
+      outputCanvases[selectedMainIndex],
+      240,
+      240
+    );
+
+    if (!mainBlob) throw new Error('main.png 產生失敗');
+
+    zip.file('main.png', mainBlob);
+
+    // 產生 tab.png：96 × 74
+    const tabBlob = await resizeImage(
+      outputCanvases[selectedTabIndex],
+      96,
+      74
+    );
+
+    if (!tabBlob) throw new Error('tab.png 產生失敗');
+
+    zip.file('tab.png', tabBlob);
+
+    // 產生 ZIP
+    const zipBlob = await zip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 6
+      }
+    });
+
+    // 下載 ZIP
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = '切割圖片.zip';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+  } catch (error) {
+    alert('ZIP 製作失敗：' + error.message);
+
+  } finally {
+    downloadZipBtn.disabled =
+      selectedMainIndex === null ||
+      selectedTabIndex === null;
+
+    downloadZipBtn.textContent = '📦 下載切割圖片（ZIP壓縮檔）';
+  }
+});
+
+
+</script>
+</body>
+</html>
