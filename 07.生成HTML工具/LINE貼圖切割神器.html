@@ -284,7 +284,9 @@ function createSlices() {
 
   const { cols, rows } = layouts[selectedCount];
   const area = getSquareCropArea(sourceImage, cols, rows);
-  const tile = Math.max(1, area.tile);
+
+// 每張切割圖片固定輸出 320 × 320 像素
+const tile = 320;
 
 outputCanvases = [];
 
