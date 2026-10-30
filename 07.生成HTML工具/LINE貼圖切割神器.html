@@ -468,7 +468,7 @@ downloadZipBtn.addEventListener('click', async () => {
       if (!blob) throw new Error('切割圖片轉檔失敗');
 
       zip.file(
-        `切割圖片_${String(i + 1).padStart(2, '0')}.png`,
+        `${String(i + 1).padStart(2, '0')}.png`,
         blob
       );
     }
