@@ -373,7 +373,7 @@ downloadBtn.addEventListener('click', async () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `切割圖片_${String(i + 1).padStart(2, '0')}.png`;
+    link.download = `${String(i + 1).padStart(2, '0')}.png`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -509,7 +509,7 @@ downloadZipBtn.addEventListener('click', async () => {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = '切割圖片.zip';
+    link.download = 'LINE貼圖_切割圖片.zip';
 
     document.body.appendChild(link);
     link.click();
