@@ -1,0 +1,545 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=big5">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>彰化網路監視器頻道</title>
+
+<style>
+:root{
+  --bg:#10171c;
+  --side:#16222a;
+  --line:#26373f;
+  --text:#e6eef0;
+  --mute:#8fa3aa;
+  --acc:#3fd0b0;
+  --sel:#1f3640;
+}
+@media(prefers-color-scheme:light){
+  :root{
+    --bg:#eef3f4;
+    --side:#fff;
+    --line:#d3dde0;
+    --text:#12252b;
+    --mute:#5b7077;
+    --acc:#0b8f78;
+    --sel:#dff1ee;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font:15px/1.5 "Noto Sans TC","Microsoft JhengHei",sans-serif;
+  display:flex;
+}
+aside{
+  width:310px;
+  flex:none;
+  background:var(--side);
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+aside h1{
+  font-size:17px;
+  margin:0;
+  padding:16px;
+  border-bottom:1px solid var(--line);
+}
+#search{
+  margin:10px 12px;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:var(--bg);
+  color:var(--text);
+  font:inherit;
+}
+#list{
+  flex:1;
+  overflow:auto;
+  padding:0 8px 12px;
+}
+#list h3{
+  margin:14px 6px 4px;
+  font-size:13px;
+  color:var(--acc);
+}
+#list button{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:none;
+  border:0;
+  border-radius:6px;
+  color:inherit;
+  padding:9px 10px;
+  cursor:pointer;
+  font:inherit;
+}
+#list button:hover,
+#list button.on{
+  background:var(--sel);
+}
+#list button.on{
+  box-shadow:inset 3px 0 var(--acc);
+}
+main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+header{
+  padding:12px 18px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+header h2{
+  margin:0;
+  font-size:17px;
+}
+header span{
+  color:var(--mute);
+  font-size:13px;
+}
+.btns{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.btns a,.btns button{
+  color:var(--acc);
+  font:inherit;
+  font-size:13px;
+  white-space:nowrap;
+  text-decoration:none;
+  border:1px solid var(--acc);
+  background:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+#stage{
+  flex:1;
+  position:relative;
+  background:#080e12;
+  min-height:0;
+  overflow:auto;
+}
+.panel{
+  min-height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:25px;
+  text-align:center;
+}
+.content{
+  max-width:540px;
+  width:100%;
+}
+.camera-icon{
+  font-size:64px;
+  margin-bottom:15px;
+}
+.content h2{
+  font-size:23px;
+  margin:8px 0;
+  color:#fff;
+}
+.content p{
+  color:#b0c0c5;
+  line-height:2;
+}
+.action{
+  display:inline-block;
+  margin:7px 4px;
+  padding:11px 20px;
+  border-radius:7px;
+  border:0;
+  background:var(--acc);
+  color:#06241d;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+  text-decoration:none;
+}
+.action.secondary{
+  background:#30434c;
+  color:#fff;
+}
+#player{
+  width:100%;
+  height:100%;
+  min-height:350px;
+  border:0;
+  display:block;
+  background:#000;
+}
+.notice{
+  padding:12px;
+  margin-top:15px;
+  background:#17272e;
+  border:1px solid #30434c;
+  border-radius:8px;
+  color:#b0c0c5;
+  font-size:13px;
+}
+#note{
+  padding:8px 18px;
+  font-size:12.5px;
+  color:var(--mute);
+  border-top:1px solid var(--line);
+}
+#note a{color:var(--acc)}
+:focus-visible{
+  outline:2px solid var(--acc);
+  outline-offset:2px;
+}
+@media(max-width:760px){
+  body{flex-direction:column}
+  aside{
+    width:100%;
+    height:42%;
+    min-height:180px;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  header{padding:10px}
+  header h2{font-size:15px}
+  .btns a,.btns button{font-size:12px}
+  .panel{padding:15px}
+}
+</style>
+</head>
+
+<body>
+
+<aside>
+  <h1>彰化網路監視器頻道</h1>
+  <input id="search" type="search"
+         placeholder="搜尋頻道"
+         aria-label="搜尋頻道">
+  <div id="list"></div>
+</aside>
+
+<main>
+
+<header>
+  <div>
+    <h2 id="title">彰化即時影像</h2>
+    <span id="sub">請選擇左側監視器頻道</span>
+  </div>
+
+  <div class="btns">
+    <a href="https://www.youtube.com/@changhua_travels"
+       target="_blank" rel="noopener">
+       愛玩彰化 YouTube
+    </a>
+
+    <button id="open" hidden>開啟官方影像</button>
+    <button id="embed" hidden>本頁嘗試播放</button>
+  </div>
+</header>
+
+<div id="stage">
+  <div class="panel">
+    <div class="content">
+      <div class="camera-icon">??</div>
+      <h2>彰化即時監視器</h2>
+      <p>請從左側選擇想觀看的景點，即可開啟官方即時影像。</p>
+    </div>
+  </div>
+</div>
+
+<div id="note">
+  影像來源：交通部觀光署
+  <a href="https://www.taiwan.net.tw/m1.aspx?sNo=0042331"
+     target="_blank" rel="noopener">
+     官方即時影像清單
+  </a>
+</div>
+
+</main>
+
+<script>
+
+// =====================================
+// 1. 官方網址
+// =====================================
+
+const OFFICIAL = uid =>
+  "https://www.taiwan.net.tw/m1.aspx?sNo=0042331&uid=" + uid;
+
+
+// =====================================
+// 2. 彰化縣頻道
+// =====================================
+
+const CAMS = {
+  "彰化縣":[
+    [27855,"彰化王功漁港"],
+    [25706,"八卦山大佛"],
+    [30095,"彰化平原"],
+    [25263,"虎山巖金針花"]
+  ]
+};
+
+
+// =====================================
+// 3. 建立頻道
+// =====================================
+
+const groups=[];
+
+for(const [county,arr] of Object.entries(CAMS)){
+
+  groups.push({
+    name:county,
+    items:arr.map(([uid,name])=>({
+      uid:String(uid),
+      name,
+      area:county,
+      url:OFFICIAL(uid)
+    }))
+  });
+
+}
+
+const $=id=>document.getElementById(id);
+
+let current=null;
+
+
+// =====================================
+// 4. 顯示選擇畫面
+// =====================================
+
+function showWelcome(){
+
+  $("stage").innerHTML=`
+    <div class="panel">
+      <div class="content">
+        <div class="camera-icon">??</div>
+        <h2>彰化即時監視器</h2>
+        <p>請從左側選擇想觀看的景點。</p>
+      </div>
+    </div>
+  `;
+
+}
+
+
+// =====================================
+// 5. 顯示頻道資訊
+// =====================================
+
+function showChannel(item){
+
+  current=item;
+
+  $("title").textContent=item.name;
+
+  $("sub").textContent=item.area;
+
+  $("open").hidden=false;
+  $("embed").hidden=false;
+
+  render();
+
+  $("stage").innerHTML=`
+    <div class="panel">
+      <div class="content">
+
+        <div class="camera-icon">??</div>
+
+        <h2>${item.name}</h2>
+
+        <p>
+          已選擇官方即時影像頻道。<br>
+          建議直接開啟官方頁面觀看，<br>
+          避免瀏覽器禁止外部網頁嵌入。
+        </p>
+
+        <button class="action" id="playOfficial">
+          ? 開啟官方即時影像
+        </button>
+
+        <button class="action secondary" id="tryEmbed">
+          在本頁嘗試播放
+        </button>
+
+        <div class="notice">
+          影像由交通部觀光署及相關管理單位提供。<br>
+          若本頁無法顯示，請使用「開啟官方即時影像」。
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  $("playOfficial").onclick=()=>openOfficial();
+
+  $("tryEmbed").onclick=()=>tryEmbed();
+
+}
+
+
+// =====================================
+// 6. 開啟官方影像
+// =====================================
+
+function openOfficial(){
+
+  if(!current)return;
+
+  window.open(
+    current.url,
+    "_blank",
+    "noopener"
+  );
+
+}
+
+
+// =====================================
+// 7. 在本頁嘗試播放
+// =====================================
+
+function tryEmbed(){
+
+  if(!current)return;
+
+  const url=current.url;
+
+  $("stage").innerHTML=`
+    <iframe
+      id="player"
+      src="${url}"
+      title="${current.name}"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+  `;
+
+  const iframe=$("player");
+
+  // 注意：
+  // iframe 的 onload 不代表影片一定成功播放。
+  // 若官方網站禁止嵌入，請改用新分頁。
+
+  const msg=document.createElement("div");
+
+  msg.style.cssText=`
+    position:absolute;
+    bottom:12px;
+    left:12px;
+    right:12px;
+    padding:10px;
+    background:rgba(0,0,0,.8);
+    color:white;
+    font-size:13px;
+    text-align:center;
+    border-radius:6px;
+  `;
+
+  msg.innerHTML=`
+    若畫面無法顯示，
+    <a href="${url}" target="_blank"
+       rel="noopener"
+       style="color:#3fd0b0">
+       請點此開啟官方影像
+    </a>
+  `;
+
+  $("stage").appendChild(msg);
+
+}
+
+
+// =====================================
+// 8. 搜尋及頻道清單
+// =====================================
+
+function render(){
+
+  const q=$("search").value.trim().toLowerCase();
+
+  const box=$("list");
+
+  box.innerHTML="";
+
+  groups.forEach(g=>{
+
+    const items=g.items.filter(i=>
+      (i.name+i.area).toLowerCase().includes(q)
+    );
+
+    if(!items.length)return;
+
+    const h=document.createElement("h3");
+
+    h.textContent=g.name+"（"+items.length+"）";
+
+    box.appendChild(h);
+
+    items.forEach(i=>{
+
+      const b=document.createElement("button");
+
+      b.textContent=i.name;
+
+      if(current && current.uid===i.uid){
+        b.className="on";
+      }
+
+      b.onclick=()=>showChannel(i);
+
+      box.appendChild(b);
+
+    });
+
+  });
+
+  if(!box.children.length){
+
+    box.innerHTML=
+      '<p style="padding:12px;color:var(--mute)">找不到符合的頻道。</p>';
+
+  }
+
+}
+
+
+// =====================================
+// 9. 按鈕事件
+// =====================================
+
+$("search").addEventListener("input",render);
+
+$("open").onclick=openOfficial;
+
+$("embed").onclick=tryEmbed;
+
+
+// =====================================
+// 10. 啟動
+// =====================================
+
+render();
+showWelcome();
+
+</script>
+
+</body>
+</html>
