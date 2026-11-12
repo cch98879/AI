@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓AI解決我的生活大小事｜我的影片創作</title>
+
+<style>
+:root {
+    --bg-image: none;
+    --blue: #55c8ff;
+    --panel: rgba(5, 18, 42, 0.82);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    color: #fff;
+    background: #061226;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image:
+        linear-gradient(rgba(1, 8, 24, .62), rgba(1, 8, 24, .86)),
+        var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at top, rgba(0,130,255,.20), transparent 65%);
+}
+
+.page {
+    width: min(960px, 94%);
+    margin: 0 auto;
+    padding: 28px 0 36px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+    font-size: clamp(23px, 4vw, 36px);
+    letter-spacing: 2px;
+    text-shadow: 0 0 18px rgba(0,174,255,.7);
+}
+
+header p {
+    margin: 0;
+    color: #b8d8f7;
+    font-size: 14px;
+}
+
+.player {
+    position: relative;
+    padding: clamp(16px, 4vw, 30px);
+    overflow: hidden;
+    border: 1px solid rgba(96,190,255,.38);
+    border-radius: 24px;
+    background: var(--panel);
+    box-shadow: 0 16px 55px rgba(0,0,0,.35),
+                inset 0 0 35px rgba(0,120,255,.08);
+    backdrop-filter: blur(12px);
+}
+
+.settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.field { min-width: 0; }
+
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #b9ddff;
+    font-size: 13px;
+}
+
+input, select, button { font: inherit; }
+
+input, select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    color: #fff;
+    border: 1px solid rgba(130,194,255,.32);
+    border-radius: 10px;
+    background: rgba(2,12,31,.88);
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(85,200,255,.12);
+}
+
+select option {
+    color: #fff;
+    background: #07172f;
+}
+
+button {
+    min-height: 42px;
+    padding: 10px 16px;
+    color: #fff;
+    border: 1px solid rgba(120,205,255,.4);
+    border-radius: 10px;
+    background: linear-gradient(135deg,#0877c9,#1744a2);
+    cursor: pointer;
+    transition: transform .15s, filter .15s;
+}
+
+button:hover {
+    filter: brightness(1.18);
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 14px 0;
+}
+
+.button-row[hidden] {
+    display: none !important;
+}
+
+.button-row button { flex: 1 1 130px; }
+
+button.secondary {
+    background: rgba(255,255,255,.08);
+}
+
+.song-title {
+    margin: 22px 0 8px;
+    text-align: center;
+    font-size: clamp(19px,3.5vw,27px);
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    text-shadow: 0 0 15px rgba(40,160,255,.65);
+}
+
+.status {
+    min-height: 22px;
+    margin: 8px 0;
+    text-align: center;
+    color: #a8ddff;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+/* MP4 影片讀取進度 */
+.mp4-loading {
+    margin: 12px 0 8px;
+    padding: 12px 14px;
+    border: 1px solid rgba(85,200,255,.32);
+    border-radius: 12px;
+    background: rgba(0,12,30,.68);
+}
+.mp4-loading[hidden] { display: none !important; }
+.mp4-loading-top {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-bottom: 8px;
+    color: #c5e9ff;
+    font-size: 13px;
+}
+.mp4-progress-track {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+}
+#mp4ProgressBar {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg,#0877c9,#55c8ff);
+    box-shadow: 0 0 12px rgba(85,200,255,.55);
+    transition: width .25s ease;
+}
+#mp4ProgressDetail {
+    margin-top: 7px;
+    color: #91bfe4;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.wave-box {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    margin: 8px auto 16px;
+}
+
+#waveCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.wave-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    border-top: 1px solid rgba(105,196,255,.22);
+    pointer-events: none;
+}
+
+video {
+    display: block;
+    width: 100%;
+    max-height: 560px;
+    margin-top: 12px;
+    border-radius: 16px;
+    background: #000;
+}
+
+/* 下載版：隱藏設定、影片輸入區及下載 MP4 按鈕 */
+body.standalone-song .settings,
+body.standalone-song label[for="songSelect"],
+body.standalone-song #songSelect,
+body.standalone-song #downloadPageRow,
+body.standalone-song #downloadMP4 {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .page {
+        width: 94%;
+        padding-top: 18px;
+    }
+
+    .settings {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .wave-box { height: 75px; }
+
+    .button-row button { flex-basis: 100px; }
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+    <header>
+        <h1>讓AI解決我的生活大小事_我的影片創作</h1>
+    </header>
+
+    <main class="player">
+
+        <div class="settings">
+            <div class="field">
+                <label for="githubUser">GitHub 帳號</label>
+                <input id="githubUser" type="text" value="cch98879">
+            </div>
+
+            <div class="field">
+                <label for="githubRepo">GitHub 儲存庫</label>
+                <input id="githubRepo" type="text" value="AI">
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="songSelect">
+                選擇影片（自動列出 mp4 資料夾中的影片）
+            </label>
+            <select id="songSelect"><option value="">請選擇影片</option></select>
+        </div>
+
+        <div class="button-row" id="downloadPageRow" hidden="">
+            <button id="downloadPage" type="button">⬇ 下載網頁</button>
+        </div>
+
+        <div class="button-row">
+            <button id="playButton" type="button">▶ 播放影片</button>
+            <button id="downloadMP4" class="secondary" type="button">
+                ⬇ 下載 MP4
+            </button>
+        </div>
+
+        <div id="songTitle" class="song-title">請選擇一部影片</div>
+
+        <div id="status" class="status" role="status" aria-live="polite">準備載入影片清單……</div>
+        <div id="mp4Loading" class="mp4-loading" hidden aria-live="polite">
+            <div class="mp4-loading-top">
+                <span id="mp4ProgressLabel">準備讀取 MP4 檔案……</span>
+                <strong id="mp4ProgressPercent">0%</strong>
+            </div>
+            <div class="mp4-progress-track" role="progressbar" aria-label="MP4 讀取進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="mp4ProgressBar"></div>
+            </div>
+            <div id="mp4ProgressDetail">正在確認檔案大小與下載進度，請稍候。</div>
+        </div>
+
+        <div class="wave-box">
+            <canvas id="waveCanvas" width="1348" height="150"></canvas>
+            <div class="wave-line"></div>
+        </div>
+
+        <video id="video" controls preload="metadata" playsinline crossorigin="anonymous"></video>
+
+    </main>
+</div>
+
+<script>
+"use strict";
+
+/* 取得網頁元件 */
+const githubUser = document.getElementById("githubUser");
+const githubRepo = document.getElementById("githubRepo");
+const songSelect = document.getElementById("songSelect");
+const playButton = document.getElementById("playButton");
+const downloadMP4 = document.getElementById("downloadMP4");
+const downloadPage = document.getElementById("downloadPage");
+const downloadPageRow = document.getElementById("downloadPageRow");
+const songTitle = document.getElementById("songTitle");
+const statusText = document.getElementById("status");
+const mp4Loading = document.getElementById("mp4Loading");
+const mp4ProgressLabel = document.getElementById("mp4ProgressLabel");
+const mp4ProgressPercent = document.getElementById("mp4ProgressPercent");
+const mp4ProgressBar = document.getElementById("mp4ProgressBar");
+const mp4ProgressDetail = document.getElementById("mp4ProgressDetail");
+const mp4ProgressTrack = mp4Loading.querySelector('[role="progressbar"]');
+let mp4TotalBytes = 0;
+let mp4LoadTimer = null;
+const video = document.getElementById("video");
+const canvas = document.getElementById("waveCanvas");
+const ctx = canvas.getContext("2d");
+
+let playRequestID = 0;
+let currentSong = "";
+let animationID = 0;
+let audioContext = null;
+let analyser = null;
+let sourceNode = null;
+let waveformReady = false;
+
+function getBaseURL() {
+    const user = githubUser.value.trim();
+    const repo = githubRepo.value.trim();
+
+    if (!user || !repo) {
+        throw new Error("請輸入 GitHub 帳號及儲存庫名稱");
+    }
+
+    return "https://" + user + ".github.io/" +
+        encodeURIComponent(repo) + "/mp4/";
+}
+
+function getFileURL(song, extension) {
+    return getBaseURL() +
+        encodeURIComponent(song) + "." + extension;
+}
+
+function setStatus(message) {
+    statusText.textContent = message;
+}
+
+function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes < 0) return "大小未知";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+}
+
+function showMP4Progress(label, percent, detail) {
+    mp4Loading.hidden = false;
+    const safePercent = Math.max(0, Math.min(100, Math.round(percent || 0)));
+    mp4ProgressLabel.textContent = label;
+    mp4ProgressPercent.textContent = safePercent + "%";
+    mp4ProgressBar.style.width = safePercent + "%";
+    mp4ProgressTrack.setAttribute("aria-valuenow", String(safePercent));
+    mp4ProgressDetail.textContent = detail;
+}
+
+function hideMP4Progress() {
+    if (mp4LoadTimer) {
+        clearInterval(mp4LoadTimer);
+        mp4LoadTimer = null;
+    }
+    mp4Loading.hidden = true;
+}
+
+async function monitorMP4Loading(url, requestID) {
+    mp4TotalBytes = 0;
+    showMP4Progress("正在確認 MP4 檔案大小……", 0, "正在連線至 GitHub，請稍候。");
+
+    try {
+        const head = await fetch(url, { method: "HEAD", cache: "no-store" });
+        if (requestID !== playRequestID) return;
+        const length = head.headers.get("content-length");
+        if (head.ok && length && Number(length) > 0) {
+            mp4TotalBytes = Number(length);
+            showMP4Progress("正在讀取 MP4 檔案……", 0,
+                "檔案大小：" + formatBytes(mp4TotalBytes) + "｜已開始讀取，進度會隨緩衝更新。");
+        } else {
+            showMP4Progress("正在讀取 MP4 檔案……", 0,
+                "伺服器未提供檔案大小，仍會持續顯示影片緩衝狀態。");
+        }
+    } catch (error) {
+        showMP4Progress("正在讀取 MP4 檔案……", 0,
+            "暫時無法取得檔案大小，正在等待影音資料。");
+    }
+
+    if (mp4LoadTimer) clearInterval(mp4LoadTimer);
+    mp4LoadTimer = setInterval(() => {
+        if (requestID !== playRequestID) {
+            clearInterval(mp4LoadTimer);
+            mp4LoadTimer = null;
+            return;
+        }
+
+        const duration = video.duration;
+        let ratio = 0;
+        let bufferedSeconds = 0;
+        if (Number.isFinite(duration) && duration > 0 && video.buffered.length) {
+            for (let i = 0; i < video.buffered.length; i++) {
+                if (video.currentTime >= video.buffered.start(i) - 0.25 &&
+                    video.currentTime <= video.buffered.end(i) + 0.25) {
+                    bufferedSeconds = Math.max(0, video.buffered.end(i) - video.currentTime);
+                    ratio = Math.min(0.99, bufferedSeconds / duration);
+                    break;
+                }
+            }
+        }
+
+        const percent = Math.round(ratio * 100);
+        let detail = mp4TotalBytes
+            ? "檔案大小：" + formatBytes(mp4TotalBytes) + "｜目前緩衝約 " + percent + "%（依播放緩衝估算）"
+            : "正在等待 MP4 緩衝資料……";
+        if (!video.paused && !video.ended && video.readyState >= 3) {
+            showMP4Progress("MP4 已可播放", 100,
+                mp4TotalBytes ? "檔案大小：" + formatBytes(mp4TotalBytes) + "｜影片已可播放。" : "影片已可播放。");
+            clearInterval(mp4LoadTimer);
+            mp4LoadTimer = null;
+            setTimeout(() => {
+                if (requestID === playRequestID) hideMP4Progress();
+            }, 1800);
+            return;
+        }
+        showMP4Progress("MP4 讀取中……", percent, detail);
+    }, 350);
+}
+
+function updateDownloadPageButton() {
+    downloadPageRow.hidden = !currentSong;
+}
+
+/* 自動讀取 GitHub MP4 清單 */
+async function loadSongList() {
+    const user = githubUser.value.trim();
+    const repo = githubRepo.value.trim();
+
+    if (!user || !repo) {
+        setStatus("請先輸入 GitHub 帳號與儲存庫名稱");
+        return;
+    }
+
+    songSelect.innerHTML =
+        '<option value="">正在讀取影片清單……</option>';
+
+    setStatus("正在讀取 GitHub 影片清單……");
+
+    const apiURL = "https://api.github.com/repos/" +
+        encodeURIComponent(user) + "/" +
+        encodeURIComponent(repo) + "/contents/mp4";
+
+    try {
+        const response = await fetch(apiURL);
+
+        if (!response.ok) {
+            throw new Error(
+                response.status === 404
+                    ? "找不到 mp4 資料夾，請確認儲存庫路徑"
+                    : "GitHub 清單讀取失敗（HTTP " +
+                      response.status + "）"
+            );
+        }
+
+        const files = await response.json();
+
+        if (!Array.isArray(files)) {
+            throw new Error("GitHub 回傳的資料格式不正確");
+        }
+
+        const songs = files
+            .filter(file =>
+                file.type === "file" && /\.mp4$/i.test(file.name)
+            )
+            .map(file => file.name.replace(/\.mp4$/i, ""))
+            .sort((a, b) => a.localeCompare(b, "zh-Hant"));
+
+        songSelect.innerHTML = "";
+
+        if (songs.length === 0) {
+            songSelect.add(new Option("找不到 MP4 影片", ""));
+            setStatus("mp4 資料夾內沒有 MP4 影片");
+            return;
+        }
+
+        songSelect.add(new Option("請選擇影片", ""));
+
+        songs.forEach(song => songSelect.add(new Option(song, song)));
+
+        setStatus("影片清單載入完成，共 " + songs.length + " 首");
+
+        if (songs.length === 1) {
+            songSelect.value = songs[0];
+            loadSong(songs[0]);
+        }
+
+    } catch (error) {
+        songSelect.innerHTML = "";
+        songSelect.add(new Option("無法讀取清單", ""));
+        setStatus(error.message);
+        console.error("影片清單讀取失敗：", error);
+    }
+}
+
+/* 選擇影片 */
+songSelect.addEventListener("change", () => {
+    if (songSelect.value) {
+        loadSong(songSelect.value);
+    }
+});
+
+/* 載入影片與 JPG */
+async function loadSong(song) {
+    song = song.trim();
+
+    if (!song) {
+        setStatus("請先選擇影片名稱");
+        return;
+    }
+
+    currentSong = song;
+    updateDownloadPageButton();
+    songTitle.textContent = song;
+    video.pause();
+
+    const requestID = ++playRequestID;
+
+    try {
+        const mp4URL = getFileURL(song, "mp4");
+        setStatus("正在載入影片……");
+
+        video.src = mp4URL;
+        video.load();
+        monitorMP4Loading(mp4URL, requestID);
+
+        setStatus("影片已載入");
+
+    } catch (error) {
+        setStatus(error.message);
+    }
+}
+
+/* 動態音波分析器 */
+async function createAudioAnalyzer() {
+    if (waveformReady) {
+        if (audioContext && audioContext.state === "suspended") {
+            await audioContext.resume();
+        }
+        return;
+    }
+
+    const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        setStatus("瀏覽器不支援音波視覺效果，但仍可播放影片");
+        return;
+    }
+
+    try {
+        audioContext = new AudioContextClass();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0.82;
+
+        sourceNode = audioContext.createMediaElementSource(video);
+        sourceNode.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        waveformReady = true;
+        await audioContext.resume();
+
+    } catch (error) {
+        console.warn("音波分析器建立失敗：", error);
+        setStatus("音波效果無法啟動，請確認瀏覽器音訊設定");
+    }
+}
+
+/* Canvas 音波 */
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function drawWave() {
+    animationID = requestAnimationFrame(drawWave);
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    ctx.clearRect(0, 0, width, height);
+
+    const centerY = height / 2;
+
+    if (!analyser || video.paused || video.ended) {
+        ctx.beginPath();
+        ctx.moveTo(0, centerY);
+        ctx.lineTo(width, centerY);
+        ctx.strokeStyle = "rgba(85,200,255,.55)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        return;
+    }
+
+    const bufferLength = analyser.fftSize;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.beginPath();
+    const sliceWidth = width / bufferLength;
+
+    for (let i = 0; i < bufferLength; i++) {
+        const value = (dataArray[i] - 128) / 128;
+        const x = i * sliceWidth;
+        const y = centerY + value * height * 0.43;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+
+    ctx.strokeStyle = "#65d8ff";
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "#168bff";
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+}
+
+/* 播放影片 */
+playButton.addEventListener("click", async () => {
+    // 獨立網頁如果還沒載入影片，透過當前標題或預設路徑載入
+    if (!currentSong) {
+        const titleText = songTitle.textContent.trim();
+        if (titleText && titleText !== "請選擇一首影片") {
+            currentSong = titleText;
+        } else {
+            setStatus("請先選擇影片名稱");
+            return;
+        }
+    }
+
+    try {
+        if (!video.src) {
+            const mp4URL = getFileURL(currentSong, "mp4");
+            video.src = mp4URL;
+            video.load();
+            monitorMP4Loading(mp4URL, playRequestID);
+        }
+
+        if (video.readyState < 3) {
+            monitorMP4Loading(video.currentSrc || getFileURL(currentSong, "mp4"), playRequestID);
+        }
+
+        const playPromise = video.play();
+
+        createAudioAnalyzer().catch(error => {
+            console.warn("音波效果啟動失敗：", error);
+        });
+
+        await playPromise;
+        setStatus("正在播放：" + currentSong);
+
+    } catch (error) {
+        setStatus("無法播放，請確認 MP4 檔案是否存在");
+        console.error("播放失敗：", error);
+    }
+});
+
+video.addEventListener("canplay", () => {
+    if (!mp4Loading.hidden) {
+        showMP4Progress("MP4 已可播放", 100,
+            mp4TotalBytes ? "檔案大小：" + formatBytes(mp4TotalBytes) + "｜影片已可播放。" : "影片已可播放。");
+        if (mp4LoadTimer) {
+            clearInterval(mp4LoadTimer);
+            mp4LoadTimer = null;
+        }
+        setTimeout(hideMP4Progress, 1800);
+    }
+});
+video.addEventListener("error", () => {
+    if (!mp4Loading.hidden) {
+        showMP4Progress("MP4 讀取失敗", 0, "無法讀取影片，請確認檔案存在或網路連線正常。");
+        if (mp4LoadTimer) {
+            clearInterval(mp4LoadTimer);
+            mp4LoadTimer = null;
+        }
+    }
+});
+
+video.addEventListener("play", () => {
+    if (animationID) cancelAnimationFrame(animationID);
+    drawWave();
+});
+
+video.addEventListener("pause", () => {
+    if (animationID) {
+        cancelAnimationFrame(animationID);
+        animationID = 0;
+    }
+    drawWave();
+});
+
+video.addEventListener("ended", () => {
+    setStatus("影片播放完畢");
+});
+
+/* 下載 MP4 */
+function downloadFile(extension) {
+    if (!currentSong) {
+        setStatus("請先選擇影片");
+        return;
+    }
+
+    let url;
+
+    try {
+        url = getFileURL(currentSong, extension);
+    } catch (error) {
+        setStatus(error.message);
+    }
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = currentSong + "." + extension;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+downloadMP4.addEventListener("click", () => downloadFile("mp4"));
+
+/* 下載指定影片的專屬網頁 */
+downloadPage.addEventListener("click", () => {
+    if (!currentSong) {
+        setStatus("請先選擇影片");
+        return;
+    }
+
+    try {
+        const sourceHTML =
+            "<!DOCTYPE html>\n" +
+            document.documentElement.outerHTML;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sourceHTML, "text/html");
+
+        doc.body.classList.add("standalone-song");
+
+        doc.getElementById("githubUser")
+            .setAttribute("value", githubUser.value.trim());
+
+        doc.getElementById("githubRepo")
+            .setAttribute("value", githubRepo.value.trim());
+
+        doc.title = currentSong + "｜影片創作";
+
+        const finalHTML =
+            "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+
+        const blob = new Blob(
+            [finalHTML],
+            { type: "text/html;charset=utf-8" }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = currentSong + ".html";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+        setStatus("已開始下載：" + currentSong + ".html");
+
+    } catch (error) {
+        console.error("下載網頁失敗：", error);
+        setStatus("下載網頁失敗，請重新操作");
+    }
+});
+
+/* 啟動網頁 */
+if (document.body.classList.contains("standalone-song")) {
+    const titleText = songTitle.textContent.trim();
+    if (titleText && titleText !== "請選擇一首影片") {
+        currentSong = titleText;
+        loadSong(currentSong);
+    }
+} else {
+    loadSongList();
+}
+
+drawWave();
+</script>
+
+</body></html>
