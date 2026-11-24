@@ -1,0 +1,665 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓AI解決我的生活大小事_LINE貼圖裁切器</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background: #f1f5fb;
+    color: #25344a;
+}
+
+header {
+    background: linear-gradient(120deg, #153b72, #287bd3, #48b8dc);
+    color: white;
+    text-align: center;
+    padding: 24px 15px;
+    font-size: 27px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px #0002;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 20px;
+    max-width: 1600px;
+    margin: 22px auto;
+    padding: 0 18px;
+    align-items: start;
+}
+
+.panel {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 4px 15px #1c3d6010;
+}
+
+.panel h2 {
+    margin: 0 0 18px;
+    font-size: 21px;
+    color: #1760a5;
+    border-bottom: 2px solid #e5eff9;
+    padding-bottom: 12px;
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 12px;
+    font-size: 17px;
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed #91b9df;
+    border-radius: 10px;
+    background: #f5faff;
+    cursor: pointer;
+}
+
+.grid-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.grid-option {
+    border: 2px solid #d9e6f3;
+    border-radius: 10px;
+    padding: 13px 5px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    background: white;
+    transition: .2s;
+}
+
+.grid-option input {
+    display: none;
+}
+
+.grid-option:has(input:checked) {
+    border-color: #2184db;
+    background: #e8f4ff;
+    color: #1267b4;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 13px 16px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: .2s;
+}
+
+button:hover {
+    filter: brightness(.94);
+    transform: translateY(-1px);
+}
+
+.btn-main {
+    width: 100%;
+    color: white;
+    background: linear-gradient(120deg, #1673c9, #36a4e9);
+}
+
+.btn-download {
+    background: #16a477;
+    color: white;
+}
+
+.btn-download-all {
+    width: 100%;
+    background: linear-gradient(120deg, #078b69, #20bd8d);
+    color: white;
+    font-size: 18px;
+    padding: 16px;
+}
+
+.btn-download:disabled,
+.btn-download-all:disabled {
+    background: #aab5c1;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hint {
+    font-size: 13px;
+    color: #77869a;
+    line-height: 1.7;
+    margin-top: 8px;
+}
+
+.preview-box {
+    border: 2px dashed #d4e2ef;
+    border-radius: 12px;
+    min-height: 180px;
+    background:
+        linear-gradient(45deg,#f0f3f6 25%,transparent 25%),
+        linear-gradient(-45deg,#f0f3f6 25%,transparent 25%),
+        linear-gradient(45deg,transparent 75%,#f0f3f6 75%),
+        linear-gradient(-45deg,transparent 75%,#f0f3f6 75%);
+    background-size: 20px 20px;
+    background-position: 0 0,0 10px,10px -10px,-10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.preview-box img {
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+}
+
+.right-panel {
+    min-width: 0;
+}
+
+.original-area {
+    margin-bottom: 25px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.result-header h2 {
+    margin: 0;
+    border: none;
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.image-card {
+    border: 1px solid #e0e9f2;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    padding: 8px;
+    min-width: 0;
+}
+
+.image-card .image-number {
+    font-weight: bold;
+    color: #3974a9;
+    margin-bottom: 8px;
+}
+
+.image-card .image-preview {
+    aspect-ratio: 1 / 1;
+    background-color: #f2f5f8;
+    background-image:
+        linear-gradient(45deg,#e2e6eb 25%,transparent 25%),
+        linear-gradient(-45deg,#e2e6eb 25%,transparent 25%),
+        linear-gradient(45deg,transparent 75%,#e2e6eb 75%),
+        linear-gradient(-45deg,transparent 75%,#e2e6eb 75%);
+    background-size: 16px 16px;
+    background-position: 0 0,0 8px,8px -8px,-8px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 7px;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.image-card button {
+    width: 100%;
+    margin-top: 9px;
+    font-size: 13px;
+    padding: 9px 3px;
+}
+
+.status {
+    margin-top: 14px;
+    color: #1474b9;
+    font-size: 14px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+.empty {
+    color: #96a5b5;
+    text-align: center;
+    padding: 55px 10px;
+    line-height: 2;
+}
+
+@media(max-width: 950px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media(max-width: 550px) {
+    header {
+        font-size: 20px;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    .panel {
+        padding: 15px;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    讓AI解決我的生活大小事_LINE貼圖裁切器
+</header>
+
+<div class="container">
+
+    <!-- 左側操作介面 -->
+    <aside class="panel">
+
+        <h2>⚙️ 操作介面</h2>
+
+        <div class="section">
+            <div class="section-title">📁 1. 上傳原始圖片</div>
+            <input type="file" id="fileInput" accept="image/*">
+            <div class="hint">
+                請上傳需要切割的圖片，支援 JPG、PNG、WEBP 等常見格式。
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">✂️ 2. 選擇切割張數</div>
+
+            <div class="grid-options">
+                <label class="grid-option">
+                    <input type="radio" name="grid" value="2" checked>
+                    4 格<br>2 × 2
+                </label>
+
+                <label class="grid-option">
+                    <input type="radio" name="grid" value="3">
+                    9 格<br>3 × 3
+                </label>
+
+                <label class="grid-option">
+                    <input type="radio" name="grid" value="4">
+                    16 格<br>4 × 4
+                </label>
+            </div>
+
+            <div class="hint">
+                系統會依照原始圖片的寬度與高度平均切割。
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🎨 3. 自動去背設定</div>
+            <div style="background:#f0fff3;padding:12px;border-radius:10px;">
+                <span style="display:inline-block;width:18px;height:18px;
+                background:#00FF00;vertical-align:middle;border:1px solid #ccc;"></span>
+                <b> 綠色背景 #00FF00</b>
+                <div class="hint">
+                    自動將指定的純綠色轉換為透明背景。
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <button class="btn-main" id="cutBtn" disabled>
+                ✂️ 開始切割圖片
+            </button>
+        </div>
+
+        <div class="section">
+            <button class="btn-download-all" id="downloadAllBtn" disabled>
+                ⬇ 一鍵下載全部圖片
+            </button>
+            <div class="hint">
+                逐張下載 PNG，不會打包成 ZIP。
+            </div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+    </aside>
+
+    <!-- 右側顯示介面 -->
+    <main class="panel right-panel">
+
+        <div class="original-area">
+            <h2>🖼️ 原始圖片預覽</h2>
+            <div class="preview-box" id="originalPreview">
+                <div class="empty">尚未上傳圖片<br>請從左側選擇圖片</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="result-header">
+                <h2>✂️ 切割後的圖片</h2>
+                <span id="resultCount" style="color:#71849a;font-weight:bold;">
+                    尚未切割
+                </span>
+            </div>
+
+            <div class="image-grid" id="imageGrid">
+                <div class="empty" style="grid-column:1/-1;">
+                    切割完成後，圖片將顯示於此處
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const cutBtn = document.getElementById("cutBtn");
+const downloadAllBtn = document.getElementById("downloadAllBtn");
+const originalPreview = document.getElementById("originalPreview");
+const imageGrid = document.getElementById("imageGrid");
+const statusBox = document.getElementById("status");
+const resultCount = document.getElementById("resultCount");
+
+let originalImage = null;
+let originalURL = null;
+let cutImages = [];
+let processing = false;
+
+// 上傳圖片
+fileInput.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("請選擇有效的圖片檔案！");
+        return;
+    }
+
+    if (originalURL) URL.revokeObjectURL(originalURL);
+
+    originalURL = URL.createObjectURL(file);
+
+    const img = new Image();
+
+    img.onload = function() {
+        originalImage = img;
+
+        originalPreview.innerHTML = "";
+        const preview = document.createElement("img");
+        preview.src = originalURL;
+        originalPreview.appendChild(preview);
+
+        cutBtn.disabled = false;
+        downloadAllBtn.disabled = true;
+
+        cutImages = [];
+        imageGrid.innerHTML =
+            '<div class="empty" style="grid-column:1/-1;">' +
+            '圖片已上傳，請按「開始切割圖片」</div>';
+
+        resultCount.textContent = "尚未切割";
+        statusBox.textContent =
+            "圖片尺寸：" + img.width + " × " + img.height;
+
+    };
+
+    img.onerror = function() {
+        alert("圖片讀取失敗，請重新上傳！");
+    };
+
+    img.src = originalURL;
+});
+
+// 選擇切割張數後，自動重新切割
+document.querySelectorAll('input[name="grid"]').forEach(radio => {
+    radio.addEventListener("change", function() {
+        if (originalImage) {
+            cutImages = [];
+            downloadAllBtn.disabled = true;
+            cutBtn.disabled = false;
+            resultCount.textContent = "尚未切割";
+            imageGrid.innerHTML =
+                '<div class="empty" style="grid-column:1/-1;">' +
+                '切割設定已變更，請重新切割</div>';
+            statusBox.textContent = "已更新切割設定";
+        }
+    });
+});
+
+// 去除純綠色背景
+function removeGreenBackground(ctx, width, height) {
+
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        // 精準辨識 #00FF00，避免誤刪其他顏色
+        if (r === 0 && g === 255 && b === 0) {
+            data[i + 3] = 0;
+        }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+// 開始切割
+cutBtn.addEventListener("click", function() {
+
+    if (!originalImage || processing) return;
+
+    processing = true;
+    cutBtn.disabled = true;
+    downloadAllBtn.disabled = true;
+    statusBox.textContent = "正在切割圖片，請稍候...";
+
+    setTimeout(() => {
+
+        try {
+            const grid = Number(
+                document.querySelector('input[name="grid"]:checked').value
+            );
+
+            const width = originalImage.naturalWidth;
+            const height = originalImage.naturalHeight;
+
+            const cellW = width / grid;
+            const cellH = height / grid;
+
+            cutImages = [];
+            imageGrid.innerHTML = "";
+
+            let index = 0;
+
+            for (let row = 0; row < grid; row++) {
+
+                for (let col = 0; col < grid; col++) {
+
+                    index++;
+
+                    const sx = Math.round(col * cellW);
+                    const sy = Math.round(row * cellH);
+
+                    const ex = Math.round((col + 1) * cellW);
+                    const ey = Math.round((row + 1) * cellH);
+
+                    const sw = ex - sx;
+                    const sh = ey - sy;
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = sw;
+                    canvas.height = sh;
+
+                    const ctx = canvas.getContext("2d", {
+                        willReadFrequently: true
+                    });
+
+                    ctx.drawImage(
+                        originalImage,
+                        sx, sy, sw, sh,
+                        0, 0, sw, sh
+                    );
+
+                    // 自動去除綠色背景
+                    removeGreenBackground(ctx, sw, sh);
+
+                    const dataURL = canvas.toDataURL("image/png");
+
+                    cutImages.push({
+                        name: "LINE貼圖_" +
+                            String(index).padStart(2, "0") + ".png",
+                        data: dataURL
+                    });
+
+                    // 建立圖片卡片
+                    const card = document.createElement("div");
+                    card.className = "image-card";
+
+                    const number = document.createElement("div");
+                    number.className = "image-number";
+                    number.textContent = "第 " + index + " 張";
+
+                    const previewBox = document.createElement("div");
+                    previewBox.className = "image-preview";
+
+                    const img = document.createElement("img");
+                    img.src = dataURL;
+                    img.alt = "切割圖片 " + index;
+
+                    previewBox.appendChild(img);
+
+                    const downloadBtn = document.createElement("button");
+                    downloadBtn.className = "btn-download";
+                    downloadBtn.textContent = "⬇ 下載圖片";
+
+                    downloadBtn.addEventListener("click", function() {
+                        downloadImage(cutImages[index - 1]);
+                    });
+
+                    card.appendChild(number);
+                    card.appendChild(previewBox);
+                    card.appendChild(downloadBtn);
+
+                    imageGrid.appendChild(card);
+                }
+            }
+
+            resultCount.textContent =
+                "共完成 " + cutImages.length + " 張";
+
+            statusBox.textContent =
+                "✓ 切割完成！已完成 " + cutImages.length + " 張圖片去背。";
+
+            downloadAllBtn.disabled = false;
+
+        } catch (error) {
+
+            console.error(error);
+            statusBox.textContent = "圖片處理失敗：" + error.message;
+            alert("圖片處理失敗，請重新上傳或使用較小的圖片。");
+
+        } finally {
+            processing = false;
+            cutBtn.disabled = false;
+        }
+
+    }, 50);
+
+});
+
+// 下載單張圖片
+function downloadImage(item) {
+
+    if (!item) return;
+
+    const link = document.createElement("a");
+    link.href = item.data;
+    link.download = item.name;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+// 一鍵下載全部圖片（逐張下載，不打包 ZIP）
+downloadAllBtn.addEventListener("click", async function() {
+
+    if (cutImages.length === 0) return;
+
+    downloadAllBtn.disabled = true;
+
+    try {
+
+        for (let i = 0; i < cutImages.length; i++) {
+
+            statusBox.textContent =
+                "正在下載第 " + (i + 1) + " / " +
+                cutImages.length + " 張圖片...";
+
+            downloadImage(cutImages[i]);
+
+            // 間隔下載，降低瀏覽器阻擋多檔案下載的機率
+            await new Promise(resolve => setTimeout(resolve, 350));
+        }
+
+        statusBox.textContent =
+            "✓ 全部 " + cutImages.length + " 張圖片已送出下載！";
+
+    } finally {
+        downloadAllBtn.disabled = false;
+    }
+
+});
+</script>
+
+</body>
+</html>
