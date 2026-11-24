@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>讓AI解決我的生活大小事_Suno音樂下載器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://usesuno.com/_assets/9ae8d1642f6ea2dacaefedfd3122d735d84b69c0a7c6930d63c56418fcc5fc3d/shared.css" rel="stylesheet" />
+  <link href="https://usesuno.com/_assets/e897e98d4af123b5e75cccc8aeb2fa76d461adc3d8ea9bd2cc5a2a159f5a3b2f/theme.css" rel="stylesheet" />
+  <link href="https://usesuno.com/_assets/24999bdc786498fe12042334fcf8007d13b48564cf217bcafb7ce89c74dab256/tools/shared/download-error.css" rel="stylesheet" />
+  <link href="https://usesuno.com/_assets/6cdd49da14899e130a659cf97ef9a8bc2a9e6253b9fe3ed1861edd6b6f5d23c7/tools/shared/download-feedback.css" rel="stylesheet" />
+  <link href="https://usesuno.com/_assets/bcb9c96a448615eece41950e1cfcdfac191e70c8a0f4c4781e4d96780e5f3a78/tools/shared/audio-processing-error.css" rel="stylesheet" />
+  <style>
+    :root {
+      --font: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      --mono: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      --accent: #9b8cff;
+      --success-text: #7ee5a0;
+    }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #090d18;
+      background-image: radial-gradient(ellipse at 50% -10%, rgba(100, 85, 210, 0.24), transparent 55%);
+      color: #eef2ff;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    }
+    main {
+      padding: 36px 18px 72px;
+    }
+    .container {
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
+    .dl-stage {
+      text-align: center;
+      padding: 28px 0 24px;
+    }
+    .dl-stage h1 {
+      margin: 0 0 18px;
+      color: #fff;
+      font-size: clamp(28px, 4.8vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .dl-input-wrap {
+      background: rgba(17, 24, 42, 0.96);
+      border: 1px solid rgba(155, 140, 255, 0.38);
+      border-radius: 22px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.2s ease, box-shadow 0.25s ease;
+    }
+    .dl-input-wrap:focus-within {
+      border-color: rgba(155, 140, 255, 0.72);
+      box-shadow: 0 0 0 4px rgba(155, 140, 255, 0.12), 0 18px 60px rgba(0, 0, 0, 0.45);
+    }
+    .dl-form textarea {
+      width: 100%;
+      min-height: 92px;
+      padding: 18px 20px 10px;
+      background: transparent;
+      border: none;
+      border-radius: 22px 22px 0 0;
+      color: #fff;
+      font: 16px/1.5 inherit;
+      outline: none;
+      resize: none;
+      box-sizing: border-box;
+      display: block;
+    }
+    .dl-form textarea::placeholder {
+      color: #8490aa;
+    }
+    .dl-input-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px 16px;
+    }
+    .dl-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 11px 24px;
+      border: 0;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #7667e8, #a078ed);
+      color: #fff;
+      font: 700 15px/1 inherit;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(123, 103, 232, 0.28);
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+    .dl-btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #8879f5, #b18bf6);
+      transform: translateY(-1px);
+    }
+    .dl-btn-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+    .tool-example {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 10px;
+      margin-top: 14px;
+      color: #9ca8c2;
+      font-size: 13px;
+    }
+    .tool-example a {
+      color: #bcb2ff;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+    .tool-example a:hover {
+      text-decoration: underline;
+    }
+    .tool-example button {
+      min-height: 30px;
+      padding: 6px 12px;
+      border: 1px solid rgba(155, 140, 255, 0.35);
+      border-radius: 999px;
+      background: rgba(155, 140, 255, 0.1);
+      color: #eef2ff;
+      font: 700 12px/1 inherit;
+      cursor: pointer;
+    }
+    .tool-example button:hover:not(:disabled) {
+      background: rgba(155, 140, 255, 0.2);
+    }
+    .song-hero {
+      margin: 22px 0 18px;
+      padding: 24px;
+      border-radius: 22px;
+      border: 1px solid rgba(155, 140, 255, 0.24);
+      background: linear-gradient(145deg, #151d33, #101727);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.28);
+    }
+    .song-hero-top {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+    .song-hero-cover {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .song-hero-title {
+      margin: 0 0 6px;
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .song-hero-artist {
+      margin: 0;
+      color: #bdc7df;
+      font-size: 0.95rem;
+    }
+    .dl-section {
+      margin-top: 20px;
+    }
+    .dl-section-label {
+      margin: 0 0 10px;
+      color: #c7c0ff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .dl-chip {
+      width: 100%;
+      min-height: 76px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-radius: 16px;
+      background: rgba(20, 29, 50, 0.92);
+      border: 1px solid rgba(155, 140, 255, 0.32);
+      color: #f4f5ff;
+      cursor: pointer;
+      font: inherit;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    }
+    .dl-chip:hover:not(:disabled) {
+      border-color: rgba(155, 140, 255, 0.72);
+      background: rgba(37, 42, 73, 0.95);
+      transform: translateY(-1px);
+    }
+    .dl-chip:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .dl-chip.is-saved {
+      border-color: rgba(126, 229, 160, 0.65);
+      background: rgba(126, 229, 160, 0.08);
+    }
+    .dl-chip-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+    .dl-chip-kind {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .dl-chip-sub {
+      display: block;
+      margin-top: 2px;
+      color: #aab5d0;
+      font-size: 13px;
+    }
+    .dl-toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      z-index: 1400;
+      max-width: min(92vw, 480px);
+      padding: 11px 16px;
+      border: 1px solid rgba(126, 229, 160, 0.35);
+      border-radius: 999px;
+      background: rgba(13, 18, 16, 0.95);
+      color: #eaf5ec;
+      font: 700 13px/1.3 inherit;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .dl-toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    .dl-toast.is-error {
+      border-color: rgba(239, 145, 133, 0.5);
+      color: #ffd5ce;
+    }
+    .dl-processing {
+      position: fixed;
+      inset: 0;
+      z-index: 1250;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+    .dl-processing::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 8, 11, 0.72);
+      backdrop-filter: blur(8px);
+    }
+    .dl-processing-card {
+      position: relative;
+      width: min(100%, 420px);
+      padding: 24px;
+      border: 1px solid rgba(126, 229, 160, 0.35);
+      border-radius: 20px;
+      background: #141b2e;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+    }
+    .dl-processing-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .dl-processing-spinner {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border: 3px solid rgba(255, 255, 255, 0.12);
+      border-top-color: var(--success-text);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .dl-processing-card h2 {
+      margin: 0 0 4px;
+      font-size: 1.2rem;
+      color: #fff;
+    }
+    .dl-processing-stage {
+      margin: 0;
+      color: #b8c1d9;
+      font-size: 0.88rem;
+    }
+    .dl-processing-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .dl-processing-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--success-text);
+      transition: width 160ms linear;
+    }
+    .dl-processing.is-indeterminate .dl-processing-bar {
+      width: 40%;
+      animation: indet 1.15s ease-in-out infinite;
+    }
+    @keyframes indet {
+      from { transform: translateX(-115%); }
+      to { transform: translateX(340%); }
+    }
+    .dl-processing-detail {
+      margin: 8px 0 0;
+      color: #9aa6c4;
+      font-size: 12px;
+      text-align: right;
+    }
+    .dl-processing-error-copy {
+      display: none;
+      margin: 0;
+      color: #ffd5ce;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .dl-processing.is-error .dl-processing-spinner {
+      animation: none;
+      border-color: rgba(239, 145, 133, 0.5);
+      border-top-color: #ef9185;
+    }
+    .dl-processing.is-error .dl-processing-track,
+    .dl-processing.is-error .dl-processing-detail,
+    .dl-processing.is-error .dl-processing-stage {
+      display: none;
+    }
+    .dl-processing.is-error .dl-processing-error-copy {
+      display: block;
+    }
+    .dl-processing-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .dl-btn-secondary {
+      min-height: 40px;
+      padding: 9px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      background: transparent;
+      color: #eef2ff;
+      font: 700 14px/1 inherit;
+      cursor: pointer;
+    }
+    .dl-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .dl-hidden {
+      display: none !important;
+    }
+    @media (max-width: 560px) {
+      .song-hero-top {
+        grid-template-columns: 76px 1fr;
+        gap: 14px;
+      }
+      .song-hero-cover {
+        width: 76px;
+        height: 76px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="container">
+      <section class="dl-stage" id="dl-stage">
+        <h1>讓AI解決我的生活大小事_Suno音樂下載器</h1>
+		
+		<div class="tool-example">
+          <span>提醒：Suno歌曲網址必須是「公開」的，才能成功下載MP3檔案</span><BR><BR>
+        </div>
+		
+		
+        <form autocomplete="off" class="dl-form" id="dl-form">
+          <div class="dl-input-wrap">
+            <textarea aria-label="Suno 音樂網址" id="dl-input" name="url" placeholder="請貼上Suno歌曲網址" rows="1" spellcheck="false"></textarea>
+            <div class="dl-input-bar">
+              <button class="dl-btn-primary" id="dl-submit" type="submit">搜尋</button>
+            </div>
+          </div>
+        </form>
+        <div class="tool-example">
+          <span>範例網址：</span>
+          <a href="https://suno.com/song/760cbdaa-52e9-4533-93ef-c68dfb6bdb29" id="dl-example-link" rel="noopener" target="_blank">https://suno.com/song/760cbdaa-52e9-4533-93ef-c68dfb6bdb29</a>
+        </div>
+      </section>
+
+      <article class="song-hero dl-hidden" id="dl-hero">
+        <div class="song-hero-top">
+          <img alt="" class="song-hero-cover" decoding="async" id="dl-cover" referrerpolicy="no-referrer" />
+          <div>
+            <h2 class="song-hero-title" id="dl-title">歌曲名稱</h2>
+            <p class="song-hero-artist" id="dl-artist"></p>
+          </div>
+        </div>
+      </article>
+
+      <section class="dl-section dl-hidden" id="dl-download-section">
+        <p class="dl-section-label">下載 MP3</p>
+        <button class="dl-chip" data-kind="mp3" id="dl-mp3-btn" type="button">
+          <span class="dl-chip-left">
+            <svg aria-hidden="true" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="24">
+              <path d="M9 17V7l10-2v10"></path>
+              <circle cx="6" cy="17" r="3"></circle>
+              <circle cx="16" cy="15" r="3"></circle>
+            </svg>
+            <span>
+              <span class="dl-chip-kind">下載 MP3</span>
+              <span class="dl-chip-sub" id="dl-mp3-sub">MP3 音訊</span>
+            </span>
+          </span>
+          <svg aria-hidden="true" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="20">
+            <path d="M12 4v12"></path>
+            <path d="M7 11l5 5 5-5"></path>
+            <path d="M5 20h14"></path>
+          </svg>
+        </button>
+      </section>
+    </div>
+  </main>
+
+  <div aria-atomic="true" aria-live="polite" class="dl-toast" id="dl-toast" role="status"></div>
+
+  <div aria-labelledby="dl-processing-title" aria-modal="true" class="dl-processing dl-hidden is-indeterminate" id="dl-processing" role="dialog">
+    <div class="dl-processing-card">
+      <div class="dl-processing-head">
+        <span aria-hidden="true" class="dl-processing-spinner"></span>
+        <div>
+          <h2 id="dl-processing-title">正在準備 MP3</h2>
+          <p class="dl-processing-stage" id="dl-processing-stage">處理音訊中…</p>
+        </div>
+      </div>
+      <div class="dl-processing-track" id="dl-processing-track">
+        <div class="dl-processing-bar" id="dl-processing-bar"></div>
+      </div>
+      <p class="dl-processing-detail" id="dl-processing-detail">請保持此頁面開啟</p>
+      <p class="dl-processing-error-copy" id="dl-processing-error-copy">無法轉換此音訊，請稍後再試。</p>
+      <div class="dl-processing-actions">
+        <button class="dl-btn-secondary dl-hidden" id="dl-processing-retry" type="button">重試</button>
+        <button class="dl-btn-secondary" id="dl-processing-cancel" type="button">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://usesuno.com/_assets/9368dc304dcca2ad4b5941bb3498259de7ea0375d9d43c1a1d73a6f6113b9fc9/tools/shared/download-filename.js"></script>
+  <script src="https://usesuno.com/_assets/839ad4afe06a6063ec1baed6d7a73f6deea7f64410c1967a3a7222032865e036/tools/shared/download-error.js"></script>
+  <script src="https://usesuno.com/_assets/0bb9c232d299b72cb40730aae3e2fa9b803b355d3631619ab43393c497f59913/tools/shared/download-quality.js"></script>
+  <script>window.UseSunoDownloadQuality = window.UseSunoDownloadQuality || { begin: function () {}, finish: function () {}, action: function () {} };</script>
+  <script src="https://usesuno.com/_assets/2a7ab48df6766c308390c6b3361e2b3d2c89893c2a00126ce56d24402ecfa34c/tools/shared/download-feedback.js"></script>
+  <script src="https://usesuno.com/_assets/dcf64242f87ce1895d7e9c9dc2c0f36f87e9cc14a94926709b7ecc9ad08cdacb/tools/shared/download-notices.js"></script>
+  <script src="https://usesuno.com/_assets/1fd4b4c5a21d08910e45992de661c74c634fea760d9c5209a64dcd598062b942/tools/shared/task-access.js"></script>
+  <script src="https://usesuno.com/_assets/67155c1b4cf3514f9976852004faf8c2e19a1298d3634a1a7d2b02dd1617cf42/tools/shared/suno-parser.js"></script>
+  <script src="https://usesuno.com/_assets/bb59384e0d4de3ed1033564713fd8e3cc5757cb64736be1b569f0c6611dd3db6/tools/downloader/suno-media-source.js"></script>
+  <script async="" src="https://usesuno.com/_assets/506c42841cf72aaaf2f2440bd3a79acb7001e10888623fd53570db8862a2af78/tools/downloader/suno-public-video-audio.js"></script>
+  <script async="" src="https://usesuno.com/_assets/113527d03eba3366d8a2c0d402b19c006503582aa32fe5e22e032054862bd3f8/tools/downloader/suno-public-video-loader.js"></script>
+  <script src="https://usesuno.com/_assets/77bed74e646fb8c9aba7a06142160d37e8ced1e3d974fce6489cc7f684dd712a/tools/downloader/suno-audio-transcoder.js"></script>
+  <script src="https://usesuno.com/_assets/c8305244dd856dd84ee145392e461184b2250e2c5a9090646cddf94ff9d8950a/tools/downloader/suno-audio-info.js"></script>
+
+  <script>
+    (function () {
+      var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      var form = document.getElementById("dl-form");
+      var input = document.getElementById("dl-input");
+      var submitBtn = document.getElementById("dl-submit");
+      var exampleLink = document.getElementById("dl-example-link");
+      var exampleTry = document.getElementById("dl-example-try");
+      var toastEl = document.getElementById("dl-toast");
+      var hero = document.getElementById("dl-hero");
+      var coverEl = document.getElementById("dl-cover");
+      var titleEl = document.getElementById("dl-title");
+      var artistEl = document.getElementById("dl-artist");
+      var dlSection = document.getElementById("dl-download-section");
+      var mp3Btn = document.getElementById("dl-mp3-btn");
+      var mp3Sub = document.getElementById("dl-mp3-sub");
+
+      var procOverlay = document.getElementById("dl-processing");
+      var procTitle = document.getElementById("dl-processing-title");
+      var procStage = document.getElementById("dl-processing-stage");
+      var procBar = document.getElementById("dl-processing-bar");
+      var procDetail = document.getElementById("dl-processing-detail");
+      var procErrorCopy = document.getElementById("dl-processing-error-copy");
+      var procRetry = document.getElementById("dl-processing-retry");
+      var procCancel = document.getElementById("dl-processing-cancel");
+
+      var currentId = "";
+      var currentTitle = "";
+      var currentArtist = "";
+      var currentTags = "";
+      var currentLyrics = "";
+      var currentCoverUrl = "";
+      var currentVideoUrl = "";
+      var currentDuration = 0;
+      var currentPublic = null;
+      var currentStatus = null;
+
+      var decodedAudioId = "";
+      var decodedAudioBlob = null;
+      var decodedAudioPromise = null;
+      var decodedAudioCtrl = null;
+      var mp3BlobCache = null;
+      var mp3PromiseCache = null;
+      var metaCtrl = null;
+      var lookupInProgress = false;
+      var toastTimer = null;
+
+      function showToast(msg, isError) {
+        if (!toastEl || !msg) return;
+        if (toastTimer) clearTimeout(toastTimer);
+        toastEl.textContent = msg;
+        toastEl.classList.remove("is-error", "is-visible");
+        if (isError) toastEl.classList.add("is-error");
+        requestAnimationFrame(function () {
+          toastEl.classList.add("is-visible");
+        });
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove("is-visible");
+        }, 2800);
+      }
+
+      function extractSongId(raw) {
+        if (window.SunoParser && typeof window.SunoParser.extractId === "function") {
+          return window.SunoParser.extractId(raw);
+        }
+        var val = String(raw || "").trim();
+        if (UUID_RE.test(val)) return val.toLowerCase();
+        var m = val.match(/suno\.(?:com|ai)\/(?:song\/([0-9a-f-]{36})|s\/([A-Za-z0-9_-]+))/i);
+        if (!m) return "";
+        return m[1] ? m[1].toLowerCase() : "s:" + m[2];
+      }
+
+      function safeMp3Filename(title, id) {
+        var stem = "";
+        try {
+          if (window.UseSunoFilename && typeof window.UseSunoFilename.stem === "function") {
+            stem = window.UseSunoFilename.stem(title || "");
+          }
+        } catch (_) {}
+        if (!stem) {
+          stem = String(title || id || "suno-audio")
+            .replace(/[\\/:*?"<>|]+/g, "_")
+            .trim()
+            .slice(0, 80) || "suno-audio";
+        }
+        return stem + ".mp3";
+      }
+
+      function triggerBlobDownload(blob, filename) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+        }, 30000);
+      }
+
+      function resetAudioState() {
+        if (decodedAudioCtrl) decodedAudioCtrl.abort();
+        decodedAudioCtrl = null;
+        decodedAudioId = "";
+        decodedAudioBlob = null;
+        decodedAudioPromise = null;
+        mp3BlobCache = null;
+        mp3PromiseCache = null;
+        mp3Btn.classList.remove("is-saved");
+        mp3Btn.disabled = false;
+        mp3Sub.textContent = "MP3 音訊";
+      }
+
+      function openProcessingModal() {
+        procOverlay.classList.remove("dl-hidden", "is-error");
+        procOverlay.classList.add("is-indeterminate");
+        procTitle.textContent = "正在準備 MP3";
+        procStage.textContent = "解密與轉換音訊中…";
+        procDetail.textContent = "請保持此頁面開啟";
+        procBar.style.width = "40%";
+        procRetry.classList.add("dl-hidden");
+        procCancel.textContent = "取消";
+      }
+
+      function updateProcessingModal(stage, progress) {
+        if (procOverlay.classList.contains("dl-hidden") || procOverlay.classList.contains("is-error")) return;
+        var label = stage === "convert" ? "正在轉檔為 MP3"
+          : stage === "info" ? "正在寫入歌曲資訊"
+          : "正在準備音訊";
+        var pct = progress && progress.percent != null ? Math.max(0, Math.min(100, Math.round(progress.percent))) : null;
+        if (pct == null) {
+          procOverlay.classList.add("is-indeterminate");
+          procStage.textContent = label + "…";
+          procDetail.textContent = "請保持此頁面開啟";
+        } else {
+          procOverlay.classList.remove("is-indeterminate");
+          procBar.style.width = pct + "%";
+          procStage.textContent = label + " · " + pct + "%";
+          procDetail.textContent = pct + "%";
+        }
+      }
+
+      function showProcessingErrorModal(err) {
+        procOverlay.classList.remove("is-indeterminate");
+        procOverlay.classList.add("is-error");
+        procTitle.textContent = "MP3 下載失敗";
+        procErrorCopy.textContent = (err && err.message) ? err.message : "無法取得或轉換音訊，請確認歌曲為公開狀態並再試一次。";
+        procRetry.classList.remove("dl-hidden");
+        procCancel.textContent = "關閉";
+      }
+
+      function closeProcessingModal() {
+        procOverlay.classList.add("dl-hidden");
+        procOverlay.classList.remove("is-error", "is-indeterminate");
+      }
+
+      function setLookupLoading(loading) {
+        lookupInProgress = loading;
+        submitBtn.disabled = loading;
+        submitBtn.textContent = loading ? "解析中…" : "解析歌曲";
+        input.disabled = loading;
+        if (exampleTry) exampleTry.disabled = loading;
+      }
+
+      function renderSong(clip, fallbackId) {
+        currentId = (clip && clip.id) || fallbackId || "";
+        currentTitle = (clip && clip.title) || "";
+        currentArtist = (clip && (clip.display_name || clip.handle)) || "";
+        currentTags = (clip && clip.metadata && clip.metadata.tags) || "";
+        var prompt = (clip && clip.metadata && clip.metadata.prompt) || "";
+        currentLyrics = prompt.trim().toLowerCase() === "[instrumental]" ? "" : prompt.trim();
+        currentDuration = Number(clip && clip.metadata && clip.metadata.duration) || 0;
+        currentPublic = clip && typeof clip.is_public === "boolean" ? clip.is_public : null;
+        currentStatus = clip && typeof clip.status === "string" ? clip.status : null;
+
+        currentCoverUrl = window.SunoAudioDecoder && typeof window.SunoAudioDecoder.coverUrl === "function"
+          ? window.SunoAudioDecoder.coverUrl(currentId, clip && clip.image_url)
+          : "https://cdn2.suno.ai/image_" + currentId + ".jpeg";
+        currentVideoUrl = window.SunoAudioDecoder && typeof window.SunoAudioDecoder.videoUrl === "function"
+          ? window.SunoAudioDecoder.videoUrl("", clip && clip.video_url)
+          : "";
+
+        coverEl.src = currentCoverUrl;
+        coverEl.alt = currentTitle || "Suno 封面";
+        titleEl.textContent = currentTitle || ("歌曲 " + currentId.slice(0, 8));
+        artistEl.textContent = currentArtist ? "創作者：" + currentArtist : "";
+
+        hero.classList.remove("dl-hidden");
+        dlSection.classList.remove("dl-hidden");
+        resetAudioState();
+      }
+
+      async function loadSong(id) {
+        if (metaCtrl) metaCtrl.abort();
+        metaCtrl = new AbortController();
+        var signal = metaCtrl.signal;
+
+        if (!window.SunoParser || typeof window.SunoParser.fetchAndParse !== "function") {
+          showToast("解析元件尚未載入，請重新整理頁面。", true);
+          return;
+        }
+
+        setLookupLoading(true);
+        showToast("正在解析歌曲資訊…", false);
+        try {
+          var clip = window.UseSunoTrial
+            ? await window.UseSunoTrial.query(id, signal, function (resolved) {
+                return window.SunoParser.fetchAndParse(resolved || id, null, signal);
+              })
+            : await window.SunoParser.fetchAndParse(id, null, signal);
+          if (signal.aborted) return;
+          if (!clip || !UUID_RE.test(clip.id || "")) {
+            throw new Error("找不到有效的歌曲資訊");
+          }
+          renderSong(clip, clip.id);
+          showToast("解析完成，點擊「下載MP3」即可儲存。", false);
+        } catch (err) {
+          if (err && err.name === "AbortError") return;
+          if (UUID_RE.test(id)) {
+            renderSong(null, id);
+            showToast("請按「下載MP3」按鈕", true);
+          } else {
+            showToast("無法解析此網址，請確認是否為公開的 Suno 歌曲連結。", true);
+          }
+        } finally {
+          setLookupLoading(false);
+        }
+      }
+
+      async function ensureMp3Blob(onStageProgress) {
+        if (!currentId || currentId.indexOf(":") !== -1) {
+          throw new Error("尚未取得有效的歌曲編號");
+        }
+        if (!window.SunoAudioDecoder || typeof window.SunoAudioDecoder.getAudio !== "function") {
+          throw new Error("音訊解碼器未載入，請重新整理頁面。");
+        }
+        if (mp3BlobCache) return mp3BlobCache;
+        if (mp3PromiseCache) return mp3PromiseCache;
+
+        mp3PromiseCache = (async function () {
+          var original = decodedAudioBlob;
+          if (!original || decodedAudioId !== currentId) {
+            if (decodedAudioCtrl) decodedAudioCtrl.abort();
+            decodedAudioCtrl = new AbortController();
+            decodedAudioId = currentId;
+            original = await window.SunoAudioDecoder.getAudio(currentId, {
+              loadPublicVideo: function () {
+                return window.SunoPublicVideoLoader && typeof window.SunoPublicVideoLoader.ensureReady === "function"
+                  ? window.SunoPublicVideoLoader.ensureReady()
+                  : Promise.resolve();
+              },
+              songStatus: currentStatus,
+              videoUrl: currentVideoUrl,
+              expectedDuration: currentDuration,
+              isPublic: currentPublic,
+              signal: decodedAudioCtrl.signal,
+              onStage: function (stage) {
+                if (typeof onStageProgress === "function") onStageProgress(stage, { percent: null });
+              },
+              onProgress: function (p) {
+                if (typeof onStageProgress === "function") onStageProgress("decrypt", p);
+              }
+            });
+            decodedAudioBlob = original;
+          }
+
+          var mp3Blob = original;
+          if (original.type !== "audio/mpeg") {
+            if (!window.SunoAudioTranscoder || typeof window.SunoAudioTranscoder.toMp3 !== "function") {
+              throw new Error("MP3 轉檔器未載入，請重新整理頁面。");
+            }
+            mp3Blob = await window.SunoAudioTranscoder.toMp3(original, {
+              bitrate: 192,
+              signal: decodedAudioCtrl ? decodedAudioCtrl.signal : undefined,
+              onProgress: function (p) {
+                if (typeof onStageProgress === "function") onStageProgress("convert", p);
+              }
+            });
+          }
+
+          if (window.SunoAudioInfo && typeof window.SunoAudioInfo.attachMp3Tags === "function") {
+            if (typeof onStageProgress === "function") onStageProgress("info", { percent: null });
+            try {
+              mp3Blob = await window.SunoAudioInfo.attachMp3Tags(mp3Blob, {
+                songId: currentId,
+                title: currentTitle || currentId,
+                artist: currentArtist,
+                album: currentTitle || "Suno AI",
+                tags: currentTags,
+                lyrics: currentLyrics,
+                cover: currentCoverUrl
+              });
+            } catch (_) {
+              // 寫入標籤失敗時仍保留已轉出的 MP3
+            }
+          }
+
+          mp3BlobCache = mp3Blob;
+          return mp3Blob;
+        })().finally(function () {
+          mp3PromiseCache = null;
+        });
+
+        return mp3PromiseCache;
+      }
+
+      async function handleDownloadMp3() {
+        if (!currentId || mp3Btn.disabled) return;
+        mp3Btn.disabled = true;
+        mp3Sub.textContent = "準備中…";
+        openProcessingModal();
+
+        try {
+          var blob = await ensureMp3Blob(function (stage, progress) {
+            updateProcessingModal(stage, progress);
+            if (progress && progress.percent != null) {
+              mp3Sub.textContent = "處理中 " + Math.round(progress.percent) + "%";
+            }
+          });
+          var filename = safeMp3Filename(currentTitle, currentId);
+          triggerBlobDownload(blob, filename);
+          closeProcessingModal();
+          mp3Btn.classList.add("is-saved");
+          mp3Sub.textContent = "已下載：" + filename;
+          showToast("MP3 下載已開始", false);
+        } catch (err) {
+          closeProcessingModal();
+          mp3Btn.disabled = false;
+          mp3Sub.textContent = "MP3 音訊";
+          if (err && err.name === "AbortError") {
+            showToast("已取消下載", false);
+            return;
+          }
+          showProcessingErrorModal(err);
+          procOverlay.classList.remove("dl-hidden");
+        } finally {
+          if (!mp3Btn.classList.contains("is-saved")) {
+            mp3Btn.disabled = false;
+          }
+        }
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (lookupInProgress) return;
+        var id = extractSongId(input.value);
+        if (!id) {
+          showToast("請輸入有效的Suno歌曲網址", true);
+          return;
+        }
+        loadSong(id);
+      });
+
+      if (exampleTry && exampleLink) {
+        exampleTry.addEventListener("click", function () {
+          input.value = exampleLink.href;
+          loadSong(extractSongId(input.value));
+        });
+      }
+
+      mp3Btn.addEventListener("click", handleDownloadMp3);
+
+      procCancel.addEventListener("click", function () {
+        if (decodedAudioCtrl) decodedAudioCtrl.abort();
+        closeProcessingModal();
+      });
+
+      procRetry.addEventListener("click", function () {
+        mp3BlobCache = null;
+        mp3PromiseCache = null;
+        closeProcessingModal();
+        handleDownloadMp3();
+      });
+    })();
+  </script>
+</body>
+</html>
